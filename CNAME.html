@@ -304,6 +304,14 @@ border-left-color: #1E92FB;    /*左边框颜色*/
           
 
   
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
 
 
 
@@ -336,7 +344,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
                 alt="ComeOnJian" />
             
               <p class="site-author-name" itemprop="name">ComeOnJian</p>
-              <p class="site-description motion-element" itemprop="description">没有借口，永不放弃！！！</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -608,6 +616,47 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: window.location.pathname, 
+            owner: 'JianWenJun# MUST HAVE, Your Github ID',
+            repo: 'JianWenJun.github.io# MUST HAVE, The repo you use to store Gitment comments',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '55b329ed0db8709eb0ae0d1e87cfbbb6e67944b3# EITHER this or proxy_gateway, Github access secret token for the Gitment',
+            
+                client_id: 'd9bf427b4584fc428b0d# MUST HAVE, Github client id for the Gitment'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
 
 
 
