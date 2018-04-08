@@ -106,8 +106,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <meta property="og:image" content="https://img-blog.csdn.net/20180404153257771?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 <meta property="og:image" content="https://img-blog.csdn.net/20180404153554898?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 <meta property="og:image" content="https://img-blog.csdn.net/20180405132347303?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:image" content="https://img-blog.csdn.net/20180404152835462?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:updated_time" content="2018-04-08T06:58:50.000Z">
+<meta property="og:updated_time" content="2018-04-08T07:23:10.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">
 <meta name="twitter:description" content="前言1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: CART决策树的构建思想；集成学习中的Bagging思想；基于CART决策树的随机森林代码实现；随机森林不易过拟合的分析。(其中不易过拟合并不是说随机森林不会过拟合)1.2 本篇博客之前的一篇博客决策树相关算法——ID3、C4.5的详细说明及实现详细的记录了决策树的思想，概念及相关公式的详解，此篇博客">
@@ -451,7 +450,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <blockquote>
 <p>1.所有特征中随机选择部分特征，一定程度上降低了模型分类器的复杂程度。可能又会有疑问，随机选择的特征会把对label重要的特征给漏选了，对这一点上，重复进行了M次随机特征选择的构成一个由M个弱分类器的组合，这将不会使得重要的特征给遗漏掉。<br>2.从总数据集上随机选取一定数量的样本数据，我们都知道数据集上是存在数据噪音的，这也是造成模型容易过拟合的原因，从总数据集上随机选取一定数量的样本数据，将在一定程度上降低数据噪音的数量。</p>
 </blockquote>
-<h4 id="参考说明"><a href="#参考说明" class="headerlink" title="参考说明"></a>参考说明</h4><p>6.1《统计学习方法》——李航<br>6.2  <a href="https://blog.csdn.net/u014732537/article/details/79667599" target="_blank" rel="noopener">决策树相关算法——ID3、C4.5的详细说明及实现</a><br><img src="https://img-blog.csdn.net/20180404152835462?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="20%" height="20%" align="center" alt="公式3"> </p>
+<h4 id="参考说明"><a href="#参考说明" class="headerlink" title="参考说明"></a>参考说明</h4><p>6.1《统计学习方法》——李航<br>6.2  <a href="https://blog.csdn.net/u014732537/article/details/79667599" target="_blank" rel="noopener">决策树相关算法——ID3、C4.5的详细说明及实现</a></p>
 
       
     </div>
@@ -480,7 +479,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p><span>本文标题:</span><a href="/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/">决策树相关算法——Bagging之基于CART的随机森林详细说明与实现</a></p>
 <p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
 <p><span>发布时间:</span>2018年04月02日 - 11:04</p>
-<p><span>最后更新:</span>2018年04月08日 - 14:04</p>
+<p><span>最后更新:</span>2018年04月08日 - 15:04</p>
 <p><span>原始链接:</span><a href="/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/" title="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/</a>
 <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/"  aria-label="复制成功！"></i></span>
 </p>
