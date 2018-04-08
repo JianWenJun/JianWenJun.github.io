@@ -83,7 +83,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="决策树,Bagging,CART," />
 
 
 
@@ -94,16 +94,23 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-<meta name="description" content="没有借口，永不放弃！！！">
-<meta property="og:type" content="website">
-<meta property="og:title" content="小简铺子">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="1 前言1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: CART决策树的构建思想；集成学习中的Bagging思想；基于CART决策树的随机森林代码实现；随机森林不易过拟合的分析。(其中不易过拟合并不是说随机森林不会过拟合)1.2 本篇博客之前的一篇博客决策树相关算法——ID3、C4.5的详细说明及实现详细的记录了决策树的思想，概念及相关公式的详解，此篇">
+<meta name="keywords" content="决策树,Bagging,CART">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">
+<meta property="og:url" content="http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/index.html">
 <meta property="og:site_name" content="小简铺子">
-<meta property="og:description" content="没有借口，永不放弃！！！">
+<meta property="og:description" content="1 前言1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: CART决策树的构建思想；集成学习中的Bagging思想；基于CART决策树的随机森林代码实现；随机森林不易过拟合的分析。(其中不易过拟合并不是说随机森林不会过拟合)1.2 本篇博客之前的一篇博客决策树相关算法——ID3、C4.5的详细说明及实现详细的记录了决策树的思想，概念及相关公式的详解，此篇">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://img-blog.csdn.net/20180404152835462?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180404153257771?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180404153554898?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180405132347303?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:updated_time" content="2018-04-08T03:47:09.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="小简铺子">
-<meta name="twitter:description" content="没有借口，永不放弃！！！">
+<meta name="twitter:title" content="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">
+<meta name="twitter:description" content="1 前言1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: CART决策树的构建思想；集成学习中的Bagging思想；基于CART决策树的随机森林代码实现；随机森林不易过拟合的分析。(其中不易过拟合并不是说随机森林不会过拟合)1.2 本篇博客之前的一篇博客决策树相关算法——ID3、C4.5的详细说明及实现详细的记录了决策树的思想，概念及相关公式的详解，此篇">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20180404152835462?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTQ3MzI1Mzc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 
 
 
@@ -133,13 +140,13 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/"/>
 
 
 
 
 
-  <title>小简铺子</title>
+  <title>决策树相关算法——Bagging之基于CART的随机森林详细说明与实现 | 小简铺子</title>
   
 
 
@@ -158,8 +165,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
     <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
     
@@ -265,191 +271,9 @@ border-left-color: #1E92FB;    /*左边框颜色*/
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/07/自我修养一/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ComeOnJian">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/me.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="小简铺子">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/07/自我修养一/" itemprop="url">自我修养一</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-07T20:10:00+08:00">
-                2018-04-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/程序人生/" itemprop="url" rel="index">
-                    <span itemprop="name">程序人生</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  1,536
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  5
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>都说清明时节雨纷纷，然而今天的广州却没有下一丝细雨，一个人坐在实验室中时不时能感受到窗外微风拂过带来的凉爽。听着歌，码着代码，突然感慨万千，想着记录一下吧，毕竟此时此刻此想不常有。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/04/07/自我修养一/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-    <div>
-    
-    </div>
-    <div>
-    
-</div>
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
 
   
 
@@ -479,9 +303,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/" itemprop="url">决策树相关算法——Bagging之基于CART的随机森林详细说明与实现</a></h1>
+          <h1 class="post-title" itemprop="name headline">决策树相关算法——Bagging之基于CART的随机森林详细说明与实现</h1>
         
 
         <div class="post-meta">
@@ -584,9 +406,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
       
 
       
-        
-          
-            <h4 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h4><p>1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: <strong>CART决策树的构建思想</strong>；<strong>集成学习中的Bagging思想</strong>；<strong>基于CART决策树的随机森林代码实现</strong>；<strong>随机森林不易过拟合的分析</strong>。(其中不易过拟合并不是说随机森林不会过拟合)<br>1.2 本篇博客之前的一篇博客<a href="https://blog.csdn.net/u014732537/article/details/79667599" target="_blank" rel="noopener">决策树相关算法——ID3、C4.5的详细说明及实现</a>详细的记录了决策树的思想，概念及相关公式的详解，此篇博客便不做雷同叙述。</p>
+        <h4 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h4><p>1.1 本篇博客主要记录的是基于CART决策树实现的随机森林算法，主要是从以下四个方面介绍: <strong>CART决策树的构建思想</strong>；<strong>集成学习中的Bagging思想</strong>；<strong>基于CART决策树的随机森林代码实现</strong>；<strong>随机森林不易过拟合的分析</strong>。(其中不易过拟合并不是说随机森林不会过拟合)<br>1.2 本篇博客之前的一篇博客<a href="https://blog.csdn.net/u014732537/article/details/79667599" target="_blank" rel="noopener">决策树相关算法——ID3、C4.5的详细说明及实现</a>详细的记录了决策树的思想，概念及相关公式的详解，此篇博客便不做雷同叙述。</p>
 <h4 id="2-CART决策树的构建思想"><a href="#2-CART决策树的构建思想" class="headerlink" title="2 CART决策树的构建思想"></a>2 CART决策树的构建思想</h4><h5 id="2-1-CART与ID3和C4-5的一些小差异"><a href="#2-1-CART与ID3和C4-5的一些小差异" class="headerlink" title="2.1 CART与ID3和C4.5的一些小差异"></a>2.1 CART与ID3和C4.5的一些小差异</h5><blockquote>
 <p>1.CART决策树构建的是二叉树，而通过ID3和C4.5算法构建的是多叉树。<br>2.CART可用于回归预测和分类问题， ID3和C4.5的决策树一般来说用于分类问题。<br>3.CART与ID3和C4.5都是不断特征空间进行划分，构建成一颗划分特征空间的树。<code>构造决策树方式有两点不同：</code><br><code>第一点，特征选择的方式不一样。</code>ID3和C4.5分别是根据信息增益和信息增益比选择特征，再根据特征的所有特征值划分为多个子树。CART分类问题中是根据Gini系数在某个特征取某个值时候得大小进行特征选择和特征值选择。CART回归问题是根据最小化预测误差(平方误差)来进行进行特征选择和特征值选择。<br><code>第二点，特征空间划分的方式不一样。</code>ID3和C4.5选择某个特征划分后，该特征便不再参与接下来的子树的特征选择划分，最后生成的决策树是局部最优的，采取的贪心的思想。CART是根据某个指标(预测误差或Gini系数)最优寻找最优特征划分点和最优特征划分值，来不断二分特征空间。</p>
 </blockquote>
@@ -621,8 +441,6 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 </blockquote>
 <h4 id="6-参考说明"><a href="#6-参考说明" class="headerlink" title="6 参考说明"></a>6 参考说明</h4><p>6.1《统计学习方法》——李航<br>6.2  <a href="https://blog.csdn.net/u014732537/article/details/79667599" target="_blank" rel="noopener">决策树相关算法——ID3、C4.5的详细说明及实现</a></p>
 
-          
-        
       
     </div>
     
@@ -630,8 +448,47 @@ border-left-color: #1E92FB;    /*左边框颜色*/
     
     <div>
     
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
     </div>
     <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/">决策树相关算法——Bagging之基于CART的随机森林详细说明与实现</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年04月02日 - 11:04</p>
+<p><span>最后更新:</span>2018年04月08日 - 11:04</p>
+<p><span>原始链接:</span><a href="/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/" title="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://yoursite.com/2018/04/02/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
     
 </div>
     
@@ -642,14 +499,40 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
     <footer class="post-footer">
       
-
+        <div class="post-tags">
+          
+            <a href="/tags/决策树/" rel="tag"><i class="fa fa-tag"></i> 决策树</a>
+          
+            <a href="/tags/Bagging/" rel="tag"><i class="fa fa-tag"></i> Bagging</a>
+          
+            <a href="/tags/CART/" rel="tag"><i class="fa fa-tag"></i> CART</a>
+          
+        </div>
       
 
       
+      
+      
 
       
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/07/自我修养一/" rel="prev" title="自我修养一">
+                自我修养一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
-        <div class="post-eof"></div>
+
+      
       
     </footer>
   </div>
@@ -659,10 +542,11 @@ border-left-color: #1E92FB;    /*左边框颜色*/
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -670,6 +554,10 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
           
+
+  
+
+
 
         </div>
         
@@ -690,8 +578,17 @@ border-left-color: #1E92FB;    /*左边框颜色*/
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -777,6 +674,22 @@ border-left-color: #1E92FB;    /*左边框颜色*/
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-前言"><span class="nav-number">1.</span> <span class="nav-text">1 前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-CART决策树的构建思想"><span class="nav-number">2.</span> <span class="nav-text">2 CART决策树的构建思想</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-CART与ID3和C4-5的一些小差异"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 CART与ID3和C4.5的一些小差异</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-Sklearn中CART的实现解读"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Sklearn中CART的实现解读</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-集成学习中的Bagging思想"><span class="nav-number">3.</span> <span class="nav-text">3 集成学习中的Bagging思想</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1集成学习概述"><span class="nav-number">3.1.</span> <span class="nav-text">3.1集成学习概述</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-Bagging-Bootstrap-aggregating-再采样"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Bagging(Bootstrap aggregating)再采样</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-Boosting提升方法"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 Boosting提升方法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-随机森林不易过拟合的分析"><span class="nav-number">4.</span> <span class="nav-text">5 随机森林不易过拟合的分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-参考说明"><span class="nav-number">5.</span> <span class="nav-text">6 参考说明</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -931,6 +844,10 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
