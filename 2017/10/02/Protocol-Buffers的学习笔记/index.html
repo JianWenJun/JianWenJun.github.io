@@ -554,7 +554,8 @@ showConfirmButton: true
   
     <div class="comments" id="comments">
       
-        <div id="gitment-container"></div>
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
       
     </div>
 
@@ -913,15 +914,19 @@ showConfirmButton: true
             oauth: {
             
             
-                client_secret: '55b329ed0db8709eb0ae0d1e87cfbbb6e67944b3# EITHER this or proxy_gateway, Github access secret token for the Gitment',
+                client_secret: '55b329ed0db8709eb0ae0d1e87cfbbb6e67944b3',
             
-                client_id: 'd9bf427b4584fc428b0d# MUST HAVE, Github client id for the Gitment'
+                client_id: 'd9bf427b4584fc428b0d'
             }});
         gitment.render('gitment-container');
       }
 
       
-      renderGitment();
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
       
       </script>
     
