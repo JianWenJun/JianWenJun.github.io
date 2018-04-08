@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="决策树,机器学习,分类问题," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本篇博客记录的是使用python实现两个个决策树相关的算法模型—— ID3、C4.5。其中训练模型使用的数据集是Adult。尽管Sklearn包中都有这些算法的实现，但是自身根据算法思路实现一遍也是美滋滋的，其中酸甜自知(话说可以提高一定的代码编写能力和调试程序的能力)，GitHub详细代码实现地址。">
+<meta name="keywords" content="决策树,机器学习,分类问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树相关算法——ID3、C4.5的详细说明及实现">
+<meta property="og:url" content="http://yoursite.com/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="前言本篇博客记录的是使用python实现两个个决策树相关的算法模型—— ID3、C4.5。其中训练模型使用的数据集是Adult。尽管Sklearn包中都有这些算法的实现，但是自身根据算法思路实现一遍也是美滋滋的，其中酸甜自知(话说可以提高一定的代码编写能力和调试程序的能力)，GitHub详细代码实现地址。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-75d47971ae390c70.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-3e2b03b948ab999b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-8c3d4aed3326a213.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-6ea215ad4bc2d9f0.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-82a85951bcf86789.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-459737b8b8de407d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-4adafaa9a23451f2.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-c56a0114a542d212.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-6e683d00b3bbad3a.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-948e31eb0299340f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-97bb7440f78b7750.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-8ebb370d11cb3d3d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-e89da875040b70e2.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-7345db7105c8ef3c.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-44a837e2d210675f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-2995ff38be8de57e.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-5f29f2a46550c28b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2447722-6dc6c7b5d2af4787.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-04-08T12:03:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树相关算法——ID3、C4.5的详细说明及实现">
+<meta name="twitter:description" content="前言本篇博客记录的是使用python实现两个个决策树相关的算法模型—— ID3、C4.5。其中训练模型使用的数据集是Adult。尽管Sklearn包中都有这些算法的实现，但是自身根据算法思路实现一遍也是美滋滋的，其中酸甜自知(话说可以提高一定的代码编写能力和调试程序的能力)，GitHub详细代码实现地址。">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/2447722-75d47971ae390c70.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/"/>
+
+
+
+
+
+  <title>决策树相关算法——ID3、C4.5的详细说明及实现 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/JianWenJun"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Star me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">决策树相关算法——ID3、C4.5的详细说明及实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-02T22:08:57+08:00">
+                2018-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/" class="leancloud_visitors" data-flag-title="决策树相关算法——ID3、C4.5的详细说明及实现">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,178
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  17 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>本篇博客记录的是使用<code>python</code>实现两个个决策树相关的算法模型—— ID3、C4.5。其中训练模型使用的数据集是<a href="http://archive.ics.uci.edu/ml/datasets/Adult" target="_blank" rel="noopener">Adult</a>。尽管Sklearn包中都有这些算法的实现，但是自身根据算法思路实现一遍也是美滋滋的，其中酸甜自知(话说可以提高一定的代码编写能力和调试程序的能力)，<a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/DecisionTree/decision_tree.py" target="_blank" rel="noopener">GitHub详细代码实现地址</a>。</p>
+<a id="more"></a>
+<h4 id="1-实现前期准备工作-——-what"><a href="#1-实现前期准备工作-——-what" class="headerlink" title="1.实现前期准备工作 —— what"></a>1.实现前期准备工作 —— what</h4><h5 id="1-1决策树的主要思想"><a href="#1-1决策树的主要思想" class="headerlink" title="1.1决策树的主要思想"></a>1.1决策树的主要思想</h5><blockquote>
+<p><code>决策树</code>是<code>基于特征</code>对实例(sample)进行分类模型，可以理解为给定特征条件下类的条件概率分布。<code>要进行分类的样本</code>即给定的特征值，<code>要预测出的label</code> 即在给定特征值条件类的概率最大——所属的类。决策树此时充当划分特征空间的一种方式。特征空间的维数为数据集的特征个数。经过ID3或C45算法将特征空间进行划分，并且划分后的每个特征空间区间对应着发生概率最大的类别label。属于<code>count-based</code>型。<code>决策树的叶结点表示数据集中的类label,内部结点表示选择划分的特征。</code></p>
+</blockquote>
+<h5 id="1-2不得不知的概念"><a href="#1-2不得不知的概念" class="headerlink" title="1.2不得不知的概念"></a>1.2不得不知的概念</h5><p>声明：下面是摘抄的(<a href="https://blog.csdn.net/bitcarmanlee/article/details/51488204" target="_blank" rel="noopener">笔记</a>)来自其他博客<br><code>熵：</code>随机变量不确定性的度量，熵越大，不确定性越高。</p>
+<blockquote>
+<p>设<code>X</code>是一个取有限个值的离散随机变量，其概率分布为：<br><img src="https://upload-images.jianshu.io/upload_images/2447722-75d47971ae390c70.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="40%" height="40%" align="center" alt="公式1"><br>则随机变量X的熵的定义为：<br><img src="https://upload-images.jianshu.io/upload_images/2447722-3e2b03b948ab999b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="27%" height="27%" align="center" alt="公式2"> </p>
+</blockquote>
+<p><code>条件熵：</code>表示已知随机变量X的条件下随机变量Y的不确定性——H(Y|X)</p>
+<blockquote>
+<p>H(Y|X)即X给定条件下Y的条件概率分布的熵对X的数学期望。<br><img src="https://upload-images.jianshu.io/upload_images/2447722-8c3d4aed3326a213.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式3"><br>其中p(x)表示X= x发生的概率</p>
+</blockquote>
+<p><code>信息增益：</code>一般为特征选择的方式常用的还有卡方检验，交叉熵，信息增益——G(D,A)表示由选择特征A而使得对数据集分类的不确定性减少的程度，减少的越多，数据集分类的不确定性越低。表示特征A对数据集D 分类影响效果越好。</p>
+<blockquote>
+<p><img src="https://upload-images.jianshu.io/upload_images/2447722-6ea215ad4bc2d9f0.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="28%" height="28%" align="center" alt="公式4"><br>其中H(D)表示数据集label类别的熵即每个label取不同类别的值的时候得不确定性。<br>其中H(D|A)表示在选择特征A的条件下，数据集label类别的熵。<br>此时也可以表示类别label与特征的互信息<br>在<code>决策树中公式的应用</code>：<br><img src="https://upload-images.jianshu.io/upload_images/2447722-82a85951bcf86789.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="25%" height="28%" align="center" alt="公式2"><br><img src="https://upload-images.jianshu.io/upload_images/2447722-459737b8b8de407d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>其中对于样本集合D来说，随机变量X是样本的类别，即，假设样本有k个类别，每个类别的概率是|Ck|/|D|，其中|Ck|表示类别k的样本个数，|D|表示样本总数</p>
+</blockquote>
+<p><code>信息增益比：</code>信息增益偏向于选择取值较多的特征。在面对连续的数据（如体重、身高、年龄、距离等），或者每列数据没有明显的类别之分（最极端的例子的该列所有数据都独一无二），在这种情况下对于一个特征它的取值越多，根据此特征划分更容易得到类别更少的子数据集。<code>原因是特征的取值越多，此时H(D|A)的值越小，信息增益就越大，所以特征选择时越容易被选。</code>H(D|A)偏小的原因可根据上面公式<code>H(D|A)</code>的由来来推理。针对这一问题使用信息增益比这一指标对信息增益进行校正。</p>
+<blockquote>
+<p><code>信息增益比 = 惩罚参数 * 信息增益</code><br><img src="https://upload-images.jianshu.io/upload_images/2447722-4adafaa9a23451f2.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="25%" height="28%" align="center" alt="公式2"><br><img src="https://upload-images.jianshu.io/upload_images/2447722-c56a0114a542d212.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>其中<code>惩罚参数</code>为HA(D)的倒数,即上式子中的Info的倒数,<code>注意Info的计算和H(D|A)的为不同计算公式获得的</code><br>当某个特征对应的取值偏多时，Info计算后偏大，取倒数后为偏小，即惩罚参数为偏小，而信息增益比 = 惩罚参数 * 信息增益，即对信息增益进行了一定程度上的惩罚。</p>
+</blockquote>
+<p><code>Gini系数：</code>表示在样本集合中一个随机选中的样本被分错的概率。在CART算法中，分类树用基尼指数选择最优特征，决定在特征空间中选取哪一维的特征进行最优二分值切分。</p>
+<blockquote>
+<p><img src="https://upload-images.jianshu.io/upload_images/2447722-6e683d00b3bbad3a.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>其中pk表示选中的样本属于k类别的概率，则这个样本被分错的概率是(1-pk)<br>设样本集合中有K个类别，一个随机选中的样本可以属于这k个类别中的任意一个，因而对类别就加和<br><img src="https://upload-images.jianshu.io/upload_images/2447722-948e31eb0299340f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>上式为样本集合D的Gini指数计算，其中Ck表示D中属于第K类的样本子集，K是数据集Label中的类别个数。<br><img src="https://upload-images.jianshu.io/upload_images/2447722-97bb7440f78b7750.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>Gini(D,A)表示在特征A的条件下，集合D的基尼指数。<br>因为CART算法中构造的树是二叉树，所有二叉树根据特征A划分的特征空间后的两个子集为D1,D2.<br>其中<code>Gini(D)</code>表示数据集D的不确定性,<code>Gini(D,A)</code>表示经过A=a分割后数据集D的不确定性。所以进行特征选择的时候选择<code>Gini(D)-Gini(D,A)</code>较大的。</p>
+</blockquote>
+<h5 id="1-3决策树的主要步骤及原因"><a href="#1-3决策树的主要步骤及原因" class="headerlink" title="1.3决策树的主要步骤及原因"></a>1.3决策树的主要步骤及原因</h5><blockquote>
+<p><code>特征选择</code>,特征的选择需要根据数据集的特点进行选择，有信息增益、信息增益比、Gini指数。即如何划分特征空间。<br><code>决策树的生成</code>,根据特征选择的算法，对数据集进行递归的生成树。<br><code>决策树的修剪</code>,由于递归生成的决策树对训练数据分类准确，但对未知的测试数据却不再那么准确，也就是泛化能力较弱，过于拟合训练数据。此时需要对生成的复杂决策树进行简化处理，从而让拟合状态变成正常化状态。</p>
+</blockquote>
+<h4 id="2具体实现过程-——-How"><a href="#2具体实现过程-——-How" class="headerlink" title="2具体实现过程 —— How"></a>2具体实现过程 —— How</h4><h5 id="Step1-数据前期准备工作"><a href="#Step1-数据前期准备工作" class="headerlink" title="Step1 数据前期准备工作"></a>Step1 数据前期准备工作</h5><p><strong>数据集说明：</strong> 本次实验选取的数据集是Adult,下图是该数据集的一些说明。考虑到使用的是决策树分类模型，还需要对数据集进行详细的分析。<br><img src="https://upload-images.jianshu.io/upload_images/2447722-8ebb370d11cb3d3d.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="数据集"><br><strong>数据集详细分析</strong><br>由于Mark表格问题，此处是截取的<code>zxhohai</code>博主的数据集属性说明图。<br><img src="https://upload-images.jianshu.io/upload_images/2447722-e89da875040b70e2.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="这里写图片描述"></p>
+<blockquote>
+<p>从下载的<code>Adult数据集说明文件adult.name</code>中能看出，数据集中包含8个离散型特征，6个连续性属性特征。<br>离散型特征8个：<code>workclass</code>有8个取值；<code>education</code>有16个取值；<code>marital-status</code>7个取值；<code>occupation</code>有14个取值；<code>relationship</code>有6个取值；<code>race</code>有5个取值；<code>sex</code>有两个取值；<code>native-country</code>有41个取值。<br>连续性特征6个。</p>
+</blockquote>
+<p><strong>对连续特征的处理</strong><br>由于连续型特征取值较多，一方面ID3算法更偏向于选择取值较多的特征，另一方面，当选择该特征进行划分的时候，容易造成决策树深度较浅分支较多的问题，从而带来严重的过拟合问题。所以<code>需要对连续型特征进行分段离散处理</code>。</p>
+<blockquote>
+<p><code>具体如何进行分段离散处理???</code>—— C4.5和ID3的决策树是支持多叉树的形式的，而CART是只支持二叉树。<br>处理方式，将连续型特征的取值按照从小到大的顺序排列，然后按顺序两两之间取中点Qi<br>计算该特征取Qi值后的数据集的信息增益，取信息增益率最大的为切分点。切分点Qi,&lt;=Qi为左支树，&gt;Qi为右支树。<br>对于离散特征的取值超过一定数目的特征，也可以对取值再次分段离散处理。</p>
+</blockquote>
+<h5 id="Step2-数据处理"><a href="#Step2-数据处理" class="headerlink" title="Step2 数据处理"></a>Step2 数据处理</h5><p><strong>数据的导入和缺失值，重复值处理</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data</span><span class="params">(flods,remove_unKnowValue=True,remove_duplicates=True)</span>:</span></span><br><span class="line">adult_train_df = pd.read_table(flods[<span class="number">0</span>], header=<span class="keyword">None</span> ,sep=<span class="string">', '</span>,converters=&#123;<span class="number">14</span>:adult_type&#125;,</span><br><span class="line">names=[<span class="string">'age'</span>, <span class="string">'workclass'</span>, <span class="string">'fnlwgt'</span>, <span class="string">'education'</span>, <span class="string">'education-num'</span>, <span class="string">'marital-status'</span>,</span><br><span class="line"><span class="string">'occupation'</span>,<span class="string">'relationship'</span>, <span class="string">'race'</span>, <span class="string">'sex'</span>, <span class="string">'capital-gain'</span>, <span class="string">'capital-loss'</span>,</span><br><span class="line"><span class="string">'hours-per-week'</span>, <span class="string">'native-country'</span>,<span class="string">'label'</span>],engine=<span class="string">'python'</span>)</span><br><span class="line"></span><br><span class="line">adult_test_df = pd.read_table(flods[<span class="number">1</span>], header=<span class="keyword">None</span>, sep=<span class="string">', '</span>, converters=&#123;<span class="number">14</span>: adult_type&#125;,</span><br><span class="line">names=[<span class="string">'age'</span>, <span class="string">'workclass'</span>, <span class="string">'fnlwgt'</span>, <span class="string">'education'</span>, <span class="string">'education-num'</span>, <span class="string">'marital-status'</span>,</span><br><span class="line"><span class="string">'occupation'</span>, <span class="string">'relationship'</span>, <span class="string">'race'</span>, <span class="string">'sex'</span>, <span class="string">'capital-gain'</span>, <span class="string">'capital-loss'</span>,</span><br><span class="line"><span class="string">'hours-per-week'</span>, <span class="string">'native-country'</span>, <span class="string">'label'</span>], engine=<span class="string">'python'</span>)</span><br><span class="line"><span class="comment"># 打乱data中样本的顺序</span></span><br><span class="line"><span class="comment"># adult_train_df = shuffle(adult_train_df)</span></span><br><span class="line">adult_train_df = adult_train_df.sample(frac=<span class="number">1</span>).reset_index(drop=<span class="keyword">True</span>)</span><br><span class="line"><span class="comment"># adult_test_df = shuffle(adult_test_df)</span></span><br><span class="line">adult_test_df = adult_test_df.sample(frac=<span class="number">1</span>).reset_index(drop=<span class="keyword">True</span>)</span><br><span class="line">print(<span class="string">'init shape train-test ================='</span>)</span><br><span class="line">print(adult_train_df.shape)</span><br><span class="line">print(adult_test_df.shape)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 移除df中重复的值</span></span><br><span class="line"><span class="keyword">if</span> remove_duplicates:</span><br><span class="line">adult_train_df.drop_duplicates(inplace=<span class="keyword">True</span>)</span><br><span class="line">adult_test_df.drop_duplicates(inplace=<span class="keyword">True</span>)</span><br><span class="line">print(<span class="string">'delete duplicates shape train-test ================='</span>)</span><br><span class="line">print(adult_train_df.shape)</span><br><span class="line">print(adult_test_df.shape)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 移除df中缺失的值</span></span><br><span class="line"><span class="keyword">if</span> remove_unKnowValue:</span><br><span class="line">adult_train_df.replace([<span class="string">'?'</span>],np.NaN,inplace=<span class="keyword">True</span>)</span><br><span class="line">adult_test_df.replace([<span class="string">'?'</span>],np.NaN,inplace=<span class="keyword">True</span>)</span><br><span class="line">adult_train_df.dropna(inplace=<span class="keyword">True</span>)</span><br><span class="line">adult_test_df.dropna(inplace=<span class="keyword">True</span>)</span><br><span class="line">print(<span class="string">'delete unKnowValues shape train-test ================='</span>)</span><br><span class="line">print(adult_train_df.shape)</span><br><span class="line">print(adult_test_df.shape)</span><br><span class="line"></span><br><span class="line">print(<span class="string">'last shape train-test ================='</span>)</span><br><span class="line">print(adult_train_df.shape)</span><br><span class="line">print(adult_test_df.shape)</span><br><span class="line"><span class="comment">#此处为离散处理</span></span><br><span class="line"><span class="comment"># ......(后面单独列出)</span></span><br><span class="line"><span class="comment"># 构造训练和测试数据	</span></span><br><span class="line">train_data_x = np.array(adult_train_df.iloc[:,<span class="number">0</span>:<span class="number">14</span>])</span><br><span class="line">train_data_y = np.array(adult_train_df.iloc[:,<span class="number">14</span>:])</span><br><span class="line"></span><br><span class="line">test_data_x = np.array(adult_test_df.iloc[:, <span class="number">0</span>:<span class="number">14</span>])</span><br><span class="line">test_data_y = np.array(adult_test_df.iloc[:, <span class="number">14</span>:])</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> train_data_x,train_data_y,test_data_x,test_data_y</span><br></pre></td></tr></table></figure></p>
+<p><strong>查看连续型数据的分布情况</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#例如年纪</span></span><br><span class="line">age_ser = adult_train_df[<span class="string">'age'</span>].value_counts(sort=<span class="keyword">False</span>).sort_index()</span><br><span class="line"><span class="comment"># age_ser</span></span><br><span class="line">age_ser.plot(kind=<span class="string">'bar'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></p>
+<p><strong>连续型特征数据处理</strong><br>此处为ID3和C45的处理方式的一般方式，而CART算法处理方式为不停的二分离散特征。<code>主要区别</code>为ID3和C45在选取某个特征进行划分后，接下来的子树便不再使用该特征进行划分了，而CART是不断的二分离散特征，即将特征的取值二分化后，对每个子区域再次选择最优特征和最优划分点。<br>当然对于此处的ID3和C45算法也可以选择用其他划分方法，可以多划分几段。而CART则必须分为二段。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">divide_feature_value</span><span class="params">(series,D)</span>:</span></span><br><span class="line"><span class="comment">#series为要处理的特征Series</span></span><br><span class="line"><span class="comment">#D 为数据集的label</span></span><br><span class="line">sets = set(series)</span><br><span class="line">mid_value = []</span><br><span class="line">a = float(sets.pop())</span><br><span class="line"><span class="comment">#取相邻点的中值</span></span><br><span class="line"><span class="keyword">for</span> par <span class="keyword">in</span> sets:</span><br><span class="line">a = (a + par) / <span class="number">2.0</span></span><br><span class="line">mid_value.append(a)</span><br><span class="line">a = float(par)</span><br><span class="line">max_divide = mid_value[<span class="number">0</span>]</span><br><span class="line">max_ent = <span class="number">0.0</span></span><br><span class="line">ent_d = calc_ent(D)</span><br><span class="line"><span class="comment">#查找最好的分裂点</span></span><br><span class="line"><span class="keyword">for</span> mid <span class="keyword">in</span> mid_value:</span><br><span class="line">Q1 = D[series &lt; mid]</span><br><span class="line">Q2 = D[series &gt;= mid]</span><br><span class="line">D_length = float(D.shape[<span class="number">0</span>])</span><br><span class="line">Q1_length = Q1.shape[<span class="number">0</span>]</span><br><span class="line">Q2_length = D_length - Q1_length</span><br><span class="line"><span class="comment">#条件熵</span></span><br><span class="line">H_Q_D = Q1_length / D_length * calc_ent(Q1) + Q2_length / D_length * calc_ent(Q2)</span><br><span class="line">H = ent_d - H_Q_D</span><br><span class="line"><span class="keyword">if</span>(H &gt; max_ent):</span><br><span class="line">max_ent = H</span><br><span class="line">max_divide = mid</span><br><span class="line"><span class="keyword">return</span> max_divide</span><br><span class="line"><span class="comment">#使用,对其他六个特征同样使用</span></span><br><span class="line">D = np.array(adult_train_df[<span class="string">'label'</span>]).reshape(adult_train_df.shape[<span class="number">0</span>], <span class="number">1</span>)</span><br><span class="line">age_div = divide_feature_value(adult_train_df[<span class="string">'age'</span>],D)</span><br><span class="line">mask1 = adult_train_df[<span class="string">'age'</span>] &gt;= age_div</span><br><span class="line">mask2 = adult_train_df[<span class="string">'age'</span>] &lt; age_div</span><br><span class="line">adult_train_df[<span class="string">'age'</span>][mask1]=<span class="number">1</span></span><br><span class="line">adult_train_df[<span class="string">'age'</span>][mask1]=<span class="number">2</span></span><br></pre></td></tr></table></figure></p>
+<h5 id="Step3-特征选择"><a href="#Step3-特征选择" class="headerlink" title="Step3 特征选择"></a>Step3 特征选择</h5><p>此处将ID3和C45算法重构为一个模板，只需要传入一个特征选择的select_func的函数名即可调用。<br>其中ID3是<code>选择信息增益最大</code>的特征进行划分；而C45是<code>选择信息增益比最大</code>的特征进行划分。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#ID3或C45</span><br><span class="line">def _select_feature(self,X,y,feature_list,select_func):</span><br><span class="line">ent_gain_max = 0.0</span><br><span class="line">ent_max_feature_index = 0</span><br><span class="line">for feature in feature_list:</span><br><span class="line">A = X[:,feature]</span><br><span class="line">D = y</span><br><span class="line">ent_gain = select_func(A,D)</span><br><span class="line">if(ent_gain &gt; ent_gain_max):</span><br><span class="line">ent_gain_max = ent_gain</span><br><span class="line">ent_max_feature_index = feature</span><br><span class="line"></span><br><span class="line">return ent_gain_max,ent_max_feature_index</span><br><span class="line">#使用方式</span><br><span class="line">select_func = calc_ent_gain /select_func = calc_ent_gain_rate #特征选择函数设置</span><br><span class="line">ent_gain_max, ent_max_feature_index = self._select_feature(X,y,feature_list,select_func)</span><br></pre></td></tr></table></figure></p>
+<h5 id="Step4-递归创建生成树-自上而下的创建的"><a href="#Step4-递归创建生成树-自上而下的创建的" class="headerlink" title="Step4 递归创建生成树(自上而下的创建的)"></a>Step4 递归创建生成树(自上而下的创建的)</h5><h5 id="ID3和C45算法思想-网上截图"><a href="#ID3和C45算法思想-网上截图" class="headerlink" title="ID3和C45算法思想(网上截图)"></a>ID3和C45算法思想(网上截图)</h5><p><img src="https://upload-images.jianshu.io/upload_images/2447722-7345db7105c8ef3c.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="算法"><br>实现1-构造决策树的结点：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span><span class="params">()</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">树节点类</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line"><span class="comment">#叶子结点需要的属性</span></span><br><span class="line"></span><br><span class="line">self.type = <span class="number">-1</span>  <span class="comment"># 结点的类型label-类标记</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#非叶子结点需要的属性</span></span><br><span class="line">self.next_nodes = []  <span class="comment"># 该结点指向的下一层结点</span></span><br><span class="line">self.feature_index = <span class="number">-1</span> <span class="comment">#该结点对应的特征编号</span></span><br><span class="line"><span class="comment"># self.feature_value = 0 #该结点划分的特征取值</span></span><br><span class="line">self.select_value = <span class="number">0</span> <span class="comment">#特征选择（信息增益、信息增益比、gini）值</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_next_node</span><span class="params">(self,node)</span>:</span></span><br><span class="line"><span class="keyword">if</span> type(node) == TreeNode:</span><br><span class="line">self.next_nodes.append(node)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line"><span class="keyword">raise</span> Exception(<span class="string">'node not belong to TreeNode type'</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_attr_and_value</span><span class="params">(self,attr_name,attr_value)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">动态给节点添加属性，因为结点分为叶子结点，正常结点</span></span><br><span class="line"><span class="string">:param attr_name:属性名</span></span><br><span class="line"><span class="string">:param attr_value:属性值</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">setattr(self,attr_name,attr_value)</span><br></pre></td></tr></table></figure></p>
+<p>实现2-生成树：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_create_tree</span><span class="params">(self,X,y,feature_list,epsoion,start_node,Vi=<span class="number">-1</span>)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">:param X: 数据集X</span></span><br><span class="line"><span class="string">:param y: label集合</span></span><br><span class="line"><span class="string">:param feature_list: 特征的id list</span></span><br><span class="line"><span class="string">:param epsoion:阈值</span></span><br><span class="line"><span class="string">:param start_node:决策树的启始结点</span></span><br><span class="line"><span class="string">:param Vi: feature value</span></span><br><span class="line"><span class="string">:return: 指向决策树的根结点的指针</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="comment"># 结点</span></span><br><span class="line">node = TreeNode()</span><br><span class="line"><span class="comment">#若所有实例都属于一个类别</span></span><br><span class="line">C = set(y[:,<span class="number">0</span>]) <span class="comment">#分类的类别集合</span></span><br><span class="line"><span class="keyword">if</span>(len(C) == <span class="number">1</span> ):</span><br><span class="line">node.type = tuple(C)[<span class="number">0</span>] <span class="comment">#该Ck作为该结点的类标记</span></span><br><span class="line">start_node.add_next_node(node)</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 特征集合A为空,将D中实例数最大的类Ck作为该结点的类标记</span></span><br><span class="line"><span class="keyword">if</span>(len(feature_list) == <span class="number">0</span>):</span><br><span class="line">max_value = self._get_max_count_array(y[:,<span class="number">0</span>])</span><br><span class="line">node.type = max_value</span><br><span class="line">start_node.add_next_node(node)</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># select feature</span></span><br><span class="line"><span class="keyword">if</span> self._mode == <span class="string">'ID3'</span> <span class="keyword">or</span> self._mode == <span class="string">'C4.5'</span>:</span><br><span class="line">select_func = calc_ent_gain</span><br><span class="line"><span class="keyword">if</span> self._mode == <span class="string">'C4.5'</span>:</span><br><span class="line">select_func = calc_ent_gain_rate</span><br><span class="line">ent_gain_max, ent_max_feature_index = self._select_feature(X,y,feature_list,select_func)</span><br><span class="line"><span class="comment"># 最大信息增益小于设定的某个阈值</span></span><br><span class="line"><span class="keyword">if</span> ent_gain_max &lt; epsoion:</span><br><span class="line">type_value = self._get_max_count_array(y[:, <span class="number">0</span>])</span><br><span class="line">node.type = type_value</span><br><span class="line">start_node.add_next_node(node)</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">node.feature_index = ent_max_feature_index</span><br><span class="line">node.select_value = ent_gain_max</span><br><span class="line">type_value = self._get_max_count_array(y[:,<span class="number">0</span>])</span><br><span class="line">node.type = type_value</span><br><span class="line"><span class="keyword">if</span> (Vi != <span class="number">-1</span>):</span><br><span class="line">node.add_attr_and_value(<span class="string">"feature_value"</span>, Vi)</span><br><span class="line">start_node.add_next_node(node)</span><br><span class="line"><span class="comment"># 获取选取的特征的所有可能值</span></span><br><span class="line">Ag_v = set(X[:,ent_max_feature_index])</span><br><span class="line"><span class="comment"># A - Ag</span></span><br><span class="line">feature_list.remove(ent_max_feature_index)</span><br><span class="line"><span class="comment"># Di</span></span><br><span class="line"><span class="keyword">for</span> v <span class="keyword">in</span> Ag_v:</span><br><span class="line"><span class="comment"># Di 为 Xi , yi</span></span><br><span class="line">mask = X[:,ent_max_feature_index] == v</span><br><span class="line">Xi = X[mask]</span><br><span class="line">yi = y[mask]</span><br><span class="line">self._create_tree(Xi, yi, feature_list, epsoion, node, Vi=v)</span><br><span class="line"><span class="keyword">return</span></span><br></pre></td></tr></table></figure></p>
+<h5 id="step5-剪枝算法"><a href="#step5-剪枝算法" class="headerlink" title="step5 剪枝算法"></a>step5 剪枝算法</h5><p>剪枝主要是为了解决决策树分类带来的模型过拟合问题，两种方式<code>剪枝和随机森林</code>。其中随机森林下篇详述。<br><strong>5.1说明</strong></p>
+<blockquote>
+<p>我们都知道过拟合的问题可能有<code>三个原因</code>:数据中有噪声；训练数据数据不足；训练模型过度导致<code>模型非常复杂</code>。一般来说，决策树主要是由于第三个原因造成的。所以需要对生成的复杂模型进行一定程度上的简化。</p>
+</blockquote>
+<p><strong>5.2理解</strong></p>
+<blockquote>
+<p>1.决策树的剪枝是通过极小化决策树的代价函数来实现的。决策树的代价函数公式：<br><img src="https://upload-images.jianshu.io/upload_images/2447722-44a837e2d210675f.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="30%" height="30%" align="center" alt="公式2"><br>其中树T的叶结点个数为|T|，t是树T的叶结点，该叶结点有Nt个样本点，其中k类样本点有Ntk个，k=1,2,…,K,Ht(T)为叶结点t上的经验熵，α≥0为超参数。<code>一个叶节点由于误差的原因可能分到多个类别的样本点，所以存在一个叶子结点有K类样本点。</code> 其中经验熵Ht(T)的公式最上面有。<br><strong>2.决策树代价函数<code>Ca(T)</code>的理解</strong><br>C|T|表示模型对训练数据的预测误差,<code>此处还是不是很明白为什么C|T|的公式这样的原因</code>,猜想：C|T|为模型对训练数据后的遗留下的样本数的不确定性的多少。|T|表示模型的复杂度，使用参数a权衡<code>C|T|与|T|</code>之间的影响即模型的复杂度和模型与训练数据的拟合度。模型过于复杂容易过拟合，需要调节a的值降低复杂度。此处是通过剪枝来实现。<code>剪枝的过程中a的值和|T|的变化的</code>需要动态规划的思想来求解最优值。<br><strong>3.从机器学习训练模型的思路理解<code>Ca(T)</code></strong><br>决策树模型训练的<code>C(T)</code>极大似然估计为：<br><img src="https://upload-images.jianshu.io/upload_images/2447722-2995ff38be8de57e.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="35%" height="35%" align="center" alt="公式2"><br>代价函数为正则化的极大似然估计,剪枝的过程为不断极小化代价函数,<br>正则项可以理解为<code>a|T|</code>.<br><img src="https://upload-images.jianshu.io/upload_images/2447722-5f29f2a46550c28b.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" width="35%" height="35%" align="center" alt="公式2"> </p>
+</blockquote>
+<p><strong>5.3简单的剪枝算法实现(此处是设置合适的a值)</strong><br>此图是网上截图，重在理解前面的剪枝思想<br><img src="https://upload-images.jianshu.io/upload_images/2447722-6dc6c7b5d2af4787.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="这里写图片描述"></p>
+<h4 id="从坑中爬起来"><a href="#从坑中爬起来" class="headerlink" title="从坑中爬起来"></a>从坑中爬起来</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.进行算法实践前，一定需要对数据集进行详细分析——包括但不限于数据的特征缺失，分布问题的观察，</span><br><span class="line">数据的各个特征的离散、连续状态，取值分布情况的查看。</span><br><span class="line">2.了解的算法不要仅仅限于了解，时间充足的话最好能亲自去实现，#因为在实现的过程中，平常不关注的细节性的东西更容易暴露出来。具体表现在程序的某个细节没处理好，程序运行的结果就很可能不理想。</span><br></pre></td></tr></table></figure>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href="https://blog.csdn.net/wzmsltw/article/details/51057311" target="_blank" rel="noopener">决策树剪枝实现</a><br><a href="https://blog.csdn.net/hohaizx/article/details/79084774" target="_blank" rel="noopener">Adult数据集说明</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/">决策树相关算法——ID3、C4.5的详细说明及实现</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年04月02日 - 22:04</p>
+<p><span>最后更新:</span>2018年04月08日 - 20:04</p>
+<p><span>原始链接:</span><a href="/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/" title="决策树相关算法——ID3、C4.5的详细说明及实现">http://yoursite.com/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://yoursite.com/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/决策树/" rel="tag"><i class="fa fa-tag"></i> 决策树</a>
+          
+            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+          
+            <a href="/tags/分类问题/" rel="tag"><i class="fa fa-tag"></i> 分类问题</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/16/卷积神经网络-TextCNN-在句子分类上的实现/" rel="next" title="卷积神经网络(TextCNN)在句子分类上的实现">
+                <i class="fa fa-chevron-left"></i> 卷积神经网络(TextCNN)在句子分类上的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/05/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/" rel="prev" title="决策树相关算法——Bagging之基于CART的随机森林详细说明与实现">
+                决策树相关算法——Bagging之基于CART的随机森林详细说明与实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">没有借口，永不放弃！！！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-实现前期准备工作-——-what"><span class="nav-number">2.</span> <span class="nav-text">1.实现前期准备工作 —— what</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1决策树的主要思想"><span class="nav-number">2.1.</span> <span class="nav-text">1.1决策树的主要思想</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-2不得不知的概念"><span class="nav-number">2.2.</span> <span class="nav-text">1.2不得不知的概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-3决策树的主要步骤及原因"><span class="nav-number">2.3.</span> <span class="nav-text">1.3决策树的主要步骤及原因</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2具体实现过程-——-How"><span class="nav-number">3.</span> <span class="nav-text">2具体实现过程 —— How</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Step1-数据前期准备工作"><span class="nav-number">3.1.</span> <span class="nav-text">Step1 数据前期准备工作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Step2-数据处理"><span class="nav-number">3.2.</span> <span class="nav-text">Step2 数据处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Step3-特征选择"><span class="nav-number">3.3.</span> <span class="nav-text">Step3 特征选择</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Step4-递归创建生成树-自上而下的创建的"><span class="nav-number">3.4.</span> <span class="nav-text">Step4 递归创建生成树(自上而下的创建的)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ID3和C45算法思想-网上截图"><span class="nav-number">3.5.</span> <span class="nav-text">ID3和C45算法思想(网上截图)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#step5-剪枝算法"><span class="nav-number">3.6.</span> <span class="nav-text">step5 剪枝算法</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#从坑中爬起来"><span class="nav-number">4.</span> <span class="nav-text">从坑中爬起来</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共39.9k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+

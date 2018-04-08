@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="TensorFlow,TensorBoard," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="说明(what)本篇博客主要有2个目的，第一，记录学习使用TensorFlow的操作流程；第二，将TensorFlow训练数据模型过程中的参数数据进行可视化记录。">
+<meta name="keywords" content="TensorFlow,TensorBoard">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow实现多层感知机及可视化训练过程中的数据记录">
+<meta property="og:url" content="http://yoursite.com/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="说明(what)本篇博客主要有2个目的，第一，记录学习使用TensorFlow的操作流程；第二，将TensorFlow训练数据模型过程中的参数数据进行可视化记录。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://img.blog.csdn.net/20180302154619914?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDczMjUzNw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="http://img.blog.csdn.net/20180302164143811?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDczMjUzNw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:updated_time" content="2018-04-08T11:24:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TensorFlow实现多层感知机及可视化训练过程中的数据记录">
+<meta name="twitter:description" content="说明(what)本篇博客主要有2个目的，第一，记录学习使用TensorFlow的操作流程；第二，将TensorFlow训练数据模型过程中的参数数据进行可视化记录。">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20180302154619914?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDczMjUzNw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/"/>
+
+
+
+
+
+  <title>TensorFlow实现多层感知机及可视化训练过程中的数据记录 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+    <a href="https://github.com/JianWenJun"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Star me on GitHub"></a>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TensorFlow实现多层感知机及可视化训练过程中的数据记录</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-02T16:43:39+08:00">
+                2018-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/" class="leancloud_visitors" data-flag-title="TensorFlow实现多层感知机及可视化训练过程中的数据记录">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,367
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="说明-what"><a href="#说明-what" class="headerlink" title="说明(what)"></a><strong>说明(what)</strong></h4><p>本篇博客主要有2个目的，第一，记录学习使用<code>TensorFlow</code>的操作流程；第二，将<code>TensorFlow</code>训练数据模型过程中的参数数据进行可视化记录。<br><a id="more"></a></p>
+<h4 id="具体操作-how"><a href="#具体操作-how" class="headerlink" title="具体操作(how)"></a>具体操作(how)</h4><h5 id="实例描述"><a href="#实例描述" class="headerlink" title="实例描述"></a>实例描述</h5><p>1.使用<code>TensorFlow</code>搭建一个3层的神经网络(输入层,隐藏层,输出层)的模型训练经典的<code>MNIST</code>数据集，从而来预测手写体数字。<br>2.训练过程中使用<code>TensorBoard</code>来可视化训练过程中参数数据<br><a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/TensorDemo/NN_tf.py" target="_blank" rel="noopener">实例的Github代码地址</a></p>
+<h5 id="TensorFlow代码实现"><a href="#TensorFlow代码实现" class="headerlink" title="TensorFlow代码实现"></a>TensorFlow代码实现</h5><p><strong>Step1 导入响应的库和加载数据集</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow.examples.tutorials.mnist <span class="keyword">import</span> input_data</span><br><span class="line"><span class="comment">#以独热编码的方式加载数据集</span></span><br><span class="line">mnist = input_data.read_data_sets(<span class="string">'./MNIST_data/'</span>,one_hot=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>Step2 模型相关的参数设置</strong><br>将模型相关的可能会变化的参数提前设置出来，方便后面统一更改<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">in_unit = <span class="number">784</span></span><br><span class="line">h1_unit = <span class="number">300</span></span><br><span class="line"></span><br><span class="line">learningrate = <span class="number">0.05</span>  <span class="comment"># 梯度下降法学习率</span></span><br><span class="line">dropout_keep_prob = <span class="number">0.75</span>  <span class="comment"># dropout时保留神经元的比例，神经网络不为0的参数变为原理的1/dropout_keep_prob倍</span></span><br><span class="line"></span><br><span class="line">batch_size = <span class="number">100</span>  <span class="comment"># 梯度下降法选取的batch的size</span></span><br><span class="line">max_iter = <span class="number">3000</span>  <span class="comment"># 迭代次数</span></span><br><span class="line"></span><br><span class="line">sava_dir = <span class="string">'../data/'</span>  <span class="comment"># 存放数据结果</span></span><br><span class="line">log_dir = <span class="string">'../log/'</span>  <span class="comment"># 日志目录</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>Step3 设置TensorFlow中的计算图</strong></p>
+<ol>
+<li>在<code>TensorFlow</code>启动<code>session</code>运行节点操作时，先设置好<code>TensorFlow</code>计算图，有利于全局把控计算图中的所有的节点操作。(<code>TensorFlow</code>中的计算图包括节点和边，其中节点为运算操作，而边代表数据的流动即张量，但是一些边没有数据流动表示节点运算操作之间的依赖关系；<code>TensorFlow</code>中的节点操作运行需要通过<code>Session</code>会话来启动，使用<code>session.run()</code>或节点操作对象调用<code>eval()</code></li>
+<li><code>tf.placeholder</code>为<code>TensorFlow</code>中的占位符，作为外部数据(包括数据集和其他一些模型参数)的输入占位，当运行节点操作时候需要设置<code>feed_dict</code>参数来对占位符数据进行填充。</li>
+<li>见下面<strong><code>NO3</code></strong>说明部分</li>
+<li>在第一层隐藏层的输出后使用<code>tf.nn.dropout</code>再加了一层<code>dropout</code>层</li>
+<li>模型训练优化器选用的是<code>AdamOptimizer</code>，<code>loss</code>函数是交叉熵，使用的是<code>tf</code>自带的<code>tf.nn.softmax_cross_entropy_with_logits</code>来计算真实值和预测值的交叉熵<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">tf.reset_default_graph()</span><br><span class="line">train_graph = tf.Graph()</span><br><span class="line"><span class="keyword">with</span> train_graph.as_default():</span><br><span class="line"><span class="comment"># step 3.1 设置算法模型中的输入，使用占位符，占用输入的数据(什么情况下使用占位符，什么情况下设置tf变量)</span></span><br><span class="line">train_x = tf.placeholder(dtype=tf.float32,shape=[<span class="keyword">None</span>,in_unit],name = <span class="string">'train_x'</span>)</span><br><span class="line">train_y = tf.placeholder(dtype=tf.float32,shape=[<span class="keyword">None</span>,<span class="number">10</span>],name = <span class="string">'train_y'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># step 3.2构造神经网络</span></span><br><span class="line"><span class="comment"># 创建第一层隐藏层</span></span><br><span class="line">hidden_layer1 = nn_layer(train_x,input_dim=in_unit,output_dim=h1_unit,layer_name=<span class="string">'hider_layer1'</span>,act=tf.nn.relu)</span><br><span class="line"></span><br><span class="line"><span class="comment">#在第一层隐藏层上创建一层 dropout层 —— 随机关闭一些hidden_layer1的神经元</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'dropout'</span>):</span><br><span class="line">dropout_prob = tf.placeholder(dtype=tf.float32, name=<span class="string">'dropout_prob'</span>)</span><br><span class="line">tf.summary.scalar(<span class="string">'dropout_keep_probability'</span>,dropout_prob)</span><br><span class="line">hidden_layer1_dropout = tf.nn.dropout(hidden_layer1,dropout_prob)</span><br><span class="line"></span><br><span class="line"><span class="comment">#创建输出层,包括10个类别，输出层的输入是hidden_layer1_dropout,输出是[1,10]</span></span><br><span class="line">y = nn_layer(hidden_layer1_dropout,h1_unit,<span class="number">10</span>,layer_name=<span class="string">'out_layer'</span>,act=tf.identity)</span><br><span class="line"></span><br><span class="line"><span class="comment"># step 3.3 创建损失函数</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'loss'</span>):</span><br><span class="line">cross_entropy_diff = tf.nn.softmax_cross_entropy_with_logits(labels=train_y, logits=y)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'total'</span>):</span><br><span class="line">cross_entropy = tf.reduce_mean(cross_entropy_diff)</span><br><span class="line">tf.summary.scalar(<span class="string">'loss'</span>, cross_entropy)</span><br><span class="line"></span><br><span class="line"><span class="comment"># step 3.4 选择优化器训练并设计计算准确率的节点</span></span><br><span class="line">optimizer = tf.train.AdamOptimizer(learning_rate=learningrate)</span><br><span class="line">train_op = optimizer.minimize(cross_entropy)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'accuracy'</span>):</span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'correct_prediction'</span>):</span><br><span class="line">correct_prediction = tf.equal(tf.argmax(y, <span class="number">1</span>), tf.argmax(train_y, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'accuracy'</span>):</span><br><span class="line">accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))</span><br><span class="line">tf.summary.scalar(<span class="string">'accuracy'</span>, accuracy)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong><code>NO3：</code></strong>   其中构建单层神经网络的操作封装于函数<strong><code>nn_layer</code></strong>，返回一个<code>Tensor</code>对象。<code>weight_variable</code>函数和<code>bias_variable</code>函数中使用<code>tf.Variable</code>来初始化网络层中对应的权重<code>w</code>和偏置项<code>b</code>. 其中<code>tf.matmul(input_tensor,weight)+bias</code>是该层网络的所有神经元的<code>wx+b</code>的向量表示，表示神经元的输入—<code>g(wx+b)</code>，其中<code>g</code>为激活函数。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">nn_layer</span><span class="params">(input_tensor,input_dim,output_dim,layer_name,act=tf.nn.relu)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">建立神经网络层（一层），并返回该层网络层的输出的tensor对象</span></span><br><span class="line"><span class="string">:param input_tensor:特征数据</span></span><br><span class="line"><span class="string">:param input_dim:输入数据的维度大小</span></span><br><span class="line"><span class="string">:param output_dim:该层神经元的个数</span></span><br><span class="line"><span class="string">:param layer_name:命名空间</span></span><br><span class="line"><span class="string">:param act:神经元对应的激活函数</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="comment">#设置命名空间</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(layer_name):</span><br><span class="line"><span class="comment">#初始化权重，并记录权重变化</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'weights'</span>):</span><br><span class="line">weight = weight_variable([input_dim,output_dim])</span><br><span class="line">variable_summeries(weight)<span class="comment"># 记录权重变化</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'bias'</span>):</span><br><span class="line">bias = bias_variable([output_dim])</span><br><span class="line">variable_summeries(bias)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'linear_compute'</span>):</span><br><span class="line">preact = tf.matmul(input_tensor,weight)+bias</span><br><span class="line">tf.summary.histogram(<span class="string">'linear'</span>,preact)</span><br><span class="line"></span><br><span class="line">activeation = act(preact,name = <span class="string">'activation'</span>)</span><br><span class="line">tf.summary.histogram(<span class="string">'activation'</span>,activeation)</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> activeation</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">weight_variable</span><span class="params">(shape)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">将每一层的神经网络的对应的权重参数w,初始化并封装到function中</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">inita_w = tf.truncated_normal(shape,stddev=<span class="number">0.1</span>)</span><br><span class="line"><span class="keyword">return</span> tf.Variable(inita_w,dtype=tf.float32)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bias_variable</span><span class="params">(shape)</span>:</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">将每一层的神经网络的对应的偏置项b,初始化并封装到function中</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">inita_b = tf.constant(<span class="number">0.1</span>,shape=shape)</span><br><span class="line"><span class="keyword">return</span> tf.Variable(inita_b)</span><br></pre></td></tr></table></figure></p>
+<p><strong>Step4 启动<code>TensorFlow Session</code>来实现计算图中的训练操作并将相应的<code>Summary</code>记录到日志文件</strong><br>1.初始化<code>Session</code>并设置<code>Session</code>对应的计算图，初始化<code>TensorFlow</code>的变量操作 <code>tf.global_variables_initializer().run()</code></p>
+<ol start="2">
+<li>计算图中的节点运行方式有两种，方式一：<code>session.run()</code>,函数中设置好计算图中对应的节点操作，如<code>session.run([train_op,cross_entropy,accuracy])</code>其中<code>train_op</code>表示运行模型训练的操作,<code>cross_entropy</code>表示运行获取训练模型交叉熵的操作，accuracy表示获取模型运行的准确率操作，<code>run</code>函数返回的节点操作运行的对应结果。方式二，在<code>tf.InteractiveSession</code>初始化<code>session</code>情况下可以使用<code>oper.eval()</code>来运行操作，如<code>train_op.eval()</code>。该方式一次只能运行一个节点操作。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">session = tf.InteractiveSession(graph=train_graph)</span><br><span class="line"><span class="comment"># step 4.1 合并summary并初始化所有变量</span></span><br><span class="line">merged = tf.summary.merge_all()</span><br><span class="line">train_writer = tf.summary.FileWriter(log_dir+<span class="string">'/train'</span>,graph=train_graph)</span><br><span class="line">test_writer = tf.summary.FileWriter(log_dir+<span class="string">'/test'</span>,graph=train_graph)</span><br><span class="line"></span><br><span class="line">tf.global_variables_initializer().run()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Step 4.2 训练模型并记录到TensorBoard</span></span><br><span class="line"><span class="keyword">for</span> iter <span class="keyword">in</span> range(max_iter):</span><br><span class="line">trainx_batch_x,train_batch_y = mnist.train.next_batch(batch_size)</span><br><span class="line"><span class="comment">#迭代10次记录一下accuracy</span></span><br><span class="line"><span class="keyword">if</span> iter % <span class="number">10</span> == <span class="number">0</span>:</span><br><span class="line">summmary,acc,loss = session.run([merged,accuracy,cross_entropy],feed_dict=&#123;train_x:trainx_batch_x,train_y:train_batch_y,dropout_prob:<span class="number">1.0</span>&#125;)</span><br><span class="line">test_writer.add_summary(summmary,iter)<span class="comment">#写入日志</span></span><br><span class="line">print(<span class="string">'loss at step %s: %s'</span>%(iter,loss))</span><br><span class="line">print(<span class="string">'Accuracy at step %s: %s'</span>%(iter,acc))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line"><span class="keyword">if</span> iter % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line"><span class="comment">#记录tensor运行节点的信息</span></span><br><span class="line">run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)</span><br><span class="line">run_metadata = tf.RunMetadata()</span><br><span class="line"><span class="comment">#将配置信息和记录运行信息的proto传入运行的过程，从而记录运行时每一个节点的时间、空间开销信息</span></span><br><span class="line">summmary,_ = session.run([merged,train_op],</span><br><span class="line">feed_dict=&#123;train_x:trainx_batch_x,train_y:train_batch_y,dropout_prob:dropout_keep_prob&#125;,</span><br><span class="line">options=run_options,</span><br><span class="line">run_metadata=run_metadata)</span><br><span class="line"><span class="comment">#将节点运行时的信息写入日志文件</span></span><br><span class="line">train_writer.add_run_metadata(run_metadata,<span class="string">'step %d'</span> % iter)</span><br><span class="line">train_writer.add_summary(summmary,iter)</span><br><span class="line"><span class="keyword">pass</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">summmary,_ = session.run([merged,train_op],feed_dict=&#123;train_x:trainx_batch_x,train_y:train_batch_y,dropout_prob:dropout_keep_prob&#125;)</span><br><span class="line">train_writer.add_summary(summmary,iter)</span><br><span class="line">train_writer.close()</span><br><span class="line">test_writer.close()</span><br><span class="line">session.close()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="TensorBoard可视化过程"><a href="#TensorBoard可视化过程" class="headerlink" title="TensorBoard可视化过程"></a>TensorBoard可视化过程</h4><p><code>TensorBoard</code>能记录的数据类型为：<br><img src="http://img.blog.csdn.net/20180302154619914?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDczMjUzNw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="数据类型"><br>标量：SCALARS<br>图片：IMAGES<br>音频：AUDIO<br>计算图：GRAPHS<br>数据分布图：DISTRIBUTIONS<br>直方图：HISTOGRAMS<br>嵌入向量：EMBEDDINGS<br>对上述数据的记录方式有：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tf.summary.audio(name, tensor)</span><br><span class="line">tf.summary.scalar(name,tensor)</span><br><span class="line">tf.summary.image(name, tensor)</span><br><span class="line">tf.summary.histogram(name, tensor)</span><br><span class="line"><span class="comment">#其中name表示生成的节点的名称。 也将作为TensorBoard中的一个系列名称。tensor为要记录的数据。</span></span><br><span class="line"><span class="comment">#其中嵌入向量EMBEDDINGS的可视化，需要依赖于模型的保存，需要定义tf.train.Saver对象,再配置projector.ProjectorConfig对象。</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>基本可视化步骤(摘自其他博客)：</strong><br>1.建立一个<code>Graph</code>计算图，即想从该计算图中记录某些数据的信息并可视化。<br>代码实现中的 <strong><code>Step 3</code></strong> 中的代码 为建立计算图的过程。<br><code>train_graph = tf.Graph()</code><br>2.确定要在<code>Graph</code>计算图中的哪些节点放置<code>Summary Operations</code>以用来记录信息。<br>其中<code>tf.name_scope(name)</code>为给节点设置上下文，可以理解为节点的文件夹管理，一层包含一层的关系<br>如<strong><code>Step 3</code></strong>设计计算图中的建立神经网络的代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#记录其中交叉熵的值</span></span><br><span class="line">tf.summary.scalar(<span class="string">'loss'</span>, cross_entropy)</span><br><span class="line"><span class="comment">#记录激活函数层的输出值</span></span><br><span class="line">tf.summary.histogram(<span class="string">'activation'</span>,activeation)</span><br></pre></td></tr></table></figure></p>
+<p>3.计算图中设计的<code>Summary Operations</code>并不会真正去执行计算记录，需要使用Session中的run去执行，或者被其他操作节点依赖执行。在<strong><code>TensorFlow代码实现</code></strong> 的<code>Step</code>中创建的<code>Summary Operations</code>没有被其他节点依赖，需要特地去运行Summary节点操作。<strong><code>Step 4</code></strong> 中通过代码<code>merged = tf.summary.merge_all()</code> 将所有的<code>Summary Operations</code>合并成一个节点，从而直接<code>run</code>该节点即可，也可以通过代码<code>tf.summary.merge(input_list)</code>,合并指定的一些<code>Summary Operations</code>成一个节点再<code>run</code>。<br>4.使用<code>tf.summary.FileWriter</code> 将运行后输出的数据都保存到本地磁盘中。<br>如<strong>Step 4</strong> 中的代码<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#graph参数为指定要获取数据信息的计算图，对应着第一步。</span></span><br><span class="line">train_writer = tf.summary.FileWriter(log_dir+<span class="string">'/train'</span>,graph=train_graph)</span><br></pre></td></tr></table></figure></p>
+<ol start="5">
+<li>运行整个程序，并在终端输入运行<code>TensorBoard</code>的指令，再打开web端查看可视化的结果<br>命令：<code>tensorboard --logdir=&#39;./ML/log/&#39;</code><br><img src="http://img.blog.csdn.net/20180302164143811?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDczMjUzNw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="tensorboard命令"><br>打开对应的网址 <code>http://0.0.0.0:6006/</code></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/">TensorFlow实现多层感知机及可视化训练过程中的数据记录</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年03月02日 - 16:03</p>
+<p><span>最后更新:</span>2018年04月08日 - 19:04</p>
+<p><span>原始链接:</span><a href="/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/" title="TensorFlow实现多层感知机及可视化训练过程中的数据记录">http://yoursite.com/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="http://yoursite.com/2018/03/02/TensorFlow实现多层感知机及可视化训练过程中的数据记录/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TensorFlow/" rel="tag"><i class="fa fa-tag"></i> TensorFlow</a>
+          
+            <a href="/tags/TensorBoard/" rel="tag"><i class="fa fa-tag"></i> TensorBoard</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/31/Java并发编程基础（二）/" rel="next" title="Java并发编程基础（二）">
+                <i class="fa fa-chevron-left"></i> Java并发编程基础（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/16/卷积神经网络-TextCNN-在句子分类上的实现/" rel="prev" title="卷积神经网络(TextCNN)在句子分类上的实现">
+                卷积神经网络(TextCNN)在句子分类上的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">没有借口，永不放弃！！！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#说明-what"><span class="nav-number">1.</span> <span class="nav-text">说明(what)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#具体操作-how"><span class="nav-number">2.</span> <span class="nav-text">具体操作(how)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#实例描述"><span class="nav-number">2.1.</span> <span class="nav-text">实例描述</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#TensorFlow代码实现"><span class="nav-number">2.2.</span> <span class="nav-text">TensorFlow代码实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TensorBoard可视化过程"><span class="nav-number">3.</span> <span class="nav-text">TensorBoard可视化过程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共39.9k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
