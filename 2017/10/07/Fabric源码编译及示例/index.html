@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Fabric," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="源码的编译-Why?Fabric源码的编译是建立在已经基本掌握了Fabric的部分模块或者很多模块的代码的基础上.但是为什么要编译Fabric的源码呢,大神们不是已经写好了Fabric这个项目框架并编译好了吗,拿来用不就好了吗?">
+<meta name="keywords" content="Fabric">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fabric源码编译及示例">
+<meta property="og:url" content="https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="源码的编译-Why?Fabric源码的编译是建立在已经基本掌握了Fabric的部分模块或者很多模块的代码的基础上.但是为什么要编译Fabric的源码呢,大神们不是已经写好了Fabric这个项目框架并编译好了吗,拿来用不就好了吗?">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-8e69e3a611e046ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-69eeee3c8cea3fc4?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-e4651e03d1af522d?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-9fafc330a674f8dd?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-3afbf1764b2cd50c?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-b413120d876e9ef0?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-581cca574cf94e85?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2447722-4bb35c22e82d2d79?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-04-08T09:00:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fabric源码编译及示例">
+<meta name="twitter:description" content="源码的编译-Why?Fabric源码的编译是建立在已经基本掌握了Fabric的部分模块或者很多模块的代码的基础上.但是为什么要编译Fabric的源码呢,大神们不是已经写好了Fabric这个项目框架并编译好了吗,拿来用不就好了吗?">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2447722-8e69e3a611e046ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/"/>
+
+
+
+
+
+  <title>Fabric源码编译及示例 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fabric源码编译及示例</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-07T17:25:47+08:00">
+                2017-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/区块链/" itemprop="url" rel="index">
+                    <span itemprop="name">区块链</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/07/Fabric源码编译及示例/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2017/10/07/Fabric源码编译及示例/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/10/07/Fabric源码编译及示例/" class="leancloud_visitors" data-flag-title="Fabric源码编译及示例">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,823
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  8 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="源码的编译-Why"><a href="#源码的编译-Why" class="headerlink" title="源码的编译-Why?"></a><strong>源码的编译-Why?</strong></h4><p>Fabric源码的编译是建立在已经基本掌握了Fabric的部分模块或者很多模块的代码的基础上.但是为什么要编译Fabric的源码呢,大神们不是已经写好了Fabric这个项目框架并编译好了吗,拿来用不就好了吗?<br><a id="more"></a></p>
+<blockquote>
+<p>1.部署Fabric网络的docker容器是通过编译Fabric里的peer/Order/fabric-ca/模块的代码形docker镜像创建的.<strong>固有的已编译好的镜像让我们要开发的系统也禁锢住了,每个要开发的应用系统都有自身的特点,我们需要通过编译Fabric的改写的模块代码生成应用系统所需要的镜像</strong>.比如说,阿里通过基于OpenJDK定制的TaobaoVM,也是自身编译的软件开发包.<br>2.<strong>编译Fabric源码可以验证自己的想法</strong>,当阅读Fabric源码时候,代码如何的运行只是通过我们理论上的猜想,通过实际的编译代码可以验证我们的猜想.<br>3.<strong>定位错误,修改bug.</strong>源码的编译是建立在<a href="http://blog.csdn.net/u014732537/article/details/78157210" target="_blank" rel="noopener">Fabric的源码的阅读</a>上的,当系统运行的日志里出现错误时,根据错误提示能定位到源码中的错误点,根据源码能修改bug.</p>
+</blockquote>
+<h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><p>1.编译环境的安装,go的安装,Fabric的源码下载,在<a href="http://blog.csdn.net/u014732537/article/details/78157210" target="_blank" rel="noopener">Fabric的源码的阅读</a>一篇中讲述了.<br>2.安装其他必要的组件.<br>假设GOPATH为<strong>/home/gopath</strong>该文件夹下有两个文件夹:<strong>src</strong>用于存放Fabric源码.<strong>bin</strong>用于存放go编译好的可执行文件.<br><strong>2.1</strong>安装go的包管理工具<strong>gopm</strong>.<br><code>export GOPATH=/home/gopath</code><br><code>go get -u github.com/gpmgo/gopm</code><br><code>/home/gopath/bin目录下将有gopm,go get是下载和编译的意思</code><br><strong>2.2</strong>通过 <strong>gopm</strong>安装 <strong>goimports</strong>.(go代码格式化工具,自动修正import的package)<br><code>export GOPATH=/home/gopath</code><br><code>gopm get -g -d golang.org/x/tools/cmd/goimports</code><br><code>再使用 go install 安装 goimports</code><br><code>go install golang.org/x/tools/cmd/goimports</code><br><code>/home/gopath/bin目录下将有goimports</code><br><strong>2.3</strong>安装 <strong>gocov</strong>(go的单元测试覆盖率检查工具)<br><code>GOPATH=/home/gopath</code><br><code>gopm get -g -d golang.org/x/tools/cover</code><br><code>gopm get -g -d github.com/axw/gocov/gocov</code><br><code>go install github.com/axw/gocov/gocov</code><br><code>/home/gopath/bin目录下将有gocov</code><br><strong>2.4</strong>安装 <strong>gocov-xml</strong><br><code>GOPATH=/home/gopath</code><br><code>gopm get -g -d github.com/AlekSi/gocov-xml</code><br><code>go install github.com/AlekSi/gocov-xml</code><br><code>/home/gopath/bin目录下将有 gocov-xml</code><br>2.5安装其他组件<br><code>yum install  -y gcc libtool libltdl-dev libtool-ltdl-devel openssl</code></p>
+<h4 id="Makefile文件的语法理解"><a href="#Makefile文件的语法理解" class="headerlink" title="Makefile文件的语法理解."></a><strong>Makefile</strong>文件的语法理解.</h4><p>Fabric的源码镜像是通过make按照Makefile中文件的编译规则来编译镜像的.<br>简要介绍Makefile的语法规则.<br><strong>3.1</strong> Makefile文件的一般形式.<br>target … : prerequisites …<br>command<br>…<br>…<br>其中<strong>…</strong>表示多个.<br><strong>target</strong>是一个目标文件，可以是Object File，也可以是执行文件。也可以是一个标签（<strong>Label</strong>），make就不会自动去找lable后的文件的依赖性，也就不会自动执行其后所定义的命令。 需要明确使用<strong>make Label</strong>。才会执行命令。<br><strong>prerequisites</strong>是要生成target所需要的文件或是目标。<br><strong>command</strong>也就是make需要执行的命令。（任意的Shell命令）<br><strong>说明</strong>,上面的一般形式是一个文件的依赖关系.target这一个或多个的目标文件依赖于prerequisites中的文件，其生成规则定义在command中。特别的，prerequisites中如果有一个以上的文件比target文件要新的话，command所定义的命令就会被执行。这就是Makefile的规则。<br><strong>3.2</strong>依赖关系的实质上就是说明了目标文件是由哪些文件生成的，换言之，目标文件是哪些文件更新的。<br><strong>3.3</strong>伪目标使用方法的终端编译命令是make lable,避免当前文件夹下也有文件叫lable。<br><code>伪目标eg:
+.PHONY lable.PHONY避免同名
+lable:
+rm *.o</code><br>终端使用make labe,执行的操作是删除所有的.o文件.<br>`一般形式的eg  :<br>main.o : main.c defs.h<br>cc -c main.c</p>
+<p>#make最后生成 main.o文件依赖于main.c defs.h两个文件,cc -c main.c执行可执行文件main.c进行编译.<br>`<br><strong>3.4</strong> Makefile中的第一个目标会被作为其默认目标。</p>
+<h4 id="How"><a href="#How" class="headerlink" title="How"></a><strong>How</strong></h4><p>1.进入Fabric源码目录/home/gopath/src/hyperledger/fabric.并添加gopath的环境变量,一定要加.<br><code>export  GOPATH= /home/gopath</code><br><code>sudo su</code><br>2.编译生成 protoc-gen-go<br><code>cd $GOPATH</code><br><code>gopm get -g -d github.com/golang/protobuf/protoc-gen-go</code><br><code>go install github.com/golang/protobuf/protoc-gen-go</code><br><code>/home/gopath/bin出现protoc-gen-go执行文件</code><br>3.根据Fabric源码目录下的Makefile文件中的说明.在源码目录下打开终端,根据下图1中方框的targets伪目标,选择你要编译的target,执行命令<code>make peer/all/orderer...</code><br><img src="http://upload-images.jianshu.io/upload_images/2447722-8e69e3a611e046ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>执行make命令后会在当前文件夹下生成一个build文件夹.编译后的镜像或者可运行工具都是在这个文件夹里找.</p>
+<h4 id="编译peer模块的代码示例"><a href="#编译peer模块的代码示例" class="headerlink" title="编译peer模块的代码示例"></a><strong>编译peer模块的代码示例</strong></h4><p>说明:peer网络节点启动时运行的命令是<code>peer node start</code>,实际上Fabric网络节点的peer docker容器中执行的便是通过Fabric源码编译的peer可执行文件来操作peer下的命令.本例中在peer节点下通过修改代码并编译来添加test命令.<br>1.在/home/gopath/src/hyperledger/fabric/peer下添加test包.并在test包下创建test.go文件.<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test</span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line"><span class="string">"github.com/hyperledger/fabric/common/flogging"</span></span><br><span class="line"><span class="string">"github.com/spf13/cobra"</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">var</span> logger = flogging.MustGetLogger(<span class="string">"testCommand"</span>)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Cmd</span><span class="params">()</span> *<span class="title">cobra</span>.<span class="title">Command</span></span> &#123;</span><br><span class="line"><span class="keyword">return</span> testCommond</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> testCommond = &amp;cobra.Command&#123;</span><br><span class="line">Use:   <span class="string">"test"</span>,</span><br><span class="line">Short: <span class="string">"test the node."</span>,</span><br><span class="line">Long:  <span class="string">`test a node that interacts with the network.`</span>,</span><br><span class="line">Run: <span class="function"><span class="keyword">func</span><span class="params">(cmd *cobra.Command, args []<span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">logger.Info(<span class="string">"Build test by JinaWenJun----------------------"</span>)</span><br><span class="line">&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.在/home/gopath/src/hyperledger/fabric/peer下的main.go文件中添加<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mainCmd.AddCommand(version.Cmd())</span><br><span class="line">mainCmd.AddCommand(node.Cmd())</span><br><span class="line">mainCmd.AddCommand(chaincode.Cmd(<span class="literal">nil</span>))</span><br><span class="line">mainCmd.AddCommand(clilogging.Cmd(<span class="literal">nil</span>))</span><br><span class="line">mainCmd.AddCommand(channel.Cmd(<span class="literal">nil</span>))</span><br><span class="line"><span class="comment">//添加的另外一个test命令,并在前面导入包"github.com/hyperledger/fabric/peer/test"</span></span><br><span class="line">mainCmd.AddCommand(test.Cmd())</span><br></pre></td></tr></table></figure></p>
+<p>3.在源码目录下打开终端进行编译 <code>make peer</code>,在/home/gopath/src/hyperledger/fabric/build/bin下将会生成可执行文件peer.将该文件拷贝到/home/gopath/bin下测试新添加的test 命令.(模拟在peer docker的容器下peer命令的执行).<br>4.打开终端,执行<code>peer test</code><br><img src="http://upload-images.jianshu.io/upload_images/2447722-69eeee3c8cea3fc4?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h4 id="遇到的问题解决方案"><a href="#遇到的问题解决方案" class="headerlink" title="遇到的问题解决方案"></a><strong>遇到的问题解决方案</strong></h4><p>1.终端执行make  命令时,出现没有那个文件或目录如图,<br><img src="http://upload-images.jianshu.io/upload_images/2447722-e4651e03d1af522d?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>方法:需要在终端下添加环境变量,执行<code>export GOPATH= /home/gopath</code></p>
+<p>2.当因为网速终端卡住时,需要将Makefile文件中的curl部分删除.手动下载相应的文件<a href="http://download.csdn.net/download/u014732537/10010177" target="_blank" rel="noopener">chaintool</a>目录/build/bin下面.<br><img src="http://upload-images.jianshu.io/upload_images/2447722-9fafc330a674f8dd?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>3.当出现文件找不到或者命令找不到,如图<br><img src="http://upload-images.jianshu.io/upload_images/2447722-3afbf1764b2cd50c?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>方法:终端执行下面两条命令,将命令复制进去<br><code>cp $GOPATH/bin/protoc-gen-go $GOPATH/src/github.com/hyperledger/fabric/build/docker/gotools/bin/</code><br><code>cp $GOPATH/bin/gocov $GOPATH/src/github.com/hyperledger/fabric/build/docker/gotools/bin/</code><br>4.当终端make peer出现下图错误时候.<br><img src="http://upload-images.jianshu.io/upload_images/2447722-b413120d876e9ef0?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>方法:根据错误提示<code>core/chaincode/ccproviderimpl.go:20:2:</code>不能找到context.进入到相应的文件ccproviderimpl.go修改.<br><img src="http://upload-images.jianshu.io/upload_images/2447722-581cca574cf94e85?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>如果在出现提示哪里不能找到”context”到指定的文件下按照上述形式修改即可.<br><code>编译成功:</code><br><img src="http://upload-images.jianshu.io/upload_images/2447722-4bb35c22e82d2d79?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="">相应的 build/bin/文件夹下有peer可执行文件.</p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2017/10/07/Fabric源码编译及示例/">Fabric源码编译及示例</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2017年10月07日 - 17:10</p>
+<p><span>最后更新:</span>2018年04月08日 - 17:04</p>
+<p><span>原始链接:</span><a href="/2017/10/07/Fabric源码编译及示例/" title="Fabric源码编译及示例">https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Fabric/" rel="tag"><i class="fa fa-tag"></i> Fabric</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/04/Fabric的源码阅读方式/" rel="next" title="Fabric的源码阅读方式">
+                <i class="fa fa-chevron-left"></i> Fabric的源码阅读方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/14/设计模式初篇/" rel="prev" title="设计模式初篇">
+                设计模式初篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码的编译-Why"><span class="nav-number">1.</span> <span class="nav-text">源码的编译-Why?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#准备工作"><span class="nav-number">2.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Makefile文件的语法理解"><span class="nav-number">3.</span> <span class="nav-text">Makefile文件的语法理解.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#How"><span class="nav-number">4.</span> <span class="nav-text">How</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编译peer模块的代码示例"><span class="nav-number">5.</span> <span class="nav-text">编译peer模块的代码示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#遇到的问题解决方案"><span class="nav-number">6.</span> <span class="nav-text">遇到的问题解决方案</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共39.9k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%=page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '55b329ed0db8709eb0ae0d1e87cfbbb6e67944b3',
+            
+                client_id: 'd9bf427b4584fc428b0d'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
