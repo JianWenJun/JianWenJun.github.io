@@ -1,3 +1,4 @@
+https://jianwenjun.xyz/2018/04/10/Hexo-Coding-Github部署个人博客Error全集/
 https://jianwenjun.xyz/2018/04/07/自我修养一/
 https://jianwenjun.xyz/2018/04/05/决策树相关算法——Bagging之基于CART的随机森林详细说明与实现/
 https://jianwenjun.xyz/2018/04/02/决策树相关算法——ID3、C4-5的详细说明及实现/
