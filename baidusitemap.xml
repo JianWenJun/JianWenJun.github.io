@@ -4,6 +4,30 @@
 
     
   <url>
+    <loc>https://jianwenjun.xyz/2018/04/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94ID3%E3%80%81C4-5%E7%9A%84%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E%E5%8F%8A%E5%AE%9E%E7%8E%B0/</loc>
+    <lastmod>2018-04-12T08:15:10.000Z</lastmod>
+    <data>
+        <display>
+        <title>决策树相关算法——ID3、C4.5的详细说明及实现</title>
+        <pubTime>2018-04-02T14:08:57.000Z</pubTime>
+        
+        <tag>决策树</tag>
+         
+        <tag>机器学习</tag>
+         
+        <tag>分类问题</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://jianwenjun.xyz/2018/04/10/Hexo-Coding-Github%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2Error%E5%85%A8%E9%9B%86/</loc>
     <lastmod>2018-04-11T13:53:34.000Z</lastmod>
     <data>
@@ -85,30 +109,6 @@
         <tag>Bagging</tag>
          
         <tag>集成学习</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/04/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94ID3%E3%80%81C4-5%E7%9A%84%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E%E5%8F%8A%E5%AE%9E%E7%8E%B0/</loc>
-    <lastmod>2018-04-08T12:03:43.000Z</lastmod>
-    <data>
-        <display>
-        <title>决策树相关算法——ID3、C4.5的详细说明及实现</title>
-        <pubTime>2018-04-02T14:08:57.000Z</pubTime>
-        
-        <tag>决策树</tag>
-         
-        <tag>机器学习</tag>
-         
-        <tag>分类问题</tag>
          
          
            
