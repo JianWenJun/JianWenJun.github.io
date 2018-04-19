@@ -102,7 +102,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <meta property="og:site_name" content="小简铺子">
 <meta property="og:description" content="介绍——what通常解释为，Protocol Buffers 是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。简要理解为，Protocol Buffers是数据结构化格式，类似于JSON、XML。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-08T08:48:04.000Z">
+<meta property="og:updated_time" content="2018-04-12T10:43:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Protocol Buffers的学习笔记">
 <meta name="twitter:description" content="介绍——what通常解释为，Protocol Buffers 是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。简要理解为，Protocol Buffers是数据结构化格式，类似于JSON、XML。">
@@ -428,7 +428,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <li>运行protocol编译器编译*.proto文件为指定语言（Java、go、c都可以）的类。</li>
 <li>数据的读和写（序列化和反序列化）——每个protocol编译后的类都有使用二进制格式写和读你所定义的类型的消息的方法 。</li>
 </ol>
-<p><strong><em>例子</em></strong><br>step 1——————创建Model.proto文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">package protobuf</span><br><span class="line">message People&#123;</span><br><span class="line">required string name = 1;</span><br><span class="line">required int32 id = 2;</span><br><span class="line">optional string email = 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>例子</em></strong><br>step 1——————创建Model.proto文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">package protobuf</span><br><span class="line">message People&#123;</span><br><span class="line">    required string name = 1;</span><br><span class="line">    required int32 id = 2;</span><br><span class="line">    optional string email = 3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>step 2——————–编译为指定语言的类<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//安装Protocol Buffers 编译器protoc</span><br><span class="line">//编译Model.proto</span><br><span class="line">protoc  --java（生成类的语言）_out=./src（生成目录） ./proto/Model.proto（根据的proto文件）</span><br></pre></td></tr></table></figure></p>
 <p>step 3——————–序列化和反序列化<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//example1--序列化将数据传输出去，网络输出</span></span><br><span class="line"><span class="comment">//构建数据</span></span><br><span class="line">Model.People.Builder peopleBuilder = Model.People.newBuilder();</span><br><span class="line">peopleBuilder.setName(<span class="string">"name1"</span>) ;</span><br><span class="line">peopleBuilder.setId(<span class="number">10</span>) ;</span><br><span class="line">peopleBuilder.setEmail(<span class="string">"1343483119@qq.com"</span>)</span><br><span class="line">Model.People people=peopleBuilder.build();</span><br><span class="line"><span class="comment">//将对象写入输出流，通过二进制输出。</span></span><br><span class="line">ByteArrayOutputStream output = <span class="keyword">new</span> ByteArrayOutputStream();  </span><br><span class="line">people.writeTo(output); </span><br><span class="line"><span class="keyword">byte</span>[] byteArray = output.toByteArray();  </span><br><span class="line"></span><br><span class="line"><span class="comment">//////////////////////////</span></span><br><span class="line"><span class="comment">//example2--反序列化，对象数据从二进制中读取出来，byteArray为网络上传过来的二进制</span></span><br><span class="line">ByteArrayInputStream input = <span class="keyword">new</span> ByteArrayInputStream(byteArray);  </span><br><span class="line"><span class="comment">// 反序列化  </span></span><br><span class="line">Model.People people= Model.People.parseFrom(input);</span><br><span class="line"><span class="comment">//获取people中的信息</span></span><br></pre></td></tr></table></figure></p>
 <h4 id="好处——Why"><a href="#好处——Why" class="headerlink" title="好处——Why"></a><strong>好处——Why</strong></h4><p>没有对比就没有伤害</p>
@@ -463,7 +463,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p><span>本文标题:</span><a href="/2017/10/02/Protocol-Buffers的学习笔记/">Protocol Buffers的学习笔记</a></p>
 <p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
 <p><span>发布时间:</span>2017年10月02日 - 16:10</p>
-<p><span>最后更新:</span>2018年04月08日 - 16:04</p>
+<p><span>最后更新:</span>2018年04月12日 - 18:04</p>
 <p><span>原始链接:</span><a href="/2017/10/02/Protocol-Buffers的学习笔记/" title="Protocol Buffers的学习笔记">https://jianwenjun.xyz/2017/10/02/Protocol-Buffers的学习笔记/</a>
 <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2017/10/02/Protocol-Buffers的学习笔记/"  aria-label="复制成功！"></i></span>
 </p>
@@ -610,7 +610,7 @@ showConfirmButton: true
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">20</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -632,7 +632,7 @@ showConfirmButton: true
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -739,7 +739,7 @@ showConfirmButton: true
 网站访问量<span id="busuanzi_value_site_uv"></span>次
 </span>
 <i class="fa fa-user-md"></i>
-<span class="post-count">博客全站共42.3k字</span>
+<span class="post-count">博客全站共46.6k字</span>
 </div>
 
 
