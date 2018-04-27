@@ -83,7 +83,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="XGBoost,决策树,集成学习," />
 
 
 
@@ -94,17 +94,20 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-<meta name="description" content="生活不能等待别人来安排，要自己去争取与奋斗！">
-<meta property="og:type" content="website">
-<meta property="og:title" content="tags">
-<meta property="og:url" content="https://jianwenjun.xyz/tags/index.html">
+<meta name="description" content="前言本篇博客主要记录的是XGBoost在构建决策树结构时，知道如何评定划分点的好坏的情况下，如何遍历查找出该树结构的切分点。前篇博客决策树相关算法——XGBoost原理分析及实例实现(一)介绍的是贪心查找算法，逐步遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点。本篇主要介绍的是近视查找算法和稀疏感知的划分查找。">
+<meta name="keywords" content="XGBoost,决策树,集成学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树相关算法——XGBoost原理分析及实例实现(二)">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/index.html">
 <meta property="og:site_name" content="小简铺子">
-<meta property="og:description" content="生活不能等待别人来安排，要自己去争取与奋斗！">
+<meta property="og:description" content="前言本篇博客主要记录的是XGBoost在构建决策树结构时，知道如何评定划分点的好坏的情况下，如何遍历查找出该树结构的切分点。前篇博客决策树相关算法——XGBoost原理分析及实例实现(一)介绍的是贪心查找算法，逐步遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点。本篇主要介绍的是近视查找算法和稀疏感知的划分查找。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-07T12:27:02.000Z">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/1.png">
+<meta property="og:updated_time" content="2018-04-27T06:50:05.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="tags">
-<meta name="twitter:description" content="生活不能等待别人来安排，要自己去争取与奋斗！">
+<meta name="twitter:title" content="决策树相关算法——XGBoost原理分析及实例实现(二)">
+<meta name="twitter:description" content="前言本篇博客主要记录的是XGBoost在构建决策树结构时，知道如何评定划分点的好坏的情况下，如何遍历查找出该树结构的切分点。前篇博客决策树相关算法——XGBoost原理分析及实例实现(一)介绍的是贪心查找算法，逐步遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点。本篇主要介绍的是近视查找算法和稀疏感知的划分查找。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/1.png">
 
 
 
@@ -134,13 +137,13 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-  <link rel="canonical" href="https://jianwenjun.xyz/tags/"/>
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/"/>
 
 
 
 
 
-  <title>tags | 小简铺子</title>
+  <title>决策树相关算法——XGBoost原理分析及实例实现(二) | 小简铺子</title>
   
 
 
@@ -265,40 +268,273 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">tags</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-                目前共计 21 个标签
+          <h1 class="post-title" itemprop="name headline">决策树相关算法——XGBoost原理分析及实例实现(二)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T11:34:42+08:00">
+                2018-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/" class="leancloud_visitors" data-flag-title="决策树相关算法——XGBoost原理分析及实例实现(二)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  169
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  1 分钟
+                </span>
+              
             </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/Bagging/" style="font-size: 12px; color: #ccc">Bagging</a> <a href="/tags/Boosting/" style="font-size: 12px; color: #ccc">Boosting</a> <a href="/tags/CART/" style="font-size: 16.5px; color: #9d9d9d">CART</a> <a href="/tags/CNN/" style="font-size: 12px; color: #ccc">CNN</a> <a href="/tags/Centos7/" style="font-size: 12px; color: #ccc">Centos7</a> <a href="/tags/Fabric/" style="font-size: 16.5px; color: #9d9d9d">Fabric</a> <a href="/tags/GRPC/" style="font-size: 16.5px; color: #9d9d9d">GRPC</a> <a href="/tags/Hexo/" style="font-size: 12px; color: #ccc">Hexo</a> <a href="/tags/TensorBoard/" style="font-size: 12px; color: #ccc">TensorBoard</a> <a href="/tags/TensorFlow/" style="font-size: 16.5px; color: #9d9d9d">TensorFlow</a> <a href="/tags/XGBoost/" style="font-size: 16.5px; color: #9d9d9d">XGBoost</a> <a href="/tags/java/" style="font-size: 30px; color: #111">java</a> <a href="/tags/个人总结/" style="font-size: 16.5px; color: #9d9d9d">个人总结</a> <a href="/tags/决策树/" style="font-size: 30px; color: #111">决策树</a> <a href="/tags/分类问题/" style="font-size: 12px; color: #ccc">分类问题</a> <a href="/tags/并发/" style="font-size: 21px; color: #6f6f6f">并发</a> <a href="/tags/文本分类/" style="font-size: 12px; color: #ccc">文本分类</a> <a href="/tags/机器学习/" style="font-size: 12px; color: #ccc">机器学习</a> <a href="/tags/程序人生/" style="font-size: 16.5px; color: #9d9d9d">程序人生</a> <a href="/tags/虚拟机/" style="font-size: 12px; color: #ccc">虚拟机</a> <a href="/tags/集成学习/" style="font-size: 25.5px; color: #404040">集成学习</a>
-            </div>
-          </div>
-        
-      </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>本篇博客主要记录的是XGBoost在构建决策树结构时，知道如何评定划分点的好坏的情况下，如何遍历查找出该树结构的切分点。前篇博客<a href="">决策树相关算法——XGBoost原理分析及实例实现(一)</a>介绍的是贪心查找算法，逐步遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点。本篇主要介绍的是近视查找算法和稀疏感知的划分查找。<br><a id="more"></a></p>
+<p><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/1.png" width="40%" height="50%" align="center" alt="图1"></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
+<p>1.传统的GBDT是以CART作为基分类器，XGBoost支持线性分类器。<br>2.</p>
+</blockquote>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href=""></a></p>
+
       
     </div>
     
     
     
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/">决策树相关算法——XGBoost原理分析及实例实现(二)</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年04月27日 - 11:04</p>
+<p><span>最后更新:</span>2018年04月27日 - 14:04</p>
+<p><span>原始链接:</span><a href="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/" title="决策树相关算法——XGBoost原理分析及实例实现(二)">https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/XGBoost/" rel="tag"><i class="fa fa-tag"></i> XGBoost</a>
+          
+            <a href="/tags/决策树/" rel="tag"><i class="fa fa-tag"></i> 决策树</a>
+          
+            <a href="/tags/集成学习/" rel="tag"><i class="fa fa-tag"></i> 集成学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/" rel="next" title="决策树相关算法——XGBoost原理分析及实例实现(一)">
+                <i class="fa fa-chevron-left"></i> 决策树相关算法——XGBoost原理分析及实例实现(一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -307,6 +543,18 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
           
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
 
         </div>
         
@@ -327,8 +575,17 @@ border-left-color: #1E92FB;    /*左边框颜色*/
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -430,6 +687,22 @@ border-left-color: #1E92FB;    /*左边框颜色*/
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -625,6 +898,34 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
     
 
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
     
 
 

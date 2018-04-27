@@ -1,3 +1,5 @@
+https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/
+https://jianwenjun.xyz/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/
 https://jianwenjun.xyz/2018/04/12/决策树相关算法——Boosting之Adaboost-GBDT详细分析与实现/
 https://jianwenjun.xyz/2018/04/10/Hexo-Coding-Github部署个人博客Error全集/
 https://jianwenjun.xyz/2018/04/07/自我修养一/
@@ -16,5 +18,3 @@ https://jianwenjun.xyz/2017/10/15/设计模式精髓篇之创建型/
 https://jianwenjun.xyz/2017/10/14/设计模式初篇/
 https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/
 https://jianwenjun.xyz/2017/10/04/Fabric的源码阅读方式/
-https://jianwenjun.xyz/2017/10/03/gRPC学习笔记/
-https://jianwenjun.xyz/2017/10/02/Protocol-Buffers的学习笔记/
