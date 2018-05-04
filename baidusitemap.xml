@@ -4,18 +4,18 @@
 
     
   <url>
-    <loc>https://jianwenjun.xyz/2018/04/26/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%80/</loc>
-    <lastmod>2018-04-27T06:50:08.000Z</lastmod>
+    <loc>https://jianwenjun.xyz/2018/05/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%89/</loc>
+    <lastmod>2018-05-04T08:09:58.000Z</lastmod>
     <data>
         <display>
-        <title>决策树相关算法——XGBoost原理分析及实例实现(一)</title>
-        <pubTime>2018-04-26T03:34:34.000Z</pubTime>
+        <title>决策树相关算法——XGBoost原理分析及实例实现(三)</title>
+        <pubTime>2018-05-02T10:12:48.000Z</pubTime>
         
-        <tag>XGBoost</tag>
-         
         <tag>决策树</tag>
          
         <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
          
          
            
@@ -29,17 +29,41 @@
     
   <url>
     <loc>https://jianwenjun.xyz/2018/04/27/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%BA%8C/</loc>
-    <lastmod>2018-04-27T06:50:05.000Z</lastmod>
+    <lastmod>2018-04-28T11:13:32.000Z</lastmod>
     <data>
         <display>
         <title>决策树相关算法——XGBoost原理分析及实例实现(二)</title>
         <pubTime>2018-04-27T03:34:42.000Z</pubTime>
         
-        <tag>XGBoost</tag>
-         
         <tag>决策树</tag>
          
         <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/04/26/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%80/</loc>
+    <lastmod>2018-04-27T11:57:15.000Z</lastmod>
+    <data>
+        <display>
+        <title>决策树相关算法——XGBoost原理分析及实例实现(一)</title>
+        <pubTime>2018-04-26T03:34:34.000Z</pubTime>
+        
+        <tag>决策树</tag>
+         
+        <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
          
          
            
@@ -61,9 +85,9 @@
         
         <tag>决策树</tag>
          
-        <tag>集成学习</tag>
-         
         <tag>CART</tag>
+         
+        <tag>集成学习</tag>
          
         <tag>Boosting</tag>
          
@@ -87,11 +111,11 @@
         
         <tag>决策树</tag>
          
-        <tag>集成学习</tag>
-         
         <tag>CART</tag>
          
         <tag>Bagging</tag>
+         
+        <tag>集成学习</tag>
          
          
            

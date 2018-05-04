@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="决策树,集成学习,XGBoost," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客作为前两篇XGBoost的原理与分析的续作三，主要记录的是使用XGBoost对kaggle中的初级赛题Titanic: Machine Learning from Disaster进行预测的实例，以此来加深自己对XGBoost库的使用。">
+<meta name="keywords" content="决策树,集成学习,XGBoost">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树相关算法——XGBoost原理分析及实例实现(三)">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客作为前两篇XGBoost的原理与分析的续作三，主要记录的是使用XGBoost对kaggle中的初级赛题Titanic: Machine Learning from Disaster进行预测的实例，以此来加深自己对XGBoost库的使用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/29.png">
+<meta property="og:updated_time" content="2018-05-04T08:09:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树相关算法——XGBoost原理分析及实例实现(三)">
+<meta name="twitter:description" content="1前言本篇博客作为前两篇XGBoost的原理与分析的续作三，主要记录的是使用XGBoost对kaggle中的初级赛题Titanic: Machine Learning from Disaster进行预测的实例，以此来加深自己对XGBoost库的使用。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/29.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/"/>
+
+
+
+
+
+  <title>决策树相关算法——XGBoost原理分析及实例实现(三) | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">决策树相关算法——XGBoost原理分析及实例实现(三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-02T18:12:48+08:00">
+                2018-05-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/" class="leancloud_visitors" data-flag-title="决策树相关算法——XGBoost原理分析及实例实现(三)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,802
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  22 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客作为前两篇XGBoost的原理与分析的续作三，主要记录的是使用XGBoost对kaggle中的初级赛题<a href="https://www.kaggle.com/c/titanic/data" target="_blank" rel="noopener">Titanic: Machine Learning from Disaster</a>进行预测的实例，以此来加深自己对XGBoost库的使用。<br><a id="more"></a><br>前两篇XGBoost原理分析如下，本篇实例地址为<a href="">Github</a><br><a href="">决策树相关算法——XGBoost原理分析及实例实现(一)</a><br><a href="">决策树相关算法——XGBoost原理分析及实例实现(二)</a></p>
+<h4 id="2数据集分析"><a href="#2数据集分析" class="headerlink" title="2数据集分析"></a>2数据集分析</h4><p>Titanic赛题的数据集需要到上述赛题地址下载，包括训练集train.csv中，测试集test.csv,最后赛题预测的答案集为gender_submission.csv。<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/29.png" width="90%" height="75%" align="center" alt="图29"><br>给出的数据集的记录中有些Variable存在缺失，而且Variable的值存在离散型数据，连续型数据和字符串数据。这些在训练模型之前都需要进行处理，首先对赛题给出的数据进行分析，提取出要训练的模型特征。</p>
+<h4 id="3特征工程"><a href="#3特征工程" class="headerlink" title="3特征工程"></a>3特征工程</h4><p>此赛题的特征工程主要包括四个任务：<strong>数据缺失值处理</strong>，<strong>连续型数据特征值处理</strong>，<strong>字符串型数据特征值处理</strong>，<strong>预测模型的特征选择</strong>。接下来这3个任务将贯穿整个特征工程的过程。<br>特征选择一般的方式有：计算每一个特征与响应变量label的相关性，比如说计算互信息系数。训练能够对特征打分的预选模型：RandomForest和Logistic Regression等都能对模型的特征打分，通过打分获得相关性后再训练最终模型；</p>
+<h5 id="3-1查看数据整体信息"><a href="#3-1查看数据整体信息" class="headerlink" title="3.1查看数据整体信息"></a>3.1查看数据整体信息</h5><p>包括行列信息，各列Variable缺失值情况，dtypes的值。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">###### in</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">train = pd.read_csv(<span class="string">"ML/data/Titanic/train.csv"</span>)</span><br><span class="line">test = pd.read_csv(<span class="string">"ML/data/Titanic/test.csv"</span>)</span><br><span class="line">full_data = [train,test]</span><br><span class="line">print(train.info())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">pandas</span>.<span class="title">core</span>.<span class="title">frame</span>.<span class="title">DataFrame</span>'&gt;</span></span><br><span class="line"><span class="class"><span class="title">RangeIndex</span>:</span> <span class="number">891</span> entries, <span class="number">0</span> to <span class="number">890</span></span><br><span class="line">Data columns (total <span class="number">12</span> columns):</span><br><span class="line">PassengerId    <span class="number">891</span> non-null int64</span><br><span class="line">Survived       <span class="number">891</span> non-null int64</span><br><span class="line">Pclass         <span class="number">891</span> non-null int64</span><br><span class="line">Name           <span class="number">891</span> non-null object</span><br><span class="line">Sex            <span class="number">891</span> non-null object</span><br><span class="line">Age            <span class="number">714</span> non-null float64</span><br><span class="line">SibSp          <span class="number">891</span> non-null int64</span><br><span class="line">Parch          <span class="number">891</span> non-null int64</span><br><span class="line">Ticket         <span class="number">891</span> non-null object</span><br><span class="line">Fare           <span class="number">891</span> non-null float64</span><br><span class="line">Cabin          <span class="number">204</span> non-null object</span><br><span class="line">Embarked       <span class="number">889</span> non-null object</span><br><span class="line">dtypes: float64(<span class="number">2</span>), int64(<span class="number">5</span>), object(<span class="number">5</span>)</span><br><span class="line">memory usage: <span class="number">83.6</span>+ KB</span><br><span class="line"><span class="keyword">None</span></span><br></pre></td></tr></table></figure></p>
+<h5 id="3-2根据train-csv中各个Variable的取值和特性进行数据处理"><a href="#3-2根据train-csv中各个Variable的取值和特性进行数据处理" class="headerlink" title="3.2根据train.csv中各个Variable的取值和特性进行数据处理"></a>3.2根据train.csv中各个Variable的取值和特性进行数据处理</h5><p>主要查看数据的各个Variable对Survived的影响来确定是否该Variable对生还有影响。<a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/DecisionTree/titanic_data_analy.ipynb" target="_blank" rel="noopener">分析代码地址</a><br><strong>1.PassengerId 和 Survived</strong><br>Survived是模型最终需要预测的Label，给定的数据集该Variable值没有缺失。PassengerId是各个乘客的ID，每个ID号各不相同，基本没有什么数据挖掘意义，对需要预测的存活性几乎没有影响。<br><strong>2.Pclass</strong><br>pclass为船票类型，离散数据(不需要进行特别处理)，没有缺失值。该变量的取值情况如下。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">###### in</span></span><br><span class="line"><span class="keyword">print</span> (train[<span class="string">'Pclass'</span>].value_counts(sort=<span class="keyword">False</span>).sort_index())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line"><span class="number">1</span>    <span class="number">216</span></span><br><span class="line"><span class="number">2</span>    <span class="number">184</span></span><br><span class="line"><span class="number">3</span>    <span class="number">491</span></span><br><span class="line"><span class="comment">###### Pclass和Survived的影响</span></span><br><span class="line"><span class="comment">#计算出每个Pclass属性的取值中存活的人的比例</span></span><br><span class="line"><span class="keyword">print</span> train[[<span class="string">'Pclass'</span>,<span class="string">'Survived'</span>]].groupby(<span class="string">'Pclass'</span>,as_index=<span class="keyword">False</span>).mean()</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">   Pclass  Survived</span><br><span class="line"><span class="number">0</span>       <span class="number">1</span>  <span class="number">0.629630</span></span><br><span class="line"><span class="number">1</span>       <span class="number">2</span>  <span class="number">0.472826</span></span><br><span class="line"><span class="number">2</span>       <span class="number">3</span>  <span class="number">0.242363</span></span><br></pre></td></tr></table></figure></p>
+<p>从输出的生还率可以看出，不同的Pclass类型对生还率影响还是很大的，所以选取该属性作为最终的模型的特征之一,取值为1，2，3.<br><strong>3.Sex</strong><br>Sex为性别，连续型数据特征，没有缺失值。该变量的取值情况如下。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">###### in</span></span><br><span class="line"><span class="keyword">print</span> (train[<span class="string">'Sex'</span>].value_counts(sort=<span class="keyword">False</span>).sort_index())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">female    <span class="number">314</span></span><br><span class="line">male      <span class="number">577</span></span><br><span class="line"><span class="comment">###### Sex和Survived的影响</span></span><br><span class="line"><span class="comment">#计算出每个Sex属性的取值中存活的人的比例</span></span><br><span class="line"><span class="keyword">print</span> train[[<span class="string">'Sex'</span>,<span class="string">'Survived'</span>]].groupby(<span class="string">'Sex'</span>,as_index=<span class="keyword">False</span>).mean()</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">      Sex  Survived</span><br><span class="line"><span class="number">0</span>  female  <span class="number">0.742038</span></span><br><span class="line"><span class="number">1</span>    male  <span class="number">0.188908</span></span><br></pre></td></tr></table></figure></p>
+<p>从输出的生还率可以看出，不同的Sex类型对生还率影响还是很大的，所以选取该属性作为最终的模型.对于字符串数据特征值的处理，可以将两个字符串值映射到两个数值0，1上。<br><strong>4.Age</strong><br>Age为年龄，连续型数据，<code>Age 714 non-null float64</code>该属性包含较多的缺失值，不宜删除缺失值所在的行的数据记录。此处不仅需要对缺失值进行处理，而且需要对该连续型数据进行处理。</p>
+<blockquote>
+<p>1.对于该属性的缺失值处理：方法一，默认填充值的范围[(mean - std) ,(mean + std)]。方法二，将缺失的Age当做label,将其他列的属性当做特征，通过已有的Age的记录训练模型，来预测缺失的Age值。<br>2.对该连续型数据进行处理：常用的方法有两种，方法一，等距离划分。方法二，通过卡方检验/信息增益/GINI系数寻找差异较大的分裂点。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">###对于该属性的缺失值处理方式一，方式二在最终的代码仓库中</span></span><br><span class="line"><span class="keyword">for</span> dataset <span class="keyword">in</span> full_data:</span><br><span class="line">    age_avg = dataset[<span class="string">'Age'</span>].mean()</span><br><span class="line">    age_std = dataset[<span class="string">'Age'</span>].std()</span><br><span class="line">    </span><br><span class="line">    age_null_count = dataset[<span class="string">'Age'</span>].isnull().sum()</span><br><span class="line">    age_default_list = np.random.randint(low=age_avg-age_std,high=age_avg+age_std,size=age_null_count,)</span><br><span class="line">    </span><br><span class="line">    dataset[<span class="string">'Age'</span>][np.isnan(dataset[<span class="string">'Age'</span>])] = age_default_list</span><br><span class="line">    dataset[<span class="string">'Age'</span>] = dataset[<span class="string">'Age'</span>].astype(int)</span><br><span class="line"><span class="comment">###对该连续型数据进行处理方式二</span></span><br><span class="line">train[<span class="string">'CategoricalAge'</span>] = pd.cut(train[<span class="string">'Age'</span>], <span class="number">5</span>)</span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'CategoricalAge'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'CategoricalAge'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">  CategoricalAge  Survived</span><br><span class="line"><span class="number">0</span>  (<span class="number">-0.08</span>, <span class="number">16.0</span>]  <span class="number">0.532710</span></span><br><span class="line"><span class="number">1</span>   (<span class="number">16.0</span>, <span class="number">32.0</span>]  <span class="number">0.360802</span></span><br><span class="line"><span class="number">2</span>   (<span class="number">32.0</span>, <span class="number">48.0</span>]  <span class="number">0.360784</span></span><br><span class="line"><span class="number">3</span>   (<span class="number">48.0</span>, <span class="number">64.0</span>]  <span class="number">0.434783</span></span><br><span class="line"><span class="number">4</span>   (<span class="number">64.0</span>, <span class="number">80.0</span>]  <span class="number">0.090909</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>可以看出对连续型特征Age离散化处理后，各个年龄阶段的存活率还是有差异的，所以可以选取CategoricalAge作为最终模型的一个特征。<br><strong>5.SibSp and Parch</strong><br>SibSp和Parch分别为同船的兄弟姐妹和父母子女数，离散数据，没有缺失值。于是可以根据该人的家庭情况组合出不同的特征。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">###### SibSp对Survived的影响</span></span><br><span class="line"><span class="keyword">print</span> train[[<span class="string">'SibSp'</span>,<span class="string">'Survived'</span>]].groupby(<span class="string">'SibSp'</span>,as_index=<span class="keyword">False</span>).mean()</span><br><span class="line"><span class="comment">###### Parch对Survived的影响</span></span><br><span class="line"><span class="keyword">print</span> train[[<span class="string">'Parch'</span>,<span class="string">'Survived'</span>]].groupby(<span class="string">'Parch'</span>,as_index=<span class="keyword">False</span>).mean()</span><br><span class="line"><span class="comment">###### Parch和SibSp组合对Survived的影响</span></span><br><span class="line"><span class="keyword">for</span> dataset <span class="keyword">in</span> full_data:</span><br><span class="line">    dataset[<span class="string">'FamilySize'</span>] = dataset[<span class="string">'SibSp'</span>] + dataset[<span class="string">'Parch'</span>] + <span class="number">1</span></span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'FamilySize'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'FamilySize'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### 是否为一个人IsAlone对Survived的影响</span></span><br><span class="line">train[<span class="string">'IsAlone'</span>] = <span class="number">0</span></span><br><span class="line">train.loc[train[<span class="string">'FamilySize'</span>]==<span class="number">1</span>,<span class="string">'IsAlone'</span>] = <span class="number">1</span></span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'IsAlone'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'IsAlone'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### out 1</span></span><br><span class="line">   SibSp  Survived </span><br><span class="line"><span class="number">0</span>      <span class="number">0</span>  <span class="number">0.345395</span></span><br><span class="line"><span class="number">1</span>      <span class="number">1</span>  <span class="number">0.535885</span></span><br><span class="line"><span class="number">2</span>      <span class="number">2</span>  <span class="number">0.464286</span></span><br><span class="line"><span class="number">3</span>      <span class="number">3</span>  <span class="number">0.250000</span></span><br><span class="line"><span class="number">4</span>      <span class="number">4</span>  <span class="number">0.166667</span></span><br><span class="line"><span class="number">5</span>      <span class="number">5</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="number">6</span>      <span class="number">8</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="comment">###### out 2</span></span><br><span class="line">   Parch  Survived</span><br><span class="line"><span class="number">0</span>      <span class="number">0</span>  <span class="number">0.343658</span></span><br><span class="line"><span class="number">1</span>      <span class="number">1</span>  <span class="number">0.550847</span></span><br><span class="line"><span class="number">2</span>      <span class="number">2</span>  <span class="number">0.500000</span></span><br><span class="line"><span class="number">3</span>      <span class="number">3</span>  <span class="number">0.600000</span></span><br><span class="line"><span class="number">4</span>      <span class="number">4</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="number">5</span>      <span class="number">5</span>  <span class="number">0.200000</span></span><br><span class="line"><span class="number">6</span>      <span class="number">6</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="comment">###### out 3</span></span><br><span class="line"><span class="number">0</span>           <span class="number">1</span>  <span class="number">0.303538</span></span><br><span class="line"><span class="number">1</span>           <span class="number">2</span>  <span class="number">0.552795</span></span><br><span class="line"><span class="number">2</span>           <span class="number">3</span>  <span class="number">0.578431</span></span><br><span class="line"><span class="number">3</span>           <span class="number">4</span>  <span class="number">0.724138</span></span><br><span class="line"><span class="number">4</span>           <span class="number">5</span>  <span class="number">0.200000</span></span><br><span class="line"><span class="number">5</span>           <span class="number">6</span>  <span class="number">0.136364</span></span><br><span class="line"><span class="number">6</span>           <span class="number">7</span>  <span class="number">0.333333</span></span><br><span class="line"><span class="number">7</span>           <span class="number">8</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="number">8</span>          <span class="number">11</span>  <span class="number">0.000000</span></span><br><span class="line"><span class="comment">###### out 4</span></span><br><span class="line">   IsAlone  Survived</span><br><span class="line"><span class="number">0</span>        <span class="number">0</span>  <span class="number">0.505650</span></span><br><span class="line"><span class="number">1</span>        <span class="number">1</span>  <span class="number">0.303538</span></span><br></pre></td></tr></table></figure></p>
+<p>从输出的生还率可以看出，可以选取的模型特征有Parch和SibSp组合特征FamilySize，Parch，SibSp，IsAlone该四个特征的取值都为离散值。<br><strong>6.Ticket和Cabin</strong><br>Ticket为船票号码，每个ID的船票号不同，难以进行数据挖掘，所以该列可以舍弃。Cabin为客舱号码，<code>204 non-null object</code>对于891条数据记录来说，缺失巨大，难以进行填充或者说进行缺失值补充带来的噪音将更多，所以可以考虑放弃该列。<br><strong>7.Fare</strong><br>Fare为船票售价，连续型数据，没有缺失值，需要对该属性值进行离散化处理。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> dataset <span class="keyword">in</span> full_data:</span><br><span class="line">    dataset[<span class="string">'Fare'</span>] = dataset[<span class="string">'Fare'</span>].fillna(train[<span class="string">'Fare'</span>].median())</span><br><span class="line">train[<span class="string">'CategoricalFare'</span>] = pd.qcut(train[<span class="string">'Fare'</span>],<span class="number">6</span>)</span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'CategoricalFare'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'CategoricalFare'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">     CategoricalFare  Survived</span><br><span class="line"><span class="number">0</span>    (<span class="number">-0.001</span>, <span class="number">7.775</span>]  <span class="number">0.205128</span></span><br><span class="line"><span class="number">1</span>     (<span class="number">7.775</span>, <span class="number">8.662</span>]  <span class="number">0.190789</span></span><br><span class="line"><span class="number">2</span>    (<span class="number">8.662</span>, <span class="number">14.454</span>]  <span class="number">0.366906</span></span><br><span class="line"><span class="number">3</span>     (<span class="number">14.454</span>, <span class="number">26.0</span>]  <span class="number">0.436242</span></span><br><span class="line"><span class="number">4</span>     (<span class="number">26.0</span>, <span class="number">52.369</span>]  <span class="number">0.417808</span></span><br><span class="line"><span class="number">5</span>  (<span class="number">52.369</span>, <span class="number">512.329</span>]  <span class="number">0.697987</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看出对连续型特征Fare离散化处理后，各个票价阶段的存活率还是有差异的，所以可以选取CategoricalFare作为最终模型的一个特征。此时分为了6个等样本数阶段。<br><strong>8.Embarked</strong><br>Embarked是终点城市，字符串型特征值，<code>889 non-null object</code>对于891个数据记录来说，缺失数极小，所以这里考虑使用该属性最多的值填充。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">print</span> (train[<span class="string">'Embarked'</span>].value_counts(sort=<span class="keyword">False</span>).sort_index())</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">C    <span class="number">168</span></span><br><span class="line">Q     <span class="number">77</span></span><br><span class="line">S    <span class="number">644</span></span><br><span class="line">Name: Embarked, dtype: int64</span><br><span class="line"><span class="comment">#### 填充和探索Embarked对Survived的影响</span></span><br><span class="line"><span class="keyword">for</span> data <span class="keyword">in</span> full_data:</span><br><span class="line">    data[<span class="string">'Embarked'</span>] = data[<span class="string">'Embarked'</span>].fillna(<span class="string">'S'</span>)</span><br><span class="line"><span class="keyword">print</span> (train[<span class="string">'Embarked'</span>].value_counts(sort=<span class="keyword">False</span>).sort_index())</span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'Embarked'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'Embarked'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### out1</span></span><br><span class="line">C    <span class="number">168</span></span><br><span class="line">Q     <span class="number">77</span></span><br><span class="line">S    <span class="number">646</span></span><br><span class="line">Name: Embarked, dtype: int64</span><br><span class="line">  Embarked  Survived</span><br><span class="line"><span class="number">0</span>        C  <span class="number">0.553571</span></span><br><span class="line"><span class="number">1</span>        Q  <span class="number">0.389610</span></span><br><span class="line"><span class="number">2</span>        S  <span class="number">0.339009</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看出不同的Embarked类型对存活率的影响有差异，所以可以选择该列作为最终模型的特征，由于该属性的值是字符型，还需要进行映射处理或者one-hot处理。<br><strong>9.Name</strong><br>Name为姓名，字符型特征值，没有缺失值，需要对字符型特征值进行处理。但是观察到Name的取值都是不相同，但其中发现Name的title name是存在类别的关系的。于是可以对Name进行提取出称呼这一类别title name.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_title_name</span><span class="params">(name)</span>:</span></span><br><span class="line">    title_s = re.search(<span class="string">' ([A-Za-z]+)\.'</span>, name)</span><br><span class="line">    <span class="keyword">if</span> title_s:</span><br><span class="line">        <span class="keyword">return</span> title_s.group(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> dataset <span class="keyword">in</span> full_data:</span><br><span class="line">    dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'Name'</span>].apply(get_title_name)</span><br><span class="line">print(pd.crosstab(train[<span class="string">'TitleName'</span>],train[<span class="string">'Sex'</span>]))</span><br><span class="line"><span class="comment">###### out</span></span><br><span class="line">Sex        female  male</span><br><span class="line">TitleName              </span><br><span class="line">Capt            <span class="number">0</span>     <span class="number">1</span></span><br><span class="line">Col             <span class="number">0</span>     <span class="number">2</span></span><br><span class="line">Countess        <span class="number">1</span>     <span class="number">0</span></span><br><span class="line">Don             <span class="number">0</span>     <span class="number">1</span></span><br><span class="line">Dr              <span class="number">1</span>     <span class="number">6</span></span><br><span class="line">Jonkheer        <span class="number">0</span>     <span class="number">1</span></span><br><span class="line">Lady            <span class="number">1</span>     <span class="number">0</span></span><br><span class="line">Major           <span class="number">0</span>     <span class="number">2</span></span><br><span class="line">Master          <span class="number">0</span>    <span class="number">40</span></span><br><span class="line">Miss          <span class="number">182</span>     <span class="number">0</span></span><br><span class="line">Mlle            <span class="number">2</span>     <span class="number">0</span></span><br><span class="line">Mme             <span class="number">1</span>     <span class="number">0</span></span><br><span class="line">Mr              <span class="number">0</span>   <span class="number">517</span></span><br><span class="line">Mrs           <span class="number">125</span>     <span class="number">0</span></span><br><span class="line">Ms              <span class="number">1</span>     <span class="number">0</span></span><br><span class="line">Rev             <span class="number">0</span>     <span class="number">6</span></span><br><span class="line">Sir             <span class="number">0</span>     <span class="number">1</span></span><br><span class="line"><span class="comment">####可以看出不同的titlename中男女还是有区别的。进一步探索titlename对Survived的影响。</span></span><br><span class="line"><span class="comment">####看出上面的离散取值范围还是比较多，所以可以将较少的几类归为一个类别。</span></span><br><span class="line">train[<span class="string">'TitleName'</span>] = train[<span class="string">'TitleName'</span>].replace(<span class="string">'Mme'</span>, <span class="string">'Mrs'</span>)</span><br><span class="line">train[<span class="string">'TitleName'</span>] = train[<span class="string">'TitleName'</span>].replace(<span class="string">'Mlle'</span>, <span class="string">'Miss'</span>)</span><br><span class="line">train[<span class="string">'TitleName'</span>] = train[<span class="string">'TitleName'</span>].replace(<span class="string">'Ms'</span>, <span class="string">'Miss'</span>)</span><br><span class="line">train[<span class="string">'TitleName'</span>] = train[<span class="string">'TitleName'</span>].replace([<span class="string">'Lady'</span>, <span class="string">'Countess'</span>,<span class="string">'Capt'</span>, <span class="string">'Col'</span>,\</span><br><span class="line">     <span class="string">'Don'</span>, <span class="string">'Dr'</span>, <span class="string">'Major'</span>, <span class="string">'Rev'</span>, <span class="string">'Sir'</span>, <span class="string">'Jonkheer'</span>, <span class="string">'Dona'</span>], <span class="string">'Other'</span>)</span><br><span class="line"><span class="keyword">print</span> (train[[<span class="string">'TitleName'</span>, <span class="string">'Survived'</span>]].groupby([<span class="string">'TitleName'</span>], as_index=<span class="keyword">False</span>).mean())</span><br><span class="line"><span class="comment">###### out1</span></span><br><span class="line">  TitleName  Survived</span><br><span class="line"><span class="number">0</span>    Master  <span class="number">0.575000</span></span><br><span class="line"><span class="number">1</span>      Miss  <span class="number">0.702703</span></span><br><span class="line"><span class="number">2</span>        Mr  <span class="number">0.156673</span></span><br><span class="line"><span class="number">3</span>       Mrs  <span class="number">0.793651</span></span><br><span class="line"><span class="number">4</span>     Other  <span class="number">0.347826</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看出TitleName对存活率还是有影响差异的，TitleName总共为了5个类别：Mrs,Miss,Master,Mr,Other。</p>
+<h5 id="3-3赛题的特征提取总结"><a href="#3-3赛题的特征提取总结" class="headerlink" title="3.3赛题的特征提取总结"></a>3.3赛题的特征提取总结</h5><p>此赛题是计算每一个属性与响应变量label的影响(存活率)来查看是否选择该属性作为最后模型的输入特征。最后选取出的模型输入特征有<strong>Pclass</strong>,<strong>Sex</strong>,<strong>CategoricalAge</strong>,<strong>FamilySize</strong>,<strong>Parch</strong>,<strong>SibSp</strong>,<strong>IsAlone</strong>,<strong>CategoricalFare</strong>,<strong>Embarked</strong>,<strong>TitleName</strong>。<br>最后对上述分析进行统一的数据清洗，将train.csv和test.csv统一进行处理，得出新的模型训练样本集。</p>
+<h4 id="4XGBoost模型训练"><a href="#4XGBoost模型训练" class="headerlink" title="4XGBoost模型训练"></a>4XGBoost模型训练</h4><h5 id="4-1数据清洗和特征选择"><a href="#4-1数据清洗和特征选择" class="headerlink" title="4.1数据清洗和特征选择"></a>4.1数据清洗和特征选择</h5><p>此步骤主要是根据3中的数据分析来进行编写的。着重点Age的缺失值使用了两种方式进行填充。均值和通过其他清洗的数据特征使用随机森林预测缺失值两种方式。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">data_feature_engineering</span><span class="params">(full_data,age_default_avg=True,one_hot=True)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param full_data:全部数据集包括train,test</span></span><br><span class="line"><span class="string">    :param age_default_avg:age默认填充方式，是否使用平均值进行填充</span></span><br><span class="line"><span class="string">    :param one_hot: Embarked字符处理是否是one_hot编码还是映射处理</span></span><br><span class="line"><span class="string">    :return: 处理好的数据集</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> dataset <span class="keyword">in</span> full_data:</span><br><span class="line">        <span class="comment"># Pclass、Parch、SibSp不需要处理</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># sex 0,1</span></span><br><span class="line">        dataset[<span class="string">'Sex'</span>] = dataset[<span class="string">'Sex'</span>].map(Passenger_sex).astype(int)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># FamilySize</span></span><br><span class="line">        dataset[<span class="string">'FamilySize'</span>] = dataset[<span class="string">'SibSp'</span>] + dataset[<span class="string">'Parch'</span>] + <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># IsAlone</span></span><br><span class="line">        dataset[<span class="string">'IsAlone'</span>] = <span class="number">0</span></span><br><span class="line">        isAlone_mask = dataset[<span class="string">'FamilySize'</span>] == <span class="number">1</span></span><br><span class="line">        dataset.loc[isAlone_mask, <span class="string">'IsAlone'</span>] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Fare 离散化处理，6个阶段</span></span><br><span class="line">        fare_median = dataset[<span class="string">'Fare'</span>].median()</span><br><span class="line">        dataset[<span class="string">'CategoricalFare'</span>] = dataset[<span class="string">'Fare'</span>].fillna(fare_median)</span><br><span class="line">        dataset[<span class="string">'CategoricalFare'</span>] = pd.qcut(dataset[<span class="string">'CategoricalFare'</span>],<span class="number">6</span>,labels=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Embarked映射处理，one-hot编码,极少部分缺失值处理</span></span><br><span class="line">        dataset[<span class="string">'Embarked'</span>] = dataset[<span class="string">'Embarked'</span>].fillna(<span class="string">'S'</span>)</span><br><span class="line">        dataset[<span class="string">'Embarked'</span>] = dataset[<span class="string">'Embarked'</span>].astype(str)</span><br><span class="line">        <span class="keyword">if</span> one_hot:</span><br><span class="line">            <span class="comment"># 因为OneHotEncoder只能编码数值型，所以此处使用LabelBinarizer进行独热编码</span></span><br><span class="line">            Embarked_arr = LabelBinarizer().fit_transform(dataset[<span class="string">'Embarked'</span>])</span><br><span class="line">            dataset[<span class="string">'Embarked_0'</span>] = Embarked_arr[:, <span class="number">0</span>]</span><br><span class="line">            dataset[<span class="string">'Embarked_1'</span>] = Embarked_arr[:, <span class="number">1</span>]</span><br><span class="line">            dataset[<span class="string">'Embarked_2'</span>] = Embarked_arr[:, <span class="number">2</span>]</span><br><span class="line">            dataset.drop(<span class="string">'Embarked'</span>,axis=<span class="number">1</span>,inplace=<span class="keyword">True</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 字符串映射处理</span></span><br><span class="line">            dataset[<span class="string">'Embarked'</span>] = dataset[<span class="string">'Embarked'</span>].map(Passenger_Embarked).astype(int)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Name选取称呼Title_name</span></span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'Name'</span>].apply(get_title_name)</span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'TitleName'</span>].replace(<span class="string">'Mme'</span>, <span class="string">'Mrs'</span>)</span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'TitleName'</span>].replace(<span class="string">'Mlle'</span>, <span class="string">'Miss'</span>)</span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'TitleName'</span>].replace(<span class="string">'Ms'</span>, <span class="string">'Miss'</span>)</span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'TitleName'</span>].replace([<span class="string">'Lady'</span>, <span class="string">'Countess'</span>, <span class="string">'Capt'</span>, <span class="string">'Col'</span>, \</span><br><span class="line">                                                             <span class="string">'Don'</span>, <span class="string">'Dr'</span>, <span class="string">'Major'</span>, <span class="string">'Rev'</span>, <span class="string">'Sir'</span>, <span class="string">'Jonkheer'</span>, <span class="string">'Dona'</span>],</span><br><span class="line">                                                            <span class="string">'Other'</span>)</span><br><span class="line">        dataset[<span class="string">'TitleName'</span>] = dataset[<span class="string">'TitleName'</span>].map(Passenger_TitleName).astype(int)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># age —— 缺失值，分段处理</span></span><br><span class="line">        <span class="keyword">if</span> age_default_avg:</span><br><span class="line">            <span class="comment"># 缺失值使用avg处理</span></span><br><span class="line">            age_avg = dataset[<span class="string">'Age'</span>].mean()</span><br><span class="line">            age_std = dataset[<span class="string">'Age'</span>].std()</span><br><span class="line">            age_null_count = dataset[<span class="string">'Age'</span>].isnull().sum()</span><br><span class="line">            age_default_list = np.random.randint(low=age_avg - age_std, high=age_avg + age_std, size=age_null_count)</span><br><span class="line"></span><br><span class="line">            dataset.loc[np.isnan(dataset[<span class="string">'Age'</span>]), <span class="string">'Age'</span>] = age_default_list</span><br><span class="line">            dataset[<span class="string">'Age'</span>] = dataset[<span class="string">'Age'</span>].astype(int)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 将age作为label，预测缺失的age</span></span><br><span class="line">            <span class="comment"># 特征为 TitleName,Sex,pclass,SibSP,Parch,IsAlone,CategoricalFare,FamileSize,Embarked</span></span><br><span class="line">            feature_list = [<span class="string">'TitleName'</span>, <span class="string">'Sex'</span>, <span class="string">'Pclass'</span>, <span class="string">'SibSp'</span>, <span class="string">'Parch'</span>, <span class="string">'IsAlone'</span>,<span class="string">'CategoricalFare'</span>,</span><br><span class="line">                            <span class="string">'FamilySize'</span>, <span class="string">'Embarked'</span>,<span class="string">'Age'</span>]</span><br><span class="line">            <span class="keyword">if</span> one_hot:</span><br><span class="line">                feature_list.append(<span class="string">'Embarked_0'</span>)</span><br><span class="line">                feature_list.append(<span class="string">'Embarked_1'</span>)</span><br><span class="line">                feature_list.append(<span class="string">'Embarked_2'</span>)</span><br><span class="line">                feature_list.remove(<span class="string">'Embarked'</span>)</span><br><span class="line">            Age_data = dataset.loc[:,feature_list]</span><br><span class="line"></span><br><span class="line">            un_Age_mask = np.isnan(Age_data[<span class="string">'Age'</span>])</span><br><span class="line">            Age_train = Age_data[~un_Age_mask] <span class="comment">#要训练的Age</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># print(Age_train.shape)</span></span><br><span class="line">            feature_list.remove(<span class="string">'Age'</span>)</span><br><span class="line">            rf0 = RandomForestRegressor(n_estimators=<span class="number">60</span>,oob_score=<span class="keyword">True</span>,min_samples_split=<span class="number">10</span>,min_samples_leaf=<span class="number">2</span>,</span><br><span class="line">                                                                   max_depth=<span class="number">7</span>,random_state=<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">            rf0.fit(Age_train[feature_list],Age_train[<span class="string">'Age'</span>])</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">set_default_age</span><span class="params">(age)</span>:</span></span><br><span class="line">                <span class="keyword">if</span> np.isnan(age[<span class="string">'Age'</span>]):</span><br><span class="line">                    <span class="comment"># print(age['PassengerId'])</span></span><br><span class="line">                    <span class="comment"># print age.loc[feature_list]</span></span><br><span class="line">                    data_x = np.array(age.loc[feature_list]).reshape(<span class="number">1</span>,<span class="number">-1</span>)</span><br><span class="line">                    <span class="comment"># print data_x</span></span><br><span class="line">                    age_v = round(rf0.predict(data_x))</span><br><span class="line">                    <span class="comment"># print('pred:',age_v)</span></span><br><span class="line">                    <span class="comment"># age['Age'] = age_v</span></span><br><span class="line">                    <span class="keyword">return</span> age_v</span><br><span class="line">                    <span class="comment"># print age</span></span><br><span class="line">                <span class="keyword">return</span> age[<span class="string">'Age'</span>]</span><br><span class="line"></span><br><span class="line">            dataset[<span class="string">'Age'</span>] = dataset.apply(set_default_age, axis=<span class="number">1</span>)</span><br><span class="line">            <span class="comment"># print(dataset.tail())</span></span><br><span class="line">            <span class="comment">#</span></span><br><span class="line">            <span class="comment"># data_age_no_full = dataset[dataset['Age'].]</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pd.cut与pd.qcut的区别，前者是根据取值范围来均匀划分，</span></span><br><span class="line">        <span class="comment"># 后者是根据取值范围的各个取值的频率来换分，划分后的某个区间的频率数相同</span></span><br><span class="line">        <span class="comment"># print(dataset.tail())</span></span><br><span class="line">        dataset[<span class="string">'CategoricalAge'</span>] = pd.cut(dataset[<span class="string">'Age'</span>], <span class="number">5</span>,labels=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>])</span><br><span class="line">    <span class="keyword">return</span> full_data</span><br><span class="line"><span class="comment">##特征选择</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">data_feature_select</span><span class="params">(full_data)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param full_data:全部数据集</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> data_set <span class="keyword">in</span> full_data:</span><br><span class="line">        drop_list = [<span class="string">'PassengerId'</span>,<span class="string">'Name'</span>,<span class="string">'Age'</span>,<span class="string">'Fare'</span>,<span class="string">'Ticket'</span>,<span class="string">'Cabin'</span>]</span><br><span class="line">        data_set.drop(drop_list,axis=<span class="number">1</span>,inplace=<span class="keyword">True</span>)</span><br><span class="line">    train_y = np.array(full_data[<span class="number">0</span>][<span class="string">'Survived'</span>])</span><br><span class="line">    train = full_data[<span class="number">0</span>].drop(<span class="string">'Survived'</span>,axis=<span class="number">1</span>,inplace=<span class="keyword">False</span>)</span><br><span class="line">    <span class="comment"># print(train.head())</span></span><br><span class="line">    train_X = np.array(train)</span><br><span class="line">    test_X = np.array(full_data[<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">return</span> train_X,train_y,test_X</span><br></pre></td></tr></table></figure></p>
+<h5 id="4-2XGBoost参数介绍"><a href="#4-2XGBoost参数介绍" class="headerlink" title="4.2XGBoost参数介绍"></a>4.2XGBoost参数介绍</h5><p>要熟练的使用XGBoost库一方面需要对XGBoost原理的了解，另一方面需要对XGBoost库的API参数的了解。此处参考了别人的博客。<br><strong>4.2.1通用参数</strong><br><strong>booster</strong>，基分类器的模型gbtree和gbliner<br><strong>nthread</strong>，线程数<br><strong>4.2.2booster参数(gbtree提升树对应的参数)</strong><br><strong>learning_rate</strong>，梯度下降的学习率，一般为0.01~0.2<br><strong>min_child_weight</strong>，最小叶子节点样本权重和，用于避免过拟合，一般为1<br><strong>max_depth</strong>，决策树的最大深度，默认为6<br><strong>max_leaf_nodes</strong>，树上最大的叶子数量<br><strong>gamma</strong>，节点分裂时候和损失函数变化相关，具体可参考XGBoost中决策树节点分裂时的代价函数的公式<br><strong>subsample和colsample_bytree</strong>，随机森林中的两种随机，也是XGBoost中的trick，用于防止过拟合，值为0.5~1，随机采样所占比例，随机列采样比例。<br><strong>lambda</strong>,L2正则化项，可调参实现。<br><strong>scale_pos_weight</strong>，在各类别样本十分不平衡时，把这个参数设定为一个正值，可以使算法更快收敛。<br><strong>4.2.3学习目标函数</strong><br><strong>objective</strong>，指定分类回归问题。如binary:logistic<br><strong>eval_metric</strong>，评价指标<br><strong>seed</strong>s随机数种子，调整参数时，随机取同样的样本集。</p>
+<h5 id="4-3XGBoost调参"><a href="#4-3XGBoost调参" class="headerlink" title="4.3XGBoost调参"></a>4.3XGBoost调参</h5><p>主要是五个步骤，按照参数的重要性依次调整。</p>
+<blockquote>
+<p>step1 确定学习速率和迭代次数n_estimators，即集分类器的数量<br>setp2 调试的参数是min_child_weight以及max_depth<br>step3 gamma参数调优<br>step4 调整subsample 和 colsample_bytree 参数<br>step5 正则化参数调优</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">xgboost_change_param</span><span class="params">(train_X,train_y)</span>:</span></span><br><span class="line">    <span class="comment"># Xgboost 调参</span></span><br><span class="line">    <span class="comment"># step1 确定学习速率和迭代次数n_estimators，即集分类器的数量</span></span><br><span class="line">    xgb1 = XGBClassifier(learning_rate=<span class="number">0.1</span>,</span><br><span class="line">                         booster=<span class="string">'gbtree'</span>,</span><br><span class="line">                                   n_estimators=<span class="number">300</span>,</span><br><span class="line">                                   max_depth=<span class="number">4</span>,</span><br><span class="line">                                   min_child_weight=<span class="number">1</span>,</span><br><span class="line">                                   gamma=<span class="number">0</span>,</span><br><span class="line">                                   subsample=<span class="number">0.8</span>,</span><br><span class="line">                                   colsample_bytree=<span class="number">0.8</span>,</span><br><span class="line">                                   objective=<span class="string">'binary:logistic'</span>,</span><br><span class="line">                                   nthread=<span class="number">2</span>,</span><br><span class="line">                                   scale_pos_weight=<span class="number">1</span>,</span><br><span class="line">                                   seed=<span class="number">10</span></span><br><span class="line">                                   )</span><br><span class="line">    <span class="comment">#最佳 n_estimators = 59 ，learning_rate=0.1</span></span><br><span class="line">    modelfit(xgb1,train_X,train_y,early_stopping_rounds=<span class="number">45</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># setp2 调试的参数是min_child_weight以及max_depth</span></span><br><span class="line">    param_test1 = &#123;</span><br><span class="line">        <span class="string">'max_depth'</span>: range(<span class="number">3</span>,<span class="number">8</span>,<span class="number">1</span>),</span><br><span class="line">        <span class="string">'min_child_weight'</span>:range(<span class="number">1</span>,<span class="number">6</span>,<span class="number">2</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    gsearch1 = GridSearchCV(estimator=XGBClassifier(learning_rate=<span class="number">0.1</span>,n_estimators=<span class="number">59</span>,</span><br><span class="line">                                                    max_depth=<span class="number">4</span>,min_child_weight=<span class="number">1</span>,gamma=<span class="number">0</span>,</span><br><span class="line">                                                    subsample=<span class="number">0.8</span>,colsample_bytree=<span class="number">0.8</span>,</span><br><span class="line">                                                    objective=<span class="string">'binary:logistic'</span>,nthread=<span class="number">2</span>,</span><br><span class="line">                                                    scale_pos_weight=<span class="number">1</span>,seed=<span class="number">10</span></span><br><span class="line">                                                    ),</span><br><span class="line">                            param_grid=param_test1,</span><br><span class="line">                            scoring=<span class="string">'roc_auc'</span>,n_jobs=<span class="number">1</span>,cv=<span class="number">5</span>)</span><br><span class="line">    gsearch1.fit(train_X,train_y)</span><br><span class="line">    <span class="keyword">print</span> gsearch1.best_params_,gsearch1.best_score_</span><br><span class="line">    <span class="comment"># 最佳 max_depth = 7 ，min_child_weight=3</span></span><br><span class="line">    <span class="comment"># modelfit(gsearch1.best_estimator_) 最佳模型为：gsearch1.best_estimator_</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># step3 gamma参数调优</span></span><br><span class="line">    param_test2 = &#123;</span><br><span class="line">        <span class="string">'gamma'</span>: [i/<span class="number">10.0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">5</span>)]</span><br><span class="line">    &#125;</span><br><span class="line">    gsearch2 = GridSearchCV(estimator=XGBClassifier(learning_rate=<span class="number">0.1</span>,n_estimators=<span class="number">59</span>,</span><br><span class="line">                                                    max_depth=<span class="number">7</span>,min_child_weight=<span class="number">3</span>,gamma=<span class="number">0</span>,</span><br><span class="line">                                                    subsample=<span class="number">0.8</span>,colsample_bytree=<span class="number">0.8</span>,</span><br><span class="line">                                                    objective=<span class="string">'binary:logistic'</span>,nthread=<span class="number">2</span>,</span><br><span class="line">                                                    scale_pos_weight=<span class="number">1</span>,seed=<span class="number">10</span>),</span><br><span class="line">                            param_grid=param_test2,</span><br><span class="line">                            scoring=<span class="string">'roc_auc'</span>,</span><br><span class="line">                            cv=<span class="number">5</span></span><br><span class="line">                            )</span><br><span class="line">    gsearch2.fit(train_X, train_y)</span><br><span class="line">    <span class="keyword">print</span> gsearch2.best_params_, gsearch2.best_score_</span><br><span class="line">    <span class="comment"># 最佳 gamma=0.3</span></span><br><span class="line">    <span class="comment"># modelfit(gsearch2.best_estimator_)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#step4 调整subsample 和 colsample_bytree 参数</span></span><br><span class="line">    param_test3 = &#123;</span><br><span class="line">        <span class="string">'subsample'</span>: [i / <span class="number">10.0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">6</span>, <span class="number">10</span>)],</span><br><span class="line">        <span class="string">'colsample_bytree'</span>: [i / <span class="number">10.0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">6</span>, <span class="number">10</span>)]</span><br><span class="line">    &#125;</span><br><span class="line">    gsearch3 = GridSearchCV(estimator=XGBClassifier(learning_rate=<span class="number">0.1</span>,n_estimators=<span class="number">59</span>,</span><br><span class="line">                                                    max_depth=<span class="number">7</span>,min_child_weight=<span class="number">3</span>,gamma=<span class="number">0.3</span>,</span><br><span class="line">                                                    subsample=<span class="number">0.8</span>,colsample_bytree=<span class="number">0.8</span>,</span><br><span class="line">                                                    objective=<span class="string">'binary:logistic'</span>,nthread=<span class="number">2</span>,</span><br><span class="line">                                                    scale_pos_weight=<span class="number">1</span>,seed=<span class="number">10</span>),</span><br><span class="line">                            param_grid=param_test3,</span><br><span class="line">                            scoring=<span class="string">'roc_auc'</span>,</span><br><span class="line">                            cv=<span class="number">5</span></span><br><span class="line">                            )</span><br><span class="line">    gsearch3.fit(train_X, train_y)</span><br><span class="line">    <span class="keyword">print</span> gsearch3.best_params_, gsearch3.best_score_</span><br><span class="line">    <span class="comment"># 最佳'subsample': 0.8, 'colsample_bytree': 0.6</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># step5 正则化参数调优</span></span><br></pre></td></tr></table></figure>
+<h5 id="4-4XGBoost训练"><a href="#4-4XGBoost训练" class="headerlink" title="4.4XGBoost训练"></a>4.4XGBoost训练</h5><p>待XGBoost调参结束后选择合适的参数，训练模型。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">train = pd.read_csv(train_file)</span><br><span class="line">test = pd.read_csv(test_file)</span><br><span class="line">test_y = pd.read_csv(test_result_file)</span><br><span class="line"></span><br><span class="line">full_data = [train,test]</span><br><span class="line"></span><br><span class="line"><span class="comment"># train.apply(axis=0)</span></span><br><span class="line"></span><br><span class="line">full_data = data_feature_engineering(full_data,age_default_avg=<span class="keyword">True</span>,one_hot=<span class="keyword">False</span>)</span><br><span class="line">train_X, train_y, test_X = data_feature_select(full_data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># XGBoost调参</span></span><br><span class="line"><span class="comment"># xgboost_change_param(train_X,train_y)</span></span><br><span class="line"></span><br><span class="line">xgb1 = XGBClassifier(learning_rate=<span class="number">0.1</span>,n_estimators=<span class="number">59</span>,</span><br><span class="line">                    max_depth=<span class="number">7</span>,min_child_weight=<span class="number">3</span>,</span><br><span class="line">                    gamma=<span class="number">0.3</span>,subsample=<span class="number">0.8</span>,</span><br><span class="line">                    colsample_bytree=<span class="number">0.6</span>,objective=<span class="string">'binary:logistic'</span>,</span><br><span class="line">                    nthread=<span class="number">2</span>,scale_pos_weight=<span class="number">1</span>,seed=<span class="number">10</span>)</span><br><span class="line">xgb1.fit(train_X,train_y)</span><br><span class="line"></span><br><span class="line">y_test_pre = xgb1.predict(test_X)</span><br><span class="line">y_test_true = np.array(test_y[<span class="string">'Survived'</span>])</span><br><span class="line"><span class="keyword">print</span> (<span class="string">"the xgboost model Accuracy : %.4g"</span> % metrics.accuracy_score(y_pred=y_test_pre, y_true=y_test_true))</span><br></pre></td></tr></table></figure></p>
+<h4 id="5实践总结"><a href="#5实践总结" class="headerlink" title="5实践总结"></a>5实践总结</h4><blockquote>
+<p>1.离散型特征进行one-hot编码的要求,OneHotEncoder只能对数值型特征进行独热编码，对字符型特征可以使用LabelBinarizer。<br>2.Pandas中的apply函数是作用在(axis=1)行Series上的，(axis==0)列Series上的。apply中的func需要返回值，并且return的值重新组合成一个Series作为最后的apply函数的返回。<br>3.字符型特征处理，有两种处理方式，第一种，直接映射到数值上，第二种进行独热编码LabelBinarizer。<br>4.缺失值处理，当某个属性列的值缺失极多，则可考虑放弃该列，如果部分缺失，可以使用该列统计的信息如平均值，中位数等进行填充，或者可以采用利用其它列作为特征，没有缺失的数作为label训练模型来预测缺失值的label。如果该属性列缺失极少的话，可以采用取值最多的数进行填充。</p>
+</blockquote>
+<h4 id="6参考链接"><a href="#6参考链接" class="headerlink" title="6参考链接"></a>6参考链接</h4><p><a href="https://www.kaggle.com/sinakhorami/titanic-best-working-classifier?scriptVersionId=566580" target="_blank" rel="noopener">Titanic数据集的特征选择</a><br><a href="https://blog.csdn.net/han_xiaoyang/article/details/52665396" target="_blank" rel="noopener">机器学习系列(12)_XGBoost参数调优完全指南</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/">决策树相关算法——XGBoost原理分析及实例实现(三)</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年05月02日 - 18:05</p>
+<p><span>最后更新:</span>2018年05月04日 - 16:05</p>
+<p><span>原始链接:</span><a href="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/" title="决策树相关算法——XGBoost原理分析及实例实现(三)">https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/决策树/" rel="tag"><i class="fa fa-tag"></i> 决策树</a>
+          
+            <a href="/tags/集成学习/" rel="tag"><i class="fa fa-tag"></i> 集成学习</a>
+          
+            <a href="/tags/XGBoost/" rel="tag"><i class="fa fa-tag"></i> XGBoost</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/" rel="next" title="决策树相关算法——XGBoost原理分析及实例实现(二)">
+                <i class="fa fa-chevron-left"></i> 决策树相关算法——XGBoost原理分析及实例实现(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2数据集分析"><span class="nav-number">2.</span> <span class="nav-text">2数据集分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3特征工程"><span class="nav-number">3.</span> <span class="nav-text">3特征工程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1查看数据整体信息"><span class="nav-number">3.1.</span> <span class="nav-text">3.1查看数据整体信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2根据train-csv中各个Variable的取值和特性进行数据处理"><span class="nav-number">3.2.</span> <span class="nav-text">3.2根据train.csv中各个Variable的取值和特性进行数据处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3赛题的特征提取总结"><span class="nav-number">3.3.</span> <span class="nav-text">3.3赛题的特征提取总结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4XGBoost模型训练"><span class="nav-number">4.</span> <span class="nav-text">4XGBoost模型训练</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1数据清洗和特征选择"><span class="nav-number">4.1.</span> <span class="nav-text">4.1数据清洗和特征选择</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2XGBoost参数介绍"><span class="nav-number">4.2.</span> <span class="nav-text">4.2XGBoost参数介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3XGBoost调参"><span class="nav-number">4.3.</span> <span class="nav-text">4.3XGBoost调参</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-4XGBoost训练"><span class="nav-number">4.4.</span> <span class="nav-text">4.4XGBoost训练</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5实践总结"><span class="nav-number">5.</span> <span class="nav-text">5实践总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6参考链接"><span class="nav-number">6.</span> <span class="nav-text">6参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共55.8k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+

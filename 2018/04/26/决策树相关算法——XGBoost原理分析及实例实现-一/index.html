@@ -83,7 +83,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 
-  <meta name="keywords" content="XGBoost,决策树,集成学习," />
+  <meta name="keywords" content="决策树,集成学习,XGBoost," />
 
 
 
@@ -95,7 +95,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 
 
 <meta name="description" content="1.前言本篇博客主要叙述的是提升方法中的XGBoost，而XGBoost本身包含的技术点及算法优化太多，且网上已经有很多原理性的相关介绍了，但是笔者还是希望自己亲身走一遍XGBoost的原理理解过程，以此来更熟练的使用XGBoost。话不多说，此篇主要叙述基于CART决策树的XGBoost的代价函数的优化过程(即该模型的参数求解过程)。">
-<meta name="keywords" content="XGBoost,决策树,集成学习">
+<meta name="keywords" content="决策树,集成学习,XGBoost">
 <meta property="og:type" content="article">
 <meta property="og:title" content="决策树相关算法——XGBoost原理分析及实例实现(一)">
 <meta property="og:url" content="https://jianwenjun.xyz/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/index.html">
@@ -120,7 +120,8 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/8.png">
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/9.png">
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/17.png">
-<meta property="og:updated_time" content="2018-04-27T06:50:08.000Z">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/xgboost/23.png">
+<meta property="og:updated_time" content="2018-04-27T11:57:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="决策树相关算法——XGBoost原理分析及实例实现(一)">
 <meta name="twitter:description" content="1.前言本篇博客主要叙述的是提升方法中的XGBoost，而XGBoost本身包含的技术点及算法优化太多，且网上已经有很多原理性的相关介绍了，但是笔者还是希望自己亲身走一遍XGBoost的原理理解过程，以此来更熟练的使用XGBoost。话不多说，此篇主要叙述基于CART决策树的XGBoost的代价函数的优化过程(即该模型的参数求解过程)。">
@@ -403,7 +404,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,018
+                  2,222
                 </span>
               
 
@@ -419,7 +420,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  7 分钟
+                  8 分钟
                 </span>
               
             </div>
@@ -444,8 +445,9 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <h4 id="2-优化前的分析"><a href="#2-优化前的分析" class="headerlink" title="2.优化前的分析"></a>2.优化前的分析</h4><p><strong>分析1：</strong> 对于XGBoost中的提升树也是加法模型：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/1.png" width="40%" height="50%" align="center" alt="图1"><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/10.png" width="75%" height="20%" align="center" alt="图10"><br><strong>分析2：</strong> XGBoost中改进的代价函数：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/2.png" width="40%" height="50%" align="center" alt="图2"><br><strong>说明1：</strong> 公式1中输出的<code>y</code>是模型最后预测的值。<code>q</code>表示每棵树的结构，它会将一个训练样本实例映射到相对应的叶子索引上。<code>T</code>是树中的叶子数。<code>w</code>的维度是<code>T</code>，<code>Wi</code>表示<code>q</code>对应的树结构上的第<code>i</code>个叶子结点的权重。<code>fk</code>是由一颗独立的树结构<code>q(x)</code>和其叶子结点对应的权重<code>W</code>组成,其中<code>q(x)</code>是<code>W</code>的下标。<code>fk</code>与正常的分类回归树不同的地方在于正常的分类回归树包含了在每个叶子上的一个连续分值，而XGBoost的回归树使用<code>wi</code>来表示第<code>i</code>个叶子上的分值。<br><strong>说明2：</strong> 公式2是XGBoost中改进的提升树的代价函数，主要改进的地方是在GBDT的代价函数上加了正则项，从而使得每步迭代的树结构更不容易过拟合.从图中可以看出正则项由叶子结点数<code>T</code>和每个叶子结点的权重<code>W的L2</code>范式相加组成.T是惩罚树结构的复杂度，<code>W的L2</code>范式是惩罚树模型的参数的复杂度。<br><strong>说明3：</strong> 观察到XBGoost中的提升树模型也属于加法模型，可考虑使用前向分步算法，迭代求解出该加法模型中所有的参数，但是需要对上述改进的代价函数进行优化化简。这个时候，XGBoost的创作者陈天奇巧妙的对改进的代价函数进行了泰勒展开，从而将代价函数进行了近似的化简。</p>
 <h4 id="3-泰勒公式的复习及初步理解"><a href="#3-泰勒公式的复习及初步理解" class="headerlink" title="3.泰勒公式的复习及初步理解"></a>3.泰勒公式的复习及初步理解</h4><p><strong>泰勒公式</strong> 是一个用函数(多项式函数)在某点的信息描述其(原复杂函数)附近取值的公式。可以理解为在某个点<code>x0</code>附近，用多项式函数来近似其他复杂的函数。为什么是用多项式去近似呢？因为多项式具有好计算，易求导，且好积分等一系列的优良性质。 公式如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/11.png" width="75%" height="30%" align="center" alt="图11"><br>其中<code>R_ n(x)</code>是泰勒公式的余项且是<code>(x-a)^n</code>的高阶无穷小：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/12.png" width="75%" height="30%" align="center" alt="图12"><br>利用到上述这一点我们可以相继写出一阶和二阶泰勒展开式如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/13.png" width="75%" height="30%" align="center" alt="图13"><br><strong>泰勒展开心得：</strong> 要灵活的使用泰勒展开式就需要记住两点：1.定位好这个特殊点<code>x0</code>（它是在多项式函数这边的）和原来要化简的复杂函数<code>f(x)</code>，2.根据现实的情况，确定你的泰勒展开式是需要几阶，阶越高，多项式函数的值和原复杂函数的值就越高。</p>
 <h4 id="4-XGBoost代价函数的优化"><a href="#4-XGBoost代价函数的优化" class="headerlink" title="4.XGBoost代价函数的优化"></a>4.XGBoost代价函数的优化</h4><p><strong>Step 1展示出要优化的代价函数</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/2.png" width="40%" height="50%" align="center" alt="图2"><br><strong>Step 2前向分步算法中第<code>t</code>步迭代时的代价函数</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/14.png" width="75%" height="50%" align="center" alt="图14"><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/3.png" width="40%" height="50%" align="center" alt="图3"><br><strong>Step 3将代价函数<code>L</code>分别进行一阶和二阶展开</strong><br><strong>使用之前的泰勒展开心得进行分析：</strong> 第<code>t</code>步的代价函数<code>L</code>是如此的复杂，它是仅关于<code>f_t(x)</code>变化的复杂函数，是需要进行泰勒展开的。某点附近可以用多项式函数近似复杂函数，其中这个某点<code>x0</code>为<code>t-1</code>时的模型<code>f_(t-1)(x)</code>的值.<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/15.png" width="90%" height="65%" align="center" alt="图15"><br><strong>Step 4泰勒的二阶展开后的式子</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/4.png" width="75%" height="45%" align="center" alt="图4"><br><strong>插入的GBDT解释：</strong> 此时<code>GBDT</code>的第<code>t</code>步需要拟合拟合前一步<code>(t-1)</code>中的负梯度值的方式来进行的解释为<code>泰勒的一阶</code>展开：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/16.png" width="90%" height="60%" align="center" alt="图16"><br>继续进行XGBoost提升树的代价函数的化简，因为上面红框中的数为常数，泰勒二阶展开后的代价函数需要减小的化简式如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/5.png" width="75%" height="45%" align="center" alt="图5"><br><strong>Step 5最终化简</strong><br>将代价函数的正则项展开，并定义<code>Ij={i|q(xi)=j}</code>是叶子j的实例(样本)集合。该式转换的过程是一开始是对所有样本的代价值进行累加得到代价函数，后面的是对每个叶子结点上的每个样本集合的代价值的累加。于是最终我们的代价函数就是式四。<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/6.png" width="75%" height="45%" align="center" alt="图6"><br>其中<code>W</code>是我们要求的第<code>t</code>步的决策树的模型参数。后面的<code>T</code>及它的系数<code>γ</code>，是变化后的正则项，也就是整个树的复杂程度的惩罚。可以看到该式是一个一元二次方程，为使得最后的<code>L</code>极小.可以推出下式：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/7.png" width="60%" height="40%" align="center" alt="图7"><br>这样的话，便可以求出第<code>t</code>步的XGBoost的决策树的每个叶子<code>j</code>的权重<code>Wj</code>.接下来就是怎么构造这颗XGBoost的决策树的树结构，首先是需要寻找某个特征的某个特征值作为切分点。遵循使得第t步代价函数最小的原则，经过式5我们可以计算出该树的具体的代价函数的值为，将式5带入式4得：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/8.png" width="60%" height="40%" align="center" alt="图8"><br>式6是可以用样本数据获取的，所以寻找q的切分点便以此为基准进行,将切分前的与切分后的进行做差对比，假设<code>IL</code>和<code>IR</code>是一次划分(split)后的左节点和右节点所对应的实例集合。<code>I=IL⋃IR</code><br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/9.png" width="60%" height="40%" align="center" alt="图9"></p>
-<h4 id="5-XGBoost树结构的切分点贪心查找算法"><a href="#5-XGBoost树结构的切分点贪心查找算法" class="headerlink" title="5.XGBoost树结构的切分点贪心查找算法"></a>5.XGBoost树结构的切分点贪心查找算法</h4><p>此处有点类似于CART回归树的树结构构造过程，遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点，算法图：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/17.png" width="85%" height="60%" align="center" alt="图17"></p>
+<h4 id="5-XGBoost树结构的切分点贪心查找算法"><a href="#5-XGBoost树结构的切分点贪心查找算法" class="headerlink" title="5.XGBoost树结构的切分点贪心查找算法"></a>5.XGBoost树结构的切分点贪心查找算法</h4><p>此处有点类似于CART回归树的树结构构造过程，遍历特征和特征取值，比较切分前后的平方误差的大小，获得最佳切分点，算法图：<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/17.png" width="85%" height="60%" align="center" alt="图17"><br><strong>理解过程：</strong> 从树的深度为0开始，每一节点都遍历所有的特征。对于某个特征，先按照该特征里的值进行排序，然后线性扫描该特征来决定最好的分割点，最后在所有特征里选择分割后，选择<code>L_spilt</code>最高的那个特征和该特征对应的取值。如此切分下去，此时需要考虑的问题是，当最好的情况下，L_spilt为负值时，树的生长停止。此种效率最高也最简单。但是这也可能错过<code>L_spilt</code>先为负后慢慢变大的情况.所以此时需要<code>设置一个树的最大深度</code>,最后来修剪掉<code>L_spilt</code>为负的切分。</p>
 <h4 id="6-XGBoost防止过拟合的两大trick"><a href="#6-XGBoost防止过拟合的两大trick" class="headerlink" title="6.XGBoost防止过拟合的两大trick"></a>6.XGBoost防止过拟合的两大trick</h4><p><strong>Shrinkage and Column Subsampling</strong><br>陈天奇的论文中提到XGBoost除了在代价函数后面添加正则项用于防止过拟合后，还引入了<code>Shrinkage and Column Subsampling</code>两个trick。<code>Shrinkage</code>会在XGBoost每一步迭代求解决策树的时候会将新加入的<code>W</code>通过一个因子<code>η</code>进行缩放即乘以η。与随机优化中的<code>learning rate</code>相类似，对于用于提升模型的新增树(future trees)，shrinkage可以减少每棵单独的树、以及叶子空间（leaves space）的影响。第二个技术是列特征子抽样(column feature subsampling)。该技术在RandomForest中使用，使用列子抽样可以阻止overfitting。列子抽样的使用可以加速并行算法的计算,在随机森林中也介绍过为什么列抽样会让模型不易过拟合。原因参考<a href="https://jianwenjun.xyz/2018/04/05/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94Bagging%E4%B9%8B%E5%9F%BA%E4%BA%8ECART%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E%E4%B8%8E%E5%AE%9E%E7%8E%B0/">决策树相关算法——Bagging之基于CART的随机森林详细说明与实现</a></p>
+<h4 id="7总结XGBoost的提升树算法过程"><a href="#7总结XGBoost的提升树算法过程" class="headerlink" title="7总结XGBoost的提升树算法过程"></a>7总结XGBoost的提升树算法过程</h4><p>参考网上资源的<br><img src="http://p6wp21cg8.bkt.clouddn.com/xgboost/23.png" width="90%" height="60%" align="center" alt="图23"></p>
 <h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href="http://202.38.196.91/cache/7/03/arxiv.org/d2e1ba4c8f4513bca562aeea6c72ec03/1603.02754v1.pdf" target="_blank" rel="noopener">XGBoost: A Scalable Tree Boosting System</a></p>
 
       
@@ -475,7 +477,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p><span>本文标题:</span><a href="/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/">决策树相关算法——XGBoost原理分析及实例实现(一)</a></p>
 <p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
 <p><span>发布时间:</span>2018年04月26日 - 11:04</p>
-<p><span>最后更新:</span>2018年04月27日 - 14:04</p>
+<p><span>最后更新:</span>2018年04月27日 - 19:04</p>
 <p><span>原始链接:</span><a href="/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/" title="决策树相关算法——XGBoost原理分析及实例实现(一)">https://jianwenjun.xyz/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/</a>
 <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/"  aria-label="复制成功！"></i></span>
 </p>
@@ -508,11 +510,11 @@ showConfirmButton: true
       
         <div class="post-tags">
           
-            <a href="/tags/XGBoost/" rel="tag"><i class="fa fa-tag"></i> XGBoost</a>
-          
             <a href="/tags/决策树/" rel="tag"><i class="fa fa-tag"></i> 决策树</a>
           
             <a href="/tags/集成学习/" rel="tag"><i class="fa fa-tag"></i> 集成学习</a>
+          
+            <a href="/tags/XGBoost/" rel="tag"><i class="fa fa-tag"></i> XGBoost</a>
           
         </div>
       
@@ -626,7 +628,7 @@ showConfirmButton: true
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -719,7 +721,7 @@ showConfirmButton: true
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-前言"><span class="nav-number">1.</span> <span class="nav-text">1.前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-优化前的分析"><span class="nav-number">2.</span> <span class="nav-text">2.优化前的分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-泰勒公式的复习及初步理解"><span class="nav-number">3.</span> <span class="nav-text">3.泰勒公式的复习及初步理解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-XGBoost代价函数的优化"><span class="nav-number">4.</span> <span class="nav-text">4.XGBoost代价函数的优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-XGBoost树结构的切分点贪心查找算法"><span class="nav-number">5.</span> <span class="nav-text">5.XGBoost树结构的切分点贪心查找算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-XGBoost防止过拟合的两大trick"><span class="nav-number">6.</span> <span class="nav-text">6.XGBoost防止过拟合的两大trick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考链接"><span class="nav-number">7.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-前言"><span class="nav-number">1.</span> <span class="nav-text">1.前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-优化前的分析"><span class="nav-number">2.</span> <span class="nav-text">2.优化前的分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-泰勒公式的复习及初步理解"><span class="nav-number">3.</span> <span class="nav-text">3.泰勒公式的复习及初步理解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-XGBoost代价函数的优化"><span class="nav-number">4.</span> <span class="nav-text">4.XGBoost代价函数的优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-XGBoost树结构的切分点贪心查找算法"><span class="nav-number">5.</span> <span class="nav-text">5.XGBoost树结构的切分点贪心查找算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-XGBoost防止过拟合的两大trick"><span class="nav-number">6.</span> <span class="nav-text">6.XGBoost防止过拟合的两大trick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7总结XGBoost的提升树算法过程"><span class="nav-number">7.</span> <span class="nav-text">7总结XGBoost的提升树算法过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考链接"><span class="nav-number">8.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -755,7 +757,7 @@ showConfirmButton: true
 网站访问量<span id="busuanzi_value_site_uv"></span>次
 </span>
 <i class="fa fa-user-md"></i>
-<span class="post-count">博客全站共48.8k字</span>
+<span class="post-count">博客全站共55.8k字</span>
 </div>
 
 
