@@ -1,3 +1,4 @@
+https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/
 https://jianwenjun.xyz/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/
 https://jianwenjun.xyz/2018/04/27/决策树相关算法——XGBoost原理分析及实例实现-二/
 https://jianwenjun.xyz/2018/04/26/决策树相关算法——XGBoost原理分析及实例实现-一/
@@ -17,4 +18,3 @@ https://jianwenjun.xyz/2017/10/28/设计模式精髓篇之行为型/
 https://jianwenjun.xyz/2017/10/21/设计模式精髓篇之结构型/
 https://jianwenjun.xyz/2017/10/15/设计模式精髓篇之创建型/
 https://jianwenjun.xyz/2017/10/14/设计模式初篇/
-https://jianwenjun.xyz/2017/10/07/Fabric源码编译及示例/

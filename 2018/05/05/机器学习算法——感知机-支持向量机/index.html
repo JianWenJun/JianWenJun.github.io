@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="感知机,SVM," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要详细介绍两种具有一定相似性的机器学习算法——感知机Perceptron和支持向量机SVM，该两种算法都是在特征空间中寻找划分平面从而对数据集进行划分的思想，但寻找划分平面的算法不同。划分平面的定义也有差距。本篇博客主要叙述思路为算法模型，代价函数，学习算法，最后的算法模型使用实例介绍。">
+<meta name="keywords" content="感知机,SVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习算法——感知机&amp;支持向量机">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要详细介绍两种具有一定相似性的机器学习算法——感知机Perceptron和支持向量机SVM，该两种算法都是在特征空间中寻找划分平面从而对数据集进行划分的思想，但寻找划分平面的算法不同。划分平面的定义也有差距。本篇博客主要叙述思路为算法模型，代价函数，学习算法，最后的算法模型使用实例介绍。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/1.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/5.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/6.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/8.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/9.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/4.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/10.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/12.png">
+<meta property="og:image" content="https://img-blog.csdn.net/20160717193629797">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/17.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/5.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/18.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/19.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/20.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/21.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/22.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/23.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/25.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/26.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/27.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/31.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/28.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/29.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/33.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/32.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/35.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/36.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/39.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/40.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/38.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/41.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/42.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/43.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/47.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/46.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/48.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/49.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/50.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/56.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/51.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/52.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/53.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/54.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/55.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/57.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/42.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/58.jpg">
+<meta property="og:updated_time" content="2018-05-10T12:36:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习算法——感知机&amp;支持向量机">
+<meta name="twitter:description" content="1前言本篇博客主要详细介绍两种具有一定相似性的机器学习算法——感知机Perceptron和支持向量机SVM，该两种算法都是在特征空间中寻找划分平面从而对数据集进行划分的思想，但寻找划分平面的算法不同。划分平面的定义也有差距。本篇博客主要叙述思路为算法模型，代价函数，学习算法，最后的算法模型使用实例介绍。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/"/>
+
+
+
+
+
+  <title>机器学习算法——感知机&支持向量机 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习算法——感知机&支持向量机</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T17:14:39+08:00">
+                2018-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/05/机器学习算法——感知机-支持向量机/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/05/机器学习算法——感知机-支持向量机/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/05/机器学习算法——感知机-支持向量机/" class="leancloud_visitors" data-flag-title="机器学习算法——感知机&支持向量机">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  5,608
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  20 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要详细介绍两种具有一定相似性的机器学习算法——感知机Perceptron和支持向量机SVM，该两种算法都是在特征空间中寻找划分平面从而对数据集进行划分的思想，但寻找划分平面的算法不同。划分平面的定义也有差距。本篇博客主要叙述思路为算法模型，代价函数，学习算法，最后的算法模型使用实例介绍。<a id="more"></a><br>这两种机器学习的算法的实例都是基于<a href="https://www.kaggle.com/c/titanic/data" target="_blank" rel="noopener">Titanic数据集</a>,关于数据集的特征工程部分就不具体介绍，笔者在<a href="https://jianwenjun.xyz/2018/05/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%89/">其他博文</a>中已经详细描述了,此篇博客将直接使用已经经过特征工程处理后的数据集进行模型训练。<br>一般来说，对于一个机器学习算法的理解，主要是从三个方面入手理解，算法模型(假设函数)，代价函数的定义，学习算法(求解算法模型中的参数的算法)。</p>
+<h4 id="2感知机"><a href="#2感知机" class="headerlink" title="2感知机"></a>2感知机</h4><h5 id="2-1感知机介绍"><a href="#2-1感知机介绍" class="headerlink" title="2.1感知机介绍"></a>2.1感知机介绍</h5><p>感知机是一个二类分类的<strong>线性分类模型</strong>，作为一个算法模型，它的输入是样本的特征向量，输出是样本的类别，分别为<strong>-1和1</strong>两个值。如果label是1,0的情况，可以对输出的-1,1进行相应的转换。</p>
+<h5 id="2-2感知机算法模型"><a href="#2-2感知机算法模型" class="headerlink" title="2.2感知机算法模型"></a>2.2感知机算法模型</h5><p>了解感知机模型之前，先得知道什么是<strong>数据集的线性可分</strong>。简单的说，就是在特征空间(维度是由各个特征组成的空间)中,存在某个<strong>超平面S</strong>能够将数据集中的正例和负例<strong>完全正确</strong>的划分到超平面的两边。则称该数据集的可以进行线性划分。————此处的S是线性超平面。<br><strong>用数学的解释来说就是，</strong>特征空间中的样本集将被超平面w*x<sub>i</sub>+b进行划分，当超平面&gt;0，是属于y<sub>i</sub>为1的样本，当超平面&lt;0，是属于y<sub>i</sub>为-1的样本。<br>于是可以定义出<strong>感知机的算法模型</strong>为如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/1.png" width="45%" height="28%" align="center" alt="图1"></p>
+<h5 id="2-3代价函数"><a href="#2-3代价函数" class="headerlink" title="2.3代价函数"></a>2.3代价函数</h5><p>代价函数主要来自于算法模型预测样本时的预测值和样本真实值直接的差距，感知机的损失函数定义为样本集中误分类点到超平面的距离。<strong>这样定义的原因为</strong>如果定义为误分类点的个数时，使用梯度下降算法更新参数时，需要对各个参数求偏导，定义为个数时，不可导。所以转而将代价函数定义为为样本集中误分类点到超平面的距离。这里可以联想到Adaboost的加法模型的代价函数，代价函数是分类误差率，而后对其代价函数的值上限进行了转换为指数函数具体查看<a href="https://jianwenjun.xyz/2018/04/12/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94Boosting%E4%B9%8BAdaboost-GBDT%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9E%E7%8E%B0/">前篇博客</a>。<br><strong>2.3.1感知机的代价函数的由来</strong><br><strong>特征空间中样本实例到超平面</strong>w<em>x<sub>i</sub>+b的距离为(其中||W||为w的L2范式,即w中各个元素的平方和再开方)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/5.png" width="25%" height="20%" align="center" alt="图5"><br><strong>2.3.2误分类点(x<sub>i</sub>,y<sub>i</sub>)的特性</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/6.png" width="25%" height="20%" align="center" alt="图6"><br><strong>解释：</strong>假设特征空间中的样本点(x<sub>i</sub>,y<sub>i</sub>)是误分类点，则有w</em>x<sub>i</sub>+b&gt;0,y<sub>i</sub>=-1,或者w*x<sub>i</sub>+b&lt;0,y<sub>i</sub>=1.所以总结出上面图中的特性。<br>可以推出该误分类点到超平面的距离为(注意|y<sub>i</sub>|=1,所以下面计算距离的公式有y<sub>i</sub>不影响最后的距离值)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/8.png" width="25%" height="20%" align="center" alt="图8"><br>进而可以得出总的样本集合中所有的误分类点的总距离为(其中<code>M</code>属于总的样本集合中所有的误分类点集合)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/9.png" width="25%" height="20%" align="center" alt="图9"><br><strong>李航的&lt;&lt;统计学习方法&gt;&gt;</strong>中代价函数没有考虑1/||w||,从而将上式进行了化简：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/4.png" width="28%" height="20%" align="center" alt="图4"><br>能这样化简的原因(个人理解)：</p>
+<blockquote>
+<p>在使用梯度下降更新参数w时，每一步迭代过程中1/||w||是相同的，都是大于0的正数。在每一步迭代更新参数过程中，由于1/||w||是相同的，所以可以通过比较-y<sub>i</sub>(w<em>x<sub>i</sub>+b)来比较误分类点到超平面的距离，也就是说能通过误分类点的-y<sub>i</sub>(w</em>x<sub>i</sub>+b)值评价代价的大小。</p>
+</blockquote>
+<h5 id="2-4学习算法"><a href="#2-4学习算法" class="headerlink" title="2.4学习算法"></a>2.4学习算法</h5><p>机器学习算法模型的学习算法的目的就是求解出模型中的参数w,b.感知机使用的是梯度下降算法来求解参数。通过极小化代价函数来求解出参数。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/10.png" width="35%" height="25%" align="center" alt="图10"><br>这里使用的是<strong>随机梯度下降算法</strong>，其中误分类集中的点可以通过误分类点的特性来判断。<strong>随机</strong>拿取出误分类点来更新参数。<br>具体梯度下降算法的每一步参数更新为如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/12.png" width="35%" height="25%" align="center" alt="图12"></p>
+<h5 id="2-5学习算法的收敛性"><a href="#2-5学习算法的收敛性" class="headerlink" title="2.5学习算法的收敛性"></a>2.5学习算法的收敛性</h5><p><strong>需要证明的是</strong>，对于线性可分数据集感知机学习算法原始形式收敛，即经过有限次的梯度下降法的迭代可以得到一个将训练数据集完全正确的划分的超平面S。<br>证明的方法和重点，这里不具体证明。</p>
+<blockquote>
+<p>1.实现需要定义出K的值，即假设已经计算好前k-1次的迭代，于是可以得出第K步迭代的相应公式。<br>2.抓住误分类点的特性y<sub>i</sub>(w<em>x<sub>i</sub>+b)&lt;0的，当得到超平面的时候，所有的点都是y<sub>i</sub>(w</em>x<sub>i</sub>+b)&gt;=0的存在。</p>
+</blockquote>
+<h5 id="2-6基于感知机的Titanic数据集预测实例"><a href="#2-6基于感知机的Titanic数据集预测实例" class="headerlink" title="2.6基于感知机的Titanic数据集预测实例"></a>2.6基于感知机的Titanic数据集预测实例</h5><p><a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/Perce_SVM/perceptron.py" target="_blank" rel="noopener">完整代码地址</a><br>数据集下载地址和特征工程处理链接<strong>前言</strong>中已经给出。<br><strong>整个算法模型的代码实现步骤图(截取网上)：</strong><br><img src="https://img-blog.csdn.net/20160717193629797" width="90%" height="60%" align="center" alt="图12"><br><strong>重点代码——模型训练代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self,train_X,train_y)</span>:</span></span><br><span class="line">       feature_size = train_X.shape[<span class="number">1</span>]</span><br><span class="line">       sample_size = train_X.shape[<span class="number">0</span>]</span><br><span class="line">       <span class="comment"># 初始化w,b参数</span></span><br><span class="line">       self.w = np.zeros((feature_size,<span class="number">1</span>))</span><br><span class="line">       self.b = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">       update_count = <span class="number">0</span></span><br><span class="line">       correct_count = <span class="number">0</span></span><br><span class="line">       <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">           <span class="keyword">if</span> correct_count &gt; self.nochange_count_limit:</span><br><span class="line">               <span class="keyword">break</span></span><br><span class="line">           <span class="comment"># 随机选取一个误分类点</span></span><br><span class="line">           sample_select_index = random.randint(<span class="number">0</span>,sample_size<span class="number">-1</span>)</span><br><span class="line">           sample = train_X[[sample_select_index]]</span><br><span class="line">           sample_y = train_y[sample_select_index]</span><br><span class="line"></span><br><span class="line">           <span class="comment"># 将labe分类为0，1转换为-1，1，其中0对应-1，1对应着1</span></span><br><span class="line">           y_i = <span class="number">-1</span></span><br><span class="line">           <span class="keyword">if</span> sample_y == <span class="number">1</span>:</span><br><span class="line">               y_i = <span class="number">1</span></span><br><span class="line">           <span class="comment"># 计算该样本的distance距离yi(xi*w)+b</span></span><br><span class="line">           distance = - (np.dot(sample,self.w)[<span class="number">0</span>][<span class="number">0</span>] + self.b) * y_i</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span> distance &gt;= <span class="number">0</span>:</span><br><span class="line">               <span class="comment"># 挑选出误分类点，更新w,b</span></span><br><span class="line">               correct_count = <span class="number">0</span>;</span><br><span class="line">               sample = np.reshape(sample,(feature_size,<span class="number">1</span>))</span><br><span class="line">               add_w = self.alpha * y_i * sample</span><br><span class="line">               self.w = self.w + add_w</span><br><span class="line">               self.b += (self.alpha * y_i)</span><br><span class="line"></span><br><span class="line">               update_count += <span class="number">1</span></span><br><span class="line">               <span class="keyword">if</span> update_count &gt; self.updata_count_total:</span><br><span class="line">                   <span class="keyword">break</span>;</span><br><span class="line">           <span class="keyword">else</span>:</span><br><span class="line">               correct_count = correct_count + <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="3支持向量机SVM"><a href="#3支持向量机SVM" class="headerlink" title="3支持向量机SVM"></a>3支持向量机SVM</h4><p>支持向量机也是在特征空间中寻找一个划分样本实例类别的超平面，这点和感知机相似，但是不同的是，支持向量机支持在特征空间中寻找出非线性的平面(非线性支持向量机).支持向量机寻找出的超平面唯一且最优，而感知机是根据误分类点定义出的代价函数求得的超平面不唯一，包含多个。</p>
+<h5 id="3-1支持向量机的类型介绍"><a href="#3-1支持向量机的类型介绍" class="headerlink" title="3.1支持向量机的类型介绍"></a>3.1支持向量机的类型介绍</h5><p>支持向量机是一种二类分类模型，该算法的基本模型是在特征空间中寻找出一个最优的分隔超平面，使得样本集实例按照类别分开。由于数据集是有线性可分和不可分性质的，所以可将寻找最优分割平面的支持向量机算法分为3种类型，当数据集线性可分(能找到超平面将数据集完全按类别划分开)时，有<strong>线性可分支持向量机</strong>。当数据集近似线性可分(能找到超平面将大部分数据集按类别划分开)，有<strong>线性支持向量机</strong>。当数据集线性不可分的时候，有<strong>非线性支持向量机</strong>。<br>那么，<strong>如何定义划分的最优超平面？</strong>这个疑问将在后续的过程中一一解开。</p>
+<h5 id="3-2线性可分支持向量机"><a href="#3-2线性可分支持向量机" class="headerlink" title="3.2线性可分支持向量机"></a>3.2线性可分支持向量机</h5><p>给出一个在特征空间(二维)中的样本数据集的示例，如下图：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/17.png" width="60%" height="35%" align="center" alt="图17"><br><strong>说明</strong>，图中<code>p</code>是划分数据集的一个超平面,d<sub>2</sub>=d<sub>3</sub>,d<sub>3</sub>不一定等于d<sub>1</sub>.<code>A</code>表示X类别实例在特征空间中到超平面<code>P</code>距离最近的一个样本实例点。同理<code>B</code>和<code>C</code>表示O类别在特征空间中到超平面<code>P</code>距离最近的一个样本实例.<br>对于<strong>线性可分支持向量机</strong>来说，图中数据集是线性可分的，<code>p</code>是划分的一个超平面，但不一定是最优的，这样的超平面通过迭代算法可以查找到很多个(感知机模型)，感知机模型这样找出的超平面泛化能力不强，如果能找到一个最优超平面将提供模型的泛化能力。线性可划分支持向量机的做法是通过移动超平面<code>P</code>使得d<sub>3</sub>=d<sub>1</sub>，此时的<code>P</code>将是最优超平面。那么特征空间中的样本点<code>A、B、C</code>将会是对最优超平面起决定性作用,这些样本实例点称为<strong>支持向量</strong>。<br>—》》<strong>那么具体的如何寻找这个最优超平面呢，还是需要通过优化算法模型的代价函数来求解。</strong></p>
+<h6 id="3-2-1代价函数的由来"><a href="#3-2-1代价函数的由来" class="headerlink" title="3.2.1代价函数的由来"></a>3.2.1代价函数的由来</h6><p><strong>首先，</strong>特征空间中样本实例到超平面wx<sub>i</sub>+b的<strong>距离</strong>为如下图:(其中||W||为w的L2范式,即w中各个元素的平方和再开方)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/5.png" width="25%" height="20%" align="center" alt="图5"><br><strong>然后</strong>，要在众多可以正确划分数据集实例类别的超平面之中找到一个最优超平面P，需要先找到上面所说的<strong>支持向量</strong><code>A、B、C</code>。寻找<strong>支持向量</strong>的数学表达为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/18.png" width="30%" height="28%" align="center" alt="图18"><br><strong>其次</strong>，上面我们已经表明过最优超平面是使得d<sub>3</sub>=d<sub>1</sub>，寻找支持向量的过程中是找到离超平面最近的点，假设是A样本点，则此时最小的距离是d<sub>1</sub>,要使得d<sub>3</sub>=d<sub>1</sub>，则需要把d<sub>1</sub>极大化，此时便能求出参数W，b。数学公式为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/19.png" width="40%" height="28%" align="center" alt="图19"><br><strong>问题来了，</strong>是需要在众多可以正确划分数据集实例类别的超平面之中找到一个最优超平面P，怎么获取和保证是可以正确划分数据集实例类别的超平面呢？？？怎么保证寻找的支持向量的样本点到超平面的距离是所有样本中的最小呢？</p>
+<blockquote>
+<p>感知机模型中判断是否是误分类点是通过y<sub>i</sub>(w<em>x<sub>i</sub>+b)&lt;0来判断的。正确分类的样本点满足y<sub>i</sub>(w</em>x<sub>i</sub>+b)&gt;=0.</p>
+</blockquote>
+<p>为了解决上述问题，需要满足的数学公式为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/20.png" width="60%" height="35%" align="center" alt="图20"><br><strong>最后</strong>，在满足上面问题的条件后，需要做的就是移动超平面使的<strong>距离最小的支持向量样本点</strong>到超平面P’的距离d<sub>1</sub>最大。<br>最后的数学公式为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/21.png" width="60%" height="35%" align="center" alt="图21"><br>最后的数学公式也就是线性可分支持向量机的<strong>代价函数</strong>。<strong>说明部分，</strong>上面的代价函数的推导过程是根据最初的最优超平面的定义来的。<br>接下来就是对代价函数(上面的数学公式进行<strong>化简</strong>)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/22.png" width="95%" height="60%" align="center" alt="图22"><br>最后的再进行优化变换为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/23.png" width="60%" height="30%" align="center" alt="图23"><br><strong>说明</strong></p>
+<blockquote>
+<p>第7步可能会有疑问——为什么函数距离可以取1，第5步中的w,b是经过伸缩变化后的不等式和等式两边进行约分的，化简后的第8步中的w,b是第5步中伸缩变化后的w,b.也就是经过了我们的第6步变化。<br>第9步也可能会有疑问，为什么优化变化成二次的||W||,主要是为了构造成一个凸二次规划问题。更容易求解出极值,从而求解出参数w,b.</p>
+</blockquote>
+<h6 id="3-2-2学习算法"><a href="#3-2-2学习算法" class="headerlink" title="3.2.2学习算法"></a>3.2.2学习算法</h6><p>主要是求解代价函数中的参数w,b的过程。最终我们的代价函数经过一些数学变化成凸二次规划问题。φ(x<sub>i</sub>)为xi的一个映射函数。此时φ(x<sub>i</sub>)=x<sub>i</sub>.<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png" width="48%" height="30%" align="center" alt="图24"><br>上面这个优化问题中，自变量是w，而目标函数是w的二次函数，共有N(样本总数量)个约束条件，每个约束条件都是线性函数，并且它的可行域是一个凸集，所以该优化问题是一个<strong>凸二次规划问题</strong>。<br>为了求解上面的<strong>凸二次规划问题</strong>，需要使用到高等数学中的<strong>拉格朗日函数和KTT条件优化公式</strong>：<br><strong>3.2.2.1高等数学知识——拉格朗日函数及对偶性</strong><br>为了把凸优化的问题变得易于处理，需要把目标函数和约束全部融入一个新的函数，即<strong>拉格朗日函数</strong>。再通过这个函数来寻找最优点。<br><strong>1.一般的有</strong>(包含目标函数和约束条件(此时的约束为多个等式约束条件))：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/25.png" width="48%" height="30%" align="center" alt="图25"><br>转换为一个自变量为W和β<sub>i</sub>的<strong>拉格朗日函数L</strong>，其中β<sub>i</sub>为<strong>拉格朗日算子</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/26.png" width="48%" height="30%" align="center" alt="图26"><br>然后分别对w和β<sub>i</sub>求偏导，使得偏导数等于0，然后解出w和β<sub>i</sub>。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/27.png" width="35%" height="28%" align="center" alt="图27"><br>为什么可以求出极值可参考图：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/31.png" width="60%" height="40%" align="center" alt="图31"><br><strong>2.其次还有</strong>(包含目标函数和约束条件(此时的约束为不等式约束和等式约束))：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/28.png" width="48%" height="30%" align="center" alt="图28"><br>同样可以转换为一个函数表达式，但函数最终的最优值需要满足如下<strong>KTT条件</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/29.png" width="48%" height="30%" align="center" alt="图29"><br><strong>KTT条件如下：</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/33.png" width="50%" height="30%" align="center" alt="图33"><br>解释获取极值图：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/32.png" width="60%" height="40%" align="center" alt="图32"><br>将带约束的原函数进行对偶性转换过程如下：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/35.png" width="95%" height="60%" align="center" alt="图35"><br><strong>3.2.2.2代价函数的拉格朗日对偶转换及参数求解</strong><br>在理解上述凸优化数学知识后，便可对SVM的数学代价函数进行参数求解。还有对该部分数学不理解的可以查看下面的<strong>参考链接</strong>。<br><strong>满足不等式的拉格朗日函数为</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/36.jpg" width="50%" height="30%" align="center" alt="图36"><br><strong>将带约束的原函数进行对偶性转换：</strong><br>原始问题：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/39.jpg" width="38%" height="25%" align="center" alt="图39"><br>对偶问题：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/40.jpg" width="38%" height="25%" align="center" alt="图40"><br><strong>接下来就是对对偶问题的求解：</strong>主要有两步第一步先求L(W,b,α)对w,b的极小，第二步再求α的极大值。<br><strong>第一步</strong>L(W,b,α)对w,b的极小将L对w,b求偏导并令其等于0得，称为<strong>结果1</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/38.jpg" width="38%" height="25%" align="center" alt="图38"><br><strong>第二步</strong>再求α的极大值，将<strong>结果1</strong>代入L(W,b,α)中：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/41.jpg" width="48%" height="35%" align="center" alt="图41"><br>第二步的结果为(在要求的式子上取反就相当于求极小了)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/42.png" width="48%" height="35%" align="center" alt="图42"><br>此时便可以用只含有等式的拉格朗日函数求解出最优值<strong>α</strong>,将<strong>α</strong>的值结合KTT条件，求出w,b：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/43.png" width="55%" height="35%" align="center" alt="图43"></p>
+<h5 id="3-3线性支持向量机"><a href="#3-3线性支持向量机" class="headerlink" title="3.3线性支持向量机"></a>3.3线性支持向量机</h5><p>如果数据集本身线性不可分(但近似线性可分？)这个时候应该怎么解决分类问题呢？————<strong>线性支持向量机</strong></p>
+<h6 id="3-3-1代价函数的由来"><a href="#3-3-1代价函数的由来" class="headerlink" title="3.3.1代价函数的由来"></a>3.3.1代价函数的由来</h6><p>我们知道<strong>线性可分支持向量机的凸优化问题为</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png" width="55%" height="35%" align="center" alt="图24"><br><strong>线性支持向量机</strong>针对的是数据集不可划分问题(近似可划分)。这里的显示不可划分是指数据集中存在某些样本点不能满足线性可分支持向量机的约束条件：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/47.png" width="40%" height="25%" align="center" alt="图47"><br><strong>为了使造成数据集不可划分的样本点</strong>也满足约束条件(这样的目的<strong>是让整个数据集又重新可以线性划分</strong>)，给每个样本点(x<sub>i</sub>,y<sub>i</sub>)引入一个松弛变量ξ<sub>i</sub>&gt;=0.如此一来，可以容忍部分样本点的函数间隔是负数即错误分类了，或者部分样本点能落在最大间隔区间。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/46.png" width="40%" height="25%" align="center" alt="图46"><br>由于对每个样本都在函数间隔上添加了松弛变量ξ<sub>i</sub>，需要支付一个代价ξ<sub>i</sub>。线性支持向量机目标函数就变为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/48.png" width="40%" height="25%" align="center" alt="图48"><br>最终加上约束条件，<strong>最终的代价函数</strong>为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/49.png" width="50%" height="25%" align="center" alt="图49"></p>
+<h6 id="3-3-2学习算法"><a href="#3-3-2学习算法" class="headerlink" title="3.3.2学习算法"></a>3.3.2学习算法</h6><p>线性支持向量机的代价函数和线性可分支持向量机的代价函数都是凸二次规划问题，都需要使用拉格朗日函数及其对偶函数来求解参数。先将目标原函数和约束条件转换为<strong>拉格朗日函数</strong>(其中α和μ大于等于0)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/50.jpg" width="58%" height="25%" align="center" alt="图50"><br>此处根据拉格朗日函数的对偶性转换(拉格朗日对偶函数对拉格朗日乘子极大值和原目标函数的关系，线性可分支持向量机那节中有说明)有：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/56.png" width="80%" height="25%" align="center" alt="图56"><br><strong>步骤1：</strong>求解对参数w,b,ξ的极小，求解的最后值称为<strong>结果2</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/51.jpg" width="45%" height="25%" align="center" alt="图51"><br><strong>步骤2：</strong>将<strong>结果2</strong>代入拉格朗日函数，求解代入后的值对拉格朗日乘子的极大。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/52.jpg" width="50%" height="25%" align="center" alt="图52"><br>对上面这个式子求极大。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/53.jpg" width="50%" height="25%" align="center" alt="图53"><br>再次进行化简(对上式子的极大就是求该式子的负数的极小)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/54.png" width="50%" height="25%" align="center" alt="图54"><br><strong>步骤3</strong>，此时可以理解为只有等式约束的优化问题，对变量求偏导等于0，再验证值是否满足<code>C&gt;=α&gt;=0</code>,此处使用<strong>SMO算法</strong>求解，最后将α值代入<strong>结果2</strong>中：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/55.png" width="45%" height="25%" align="center" alt="图55"></p>
+<h5 id="3-4非线性支持向量机"><a href="#3-4非线性支持向量机" class="headerlink" title="3.4非线性支持向量机"></a>3.4非线性支持向量机</h5><p>前面叙述的数据集都是在当前维度的特征空间中，可以进行线性划分和近似线性划分。但是如果当前维度的特征空间无法近似划分，就是一个完全不可划分的数据集时，这时候会使用到<strong>核函数</strong>将当前维度的特征空间映射到高维空间，让数据集在高维空间中线性可分。</p>
+<h6 id="3-4-1核函数"><a href="#3-4-1核函数" class="headerlink" title="3.4.1核函数"></a>3.4.1核函数</h6><p><strong>1.此处具体分析居然核函数是怎样发挥它的作用呢？</strong><br>我们的最终目标是希望<strong>数据集线性可分</strong>，这样才能寻找出一个可划分的最优超平面。我们都知道，样本点数据在低维度特征空间中不可划分，但是如果将样本数据点映射到高维特征空间中，数据集将可进行线性划分。<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/57.jpg" width="70%" height="25%" align="center" alt="图57"><br><strong>2.映射函数</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/24.png" width="50%" height="25%" align="center" alt="图24">上式是线性可分支持向量机的凸优化问题的式子。其中有个φ(x<sub>i</sub>)，它是x<sub>i</sub>的一个<strong>映射函数</strong>。当数据集在当前维度的特征空间中线性可分时候，φ(x<sub>i</sub>)=x<sub>i</sub>。如果不可划分时候，此时φ(x<sub>i</sub>)将x<sub>i</sub>样本点映射到更高的特征空间中让数据集线性可分。比如说x<sub>i</sub>=(1,2),是一个二维向量。经过φ(x<sub>i</sub>)=(1,2,4),映射到三维向量了。<br><strong>3.核函数的映射方式</strong><br><strong>核函数</strong>并不是直接定义φ(x<sub>i</sub>)来将当前维度的特征空间里的样本点映射到高维度特征空间。而是采用<strong>间接</strong>的方式映射。<br><strong>为什么采用间接的方式映射？？</strong><br>我们的凸二次规划原问题的对偶问题为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/42.png" width="60%" height="25%" align="center" alt="图42"></p>
+<blockquote>
+<p>1.从上面式子来看，每次我们求极值的时候都需要计算(φ(x<sub>i</sub>)·φ(x<sub>j</sub>))的，为了简化每次将x<sub>i</sub>映射到φ(x<sub>i</sub>再运算φ(x<sub>i</sub>)·φ(x<sub>j</sub>)的点乘以，我们可以直接定义K(x<sub>i</sub>,x<sub>j</sub>)=φ(x<sub>i</sub>)·φ(x<sub>j</sub>)的表达式，从而不定义φ(x<sub>i</sub>)，但是这之间是隐含着一个φ(x<sub>i</sub>)映射的过程的。其中K(x<sub>i</sub>,x<sub>j</sub>)就是我们的核函数。这样一来便简化了计算过程。<br>2.映射函数的存在是为了便于我们了解低维度空间到高维度空间的映射的理解，其实可以通过函数K(x<sub>i</sub>,x<sub>j</sub>)反推出映射函数φ(x<sub>i</sub>)。只是对于凸优化求极值的过程中只关注核函数的表达式。<br>3.<strong>注意</strong>，核函数间接是可以将低维特征空间映射到无穷维特征空间，具体证明需要使用到泰勒展开式。</p>
+</blockquote>
+<p><strong>4.常用的核函数</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/感知机和支持向量机/58.jpg" width="90%" height="25%" align="center" alt="图58"></p>
+<h6 id="3-4-2学习过程"><a href="#3-4-2学习过程" class="headerlink" title="3.4.2学习过程"></a>3.4.2学习过程</h6><p>求解原问题的对偶问题时，我们需要选取核函数，根据情况来选取核函数，当我们不知道先验知识的时候，优先选用高斯核函数。选取好后，我们便可以将(x<sub>i</sub>,x<sub>j</sub>)代入到核函数，从而求解出凸优化的极值点。</p>
+<h4 id="4总结"><a href="#4总结" class="headerlink" title="4总结"></a>4总结</h4><blockquote>
+<p>1.感知机是基于误分类点驱动来更新参数w,b.如何判断是分类点是根据y<sub>i</sub>(w*x<sub>i</sub>+b)&lt;0的。代价函数为误分类点到超平面的距离最小。这样只要能正确划分出正负实例代价函数就能达到最小。所以感知机模型求得的超平面有多个。<br>2.对于线性可分支持向量机模型的求解，首先定义好最优超平面，什么是最优。然后在可正确划分数据集类别的超平面中寻找支持向量(距离超平面最近的点),然后最大化超平面到支持向量间的距离(几何距离)。<br>3.线性可分支持向量机的代价函数为<strong>凸二次规划问题</strong>，对于约束为等式的优化问题，可以使用拉格朗日函数求极值来得到参数。对于约束含有不等式的优化问题，这时不能直接采用求极值的方法，应该先转换为拉格朗日函数，再获取该<strong>拉格朗日函数的对偶函数</strong>，求对偶函数的最大值，最终原始问题为<strong>极小极大问题</strong>。紧接着求原始问题的对偶问题在满足KTT条件下转换为极大极小问题。在进行求参化简。<br>4.核函数是间接进行将低维特征空间的样本集映射到高维特征空间去的。</p>
+</blockquote>
+<h4 id="5参考链接"><a href="#5参考链接" class="headerlink" title="5参考链接"></a>5参考链接</h4><p><a href="https://blog.csdn.net/wds2006sdo/article/details/51923546" target="_blank" rel="noopener">用Python实现感知器模型</a><br><a href="https://blog.csdn.net/a595130080/article/details/53159082" target="_blank" rel="noopener">感知机模型</a><br><a href="https://blog.csdn.net/wangkr111/article/details/21170809" target="_blank" rel="noopener">拉格朗日对偶</a><br><a href="https://blog.csdn.net/xianlingmao/article/details/7919597" target="_blank" rel="noopener">深入理解拉格朗日乘子法（Lagrange Multiplier) 和KKT条件</a><br><a href="https://blog.csdn.net/luoshixian099/article/details/51227754" target="_blank" rel="noopener">SMO算法剖析</a><br><a href="https://blog.csdn.net/szlcw1/article/details/52259668" target="_blank" rel="noopener">数据挖掘（机器学习）面试–SVM面试常考问题</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/05/05/机器学习算法——感知机-支持向量机/">机器学习算法——感知机&支持向量机</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年05月05日 - 17:05</p>
+<p><span>最后更新:</span>2018年05月10日 - 20:05</p>
+<p><span>原始链接:</span><a href="/2018/05/05/机器学习算法——感知机-支持向量机/" title="机器学习算法——感知机&支持向量机">https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/05/机器学习算法——感知机-支持向量机/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/感知机/" rel="tag"><i class="fa fa-tag"></i> 感知机</a>
+          
+            <a href="/tags/SVM/" rel="tag"><i class="fa fa-tag"></i> SVM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/02/决策树相关算法——XGBoost原理分析及实例实现-三/" rel="next" title="决策树相关算法——XGBoost原理分析及实例实现(三)">
+                <i class="fa fa-chevron-left"></i> 决策树相关算法——XGBoost原理分析及实例实现(三)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2感知机"><span class="nav-number">2.</span> <span class="nav-text">2感知机</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1感知机介绍"><span class="nav-number">2.1.</span> <span class="nav-text">2.1感知机介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2感知机算法模型"><span class="nav-number">2.2.</span> <span class="nav-text">2.2感知机算法模型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3代价函数"><span class="nav-number">2.3.</span> <span class="nav-text">2.3代价函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4学习算法"><span class="nav-number">2.4.</span> <span class="nav-text">2.4学习算法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-5学习算法的收敛性"><span class="nav-number">2.5.</span> <span class="nav-text">2.5学习算法的收敛性</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-6基于感知机的Titanic数据集预测实例"><span class="nav-number">2.6.</span> <span class="nav-text">2.6基于感知机的Titanic数据集预测实例</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3支持向量机SVM"><span class="nav-number">3.</span> <span class="nav-text">3支持向量机SVM</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1支持向量机的类型介绍"><span class="nav-number">3.1.</span> <span class="nav-text">3.1支持向量机的类型介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2线性可分支持向量机"><span class="nav-number">3.2.</span> <span class="nav-text">3.2线性可分支持向量机</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#3-2-1代价函数的由来"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1代价函数的由来</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#3-2-2学习算法"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2学习算法</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3线性支持向量机"><span class="nav-number">3.3.</span> <span class="nav-text">3.3线性支持向量机</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#3-3-1代价函数的由来"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1代价函数的由来</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#3-3-2学习算法"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2学习算法</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4非线性支持向量机"><span class="nav-number">3.4.</span> <span class="nav-text">3.4非线性支持向量机</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#3-4-1核函数"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.4.1核函数</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#3-4-2学习过程"><span class="nav-number">3.4.2.</span> <span class="nav-text">3.4.2学习过程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4总结"><span class="nav-number">4.</span> <span class="nav-text">4总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5参考链接"><span class="nav-number">5.</span> <span class="nav-text">5参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共61.4k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
