@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="最大熵模型,逻辑斯谛回归," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要记录两个分类模型(逻辑斯谛回归模型和最大熵模型)原理及模型的代码实现，将这两个模型放一块的原因是这两个模型都是对数线性模型，都是由条件概率分布表示P(Y|X).">
+<meta name="keywords" content="最大熵模型,逻辑斯谛回归">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习算法——逻辑斯谛回归模型&amp;最大熵模型">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要记录两个分类模型(逻辑斯谛回归模型和最大熵模型)原理及模型的代码实现，将这两个模型放一块的原因是这两个模型都是对数线性模型，都是由条件概率分布表示P(Y|X).">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/3.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/4.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/5.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/6.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/7.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/8.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/22.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/10.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/9.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/11.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/12.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/13.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/14.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/15.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/16.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/17.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/18.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/19.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/20.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/21.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/23.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/24.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/25.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/26.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/27.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/28.png">
+<meta property="og:updated_time" content="2018-05-17T03:03:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习算法——逻辑斯谛回归模型&amp;最大熵模型">
+<meta name="twitter:description" content="1前言本篇博客主要记录两个分类模型(逻辑斯谛回归模型和最大熵模型)原理及模型的代码实现，将这两个模型放一块的原因是这两个模型都是对数线性模型，都是由条件概率分布表示P(Y|X).">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/"/>
+
+
+
+
+
+  <title>机器学习算法——逻辑斯谛回归模型&最大熵模型 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习算法——逻辑斯谛回归模型&最大熵模型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-15T17:14:23+08:00">
+                2018-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML-DL/" itemprop="url" rel="index">
+                    <span itemprop="name">ML&DL</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/" class="leancloud_visitors" data-flag-title="机器学习算法——逻辑斯谛回归模型&最大熵模型">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2,855
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要记录两个分类模型(逻辑斯谛回归模型和最大熵模型)原理及模型的代码实现，将这两个模型放一块的原因是这两个模型都是对数线性模型，都是由条件概率分布表示<code>P(Y|X)</code>. <a id="more"></a><br>这两种机器学习的算法的实例都是基于<a href="https://www.kaggle.com/c/titanic/data" target="_blank" rel="noopener">Titanic数据集</a>,关于数据集的特征工程部分就不具体介绍，笔者在<a href="https://jianwenjun.xyz/2018/05/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%89/">其他博文</a>中已经详细描述了,此篇博客将直接使用已经经过特征工程处理后的数据集进行模型训练。</p>
+<h4 id="2逻辑斯谛回归模型"><a href="#2逻辑斯谛回归模型" class="headerlink" title="2逻辑斯谛回归模型"></a>2逻辑斯谛回归模型</h4><p>逻辑斯谛回归模型是建立在逻辑斯谛分布上的一种分类模型的，是可以解决多类别分类问题，属于概率模型。</p>
+<h5 id="2-1逻辑斯谛分布"><a href="#2-1逻辑斯谛分布" class="headerlink" title="2.1逻辑斯谛分布"></a>2.1逻辑斯谛分布</h5><p>假设X是随机变量，当X服从逻辑斯谛分布时，满足如下<strong>分布函数</strong>和<strong>概率密度函数</strong>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/3.jpg" width="50%" height="20%" align="center" alt="图3"><br>根据<strong>分布函数</strong>和<strong>概率密度函数</strong>可以画出图形如下，从图的右半部分概率分布函数来看，当随机变量X取值在μ值附近时，概率变化非常大。概率分布范围[0,1],且关于(μ,0.5)点对称。<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/4.jpg" width="50%" height="20%" align="center" alt="图4"></p>
+<h5 id="2-2算法模型"><a href="#2-2算法模型" class="headerlink" title="2.2算法模型"></a>2.2算法模型</h5><p>此处主要讲解的是二分类问题，对应的算法模型是基于<strong>二项逻辑斯谛回归分布</strong>的<strong>条件概率模型</strong>。二项的意思是每次对于随机变量X的取值，Y有两种不同的结果<code>Y={0，1}</code>.当然如果是多分类问题的话，算法模型对应的是基于多(K)<br>项逻辑斯谛回归分布的条件概率。此时对于随机变量X的取值，Y有K中不同的结果<code>Y={0,1,...,k}</code>.<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/5.jpg" width="45%" height="20%" align="center" alt="图5"></p>
+<blockquote>
+<p>P是算法模型，为条件概率分布P(Y|X)。其中X为随机变量，对应着我们的样本。Y为样本归属的类别。使用算法模型对样本进行分类时，输入样本X，根据算法模型P,求出P(Y=0|X),P(Y=1|X)。比较P(Y=0|X),P(Y=1|X)大小，输出数值P条件概率大对应的类别。</p>
+</blockquote>
+<h5 id="2-3学习算法"><a href="#2-3学习算法" class="headerlink" title="2.3学习算法"></a>2.3学习算法</h5><p>学习算法主要用于求解算法模型，即求解P的过程。对于机器学习算法模型来说，一般都是通过先定义代价函数，再通过极小化代价函数的过程中，迭代求解出算法模型中的参数。对于算法模型是概率模型的，可以使用极大似然估计求解模型参数。当然也可以将负的似然函数理解成代价函数，通过极小化负的似然函数来求解出参数。<br><strong>a.算法模型</strong>(其中<code>π(x)</code>代表逻辑斯谛回归分布函数)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/6.jpg" width="45%" height="20%" align="center" alt="图6"><br><strong>b.似然函数：</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/7.jpg" width="40%" height="20%" align="center" alt="图7"><br><strong>c.对数似然函数</strong>(将上面的似然函数进行取对数，由乘变为加法方便求导计算)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/8.jpg" width="55%" height="20%" align="center" alt="图8"><br><strong>d.使用梯度下降法</strong>(迭代算法求解出模型参数)，对数似然函数中变量是w.</p>
+<h5 id="2-4模型代码实现"><a href="#2-4模型代码实现" class="headerlink" title="2.4模型代码实现"></a>2.4模型代码实现</h5><p><a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/LogisticRegression_MEM/LR_MEM_demo.py" target="_blank" rel="noopener">详细实例代码地址</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 主要代码，迭代求解，需要判断是否收敛</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self,train_X,train_y)</span>:</span></span><br><span class="line">        feature_size = train_X.shape[<span class="number">1</span>]</span><br><span class="line">        sample_size = train_X.shape[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># 将w,b 融合了</span></span><br><span class="line">        self.w = np.zeros(feature_size + <span class="number">1</span>)</span><br><span class="line">        correct_num = <span class="number">0</span></span><br><span class="line">        <span class="comment">#梯度下降算法</span></span><br><span class="line">        <span class="keyword">for</span> iter <span class="keyword">in</span> range(self.maxIter):</span><br><span class="line">            <span class="comment"># 随机选取一个样本</span></span><br><span class="line">            sample_index = random.randint(<span class="number">0</span>,sample_size<span class="number">-1</span>)</span><br><span class="line">            sample_select = train_X[sample_index].tolist()</span><br><span class="line">            sample_select.append(<span class="number">1.0</span>)</span><br><span class="line">            sample_y = train_y[sample_index]</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> sample_y == self.predict(sample_select):</span><br><span class="line">                <span class="comment"># 连续预测对一定的数量</span></span><br><span class="line">                correct_num = correct_num + <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> correct_num &gt; self.maxIter:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            correct_num = <span class="number">0</span></span><br><span class="line">            temp = np.exp(sum(self.w * sample_select))</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> index <span class="keyword">in</span> range(feature_size):</span><br><span class="line">                self.w[index] = self.w[index] - self.learn_late * \</span><br><span class="line">                                (- sample_y * sample_select[index] + float(temp * sample_select[index])/float(<span class="number">1</span> + temp))</span><br></pre></td></tr></table></figure></p>
+<h4 id="3最大熵模型"><a href="#3最大熵模型" class="headerlink" title="3最大熵模型"></a>3最大熵模型</h4><p>最大熵模型是一种用于分类的<strong>概率模型</strong>，它的思路是将<strong>最大熵原理</strong>应用到分类问题中。</p>
+<h5 id="3-1最大熵原理"><a href="#3-1最大熵原理" class="headerlink" title="3.1最大熵原理"></a>3.1最大熵原理</h5><p>1.对于概率模型的学习求解过程中，最大熵原理是一个准则。<strong>最大熵原理</strong>：学习概率模型时(求解概率模型参数时)，在所有可能的概率模型中(所有可能的模型参数解)中，熵最大的模型是最好的模型(使得熵最大的模型参数是最终概率模型最好的参数)。<br>2.如何来确定可能的概率模型的集合？通常使用约束条件来确定概率模型的集合。这里的约束条件即是我们的<strong>特征函数</strong>——数据集中已有的事实。</p>
+<blockquote>
+<p><strong>熵最大的模型是最好的模型的原因</strong>：<strong>熵</strong>表示一个随机变量的不确定性，熵越大，表示随机变量越不确定，也就是随机变量越随机，对其行为做准确预测最困难。最大熵原理的实质就是，在已知部分知识的前提下，关于未知分布最合理的推断就是符合已知知识最不确定或最随机的推断，这是我们可以作出的唯一不偏不倚的选择，任何其它的选择都意味着我们增加了其它的约束和假设，这些约束和假设根据我们掌握的信息无法作出。</p>
+</blockquote>
+<h5 id="3-2最大熵模型的构建"><a href="#3-2最大熵模型的构建" class="headerlink" title="3.2最大熵模型的构建"></a>3.2最大熵模型的构建</h5><p><strong>最大熵模型：</strong>对于一个分类模型，它的算法模型是一个概率模型P(Y|X),对于该概率模型的参数求解，采用的是基于最大熵原理进行选择最优的概率模型。<br>首先给定一个训练数据集T：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/22.png" width="50%" height="20%" align="center" alt="图22"></p>
+<blockquote>
+<p>对于如何使用<strong>最大熵原理</strong>求解出该分类问题的概率模型参数，主要有以下几步：</p>
+</blockquote>
+<p><strong>Step1 提取出模型应该满足的约束条件然后表述成特征函数</strong><br>特征函数<code>f(x,y)</code>：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/10.png" width="50%" height="20%" align="center" alt="图10"></p>
+<blockquote>
+<p>它描述的是模型的输入x和输出y之间的某一个事实，即对输入和输出同时抽取特征。</p>
+</blockquote>
+<p><strong>事实上满足的条件</strong>：理想的情况下最后的算法模型能够获取训练数据中的信息————对于最后求得的模型P(Y|X),特征函数f的期望和在训练集上特征函数f的期望理想情况上是相等的。<br>对于X，Y在数据集上的经验分布，可以得到经验联合分布P(X,Y)和经验边缘分布P(X)，其中v(X=x,Y=y)表示样本(x,y)出现的次数，v(X=x)表示样本的输入为x的次数，N表示样本集的大小。<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/9.png" width="55%" height="20%" align="center" alt="图9"><br>取训练集上特征函数f这一事实在经验分布P(X,Y)上的期望：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/11.png" width="55%" height="20%" align="center" alt="图11"><br>取特征函数在算法模型与经验分布上的期望：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/12.png" width="55%" height="20%" align="center" alt="图12"><br>根据事实上满足的条件：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/13.png" width="30%" height="20%" align="center" alt="图13"><br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/14.png" width="40%" height="20%" align="center" alt="图14"><br>如果有N个事实(特征函数)就要N个约束条件，最后的算法模型需要满足这N个约束条件。<br><strong>Step2 构建出满足所有约束条件的概率模型的集合</strong><br>根据需要满足的N个约束条件构造出概率模型集合：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/15.png" width="42%" height="20%" align="center" alt="图15"><br>此时，我们的概率模型P(Y|X)在集合C中的条件熵为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/16.png" width="48%" height="20%" align="center" alt="图16"><br><strong>Step3 表述出概率模型的熵，并使之最大，求解出令该式子最大的模型</strong><br>根据最大熵原理，可以列出式子求解出集合C中令概率模型熵最大的模型。于是我们的目标函数为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/17.png" width="48%" height="20%" align="center" alt="图17"></p>
+<h5 id="3-3学习算法"><a href="#3-3学习算法" class="headerlink" title="3.3学习算法"></a>3.3学习算法</h5><p>求解目标函数的过程也就是我们的学习算法，当然我们的目标函数需要满足事实上的一些条件：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/18.png" width="50%" height="20%" align="center" alt="图18"><br>对应上式子，可以想到拉格朗日函数，来求解出极值。式中(w<sub>0</sub>,w<sub>1</sub>,…,w<sub>n</sub>为拉格朗日乘子)<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/19.png" width="75%" height="20%" align="center" alt="图19"><br>根据拉格朗日函数的对偶函数得出原始问题的形式为：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/20.png" width="35%" height="20%" align="center" alt="图20"><br>将原始问题进行对偶转换：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/21.png" width="35%" height="20%" align="center" alt="图21"></p>
+<blockquote>
+<p>计算方式，先以w为定值计算关于P的极小，再进行计算关于w的极大值。</p>
+</blockquote>
+<p><strong>第一步</strong>:先以w为定值计算关于P的极小<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/23.png" width="35%" height="20%" align="center" alt="图23"><br>求极值，对参数求偏导，令等式等于0。<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/24.png" width="70%" height="20%" align="center" alt="图24"><br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/25.png" width="70%" height="20%" align="center" alt="图25"><br>最后得：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/26.png" width="50%" height="20%" align="center" alt="图26"><br><strong>第二步</strong>:再进行计算关于w的极大值，其中ψ(x)表示第一步求解的最小值。<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/27.png" width="45%" height="20%" align="center" alt="图27"></p>
+<h5 id="3-4模型代码实现——BFGS算法实现"><a href="#3-4模型代码实现——BFGS算法实现" class="headerlink" title="3.4模型代码实现——BFGS算法实现"></a>3.4模型代码实现——BFGS算法实现</h5><p><a href="https://github.com/JianWenJun/MLDemo/blob/master/ML/LogisticRegression_MEM/LR_MEM_demo.py" target="_blank" rel="noopener">详细实例代码地址</a><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(self,train_X,train_y)</span>:</span></span><br><span class="line">     <span class="comment"># 使用《统计学习方法》P92算法6.2——BFGS，求解参数</span></span><br><span class="line">     self.feature_size = train_X.shape[<span class="number">1</span>]</span><br><span class="line">     self.sample_num = train_X.shape[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">     self.samples = train_X</span><br><span class="line">     self.labels = train_y</span><br><span class="line"></span><br><span class="line">     <span class="comment"># 统计数据集中的特征函数个数</span></span><br><span class="line">     self._cal_feature_func()</span><br><span class="line">     self._f2id()</span><br><span class="line">     self.n = len(self.P_x_y) <span class="comment"># n为特征函数的个数</span></span><br><span class="line">     <span class="comment"># 计算每个特征函数关于经验分布p(x,y)的期望，并保持于EPxy字典中</span></span><br><span class="line">     self._cal_EPxy()</span><br><span class="line"></span><br><span class="line">     self.w = np.zeros(self.n) <span class="comment">#wi为拉格函数中的乘子</span></span><br><span class="line">     self.g = np.zeros(self.n) <span class="comment">#对应g(w),《统计学习方法》P92,最上面g(w)的公式</span></span><br><span class="line"></span><br><span class="line">     self.B = np.eye(self.n) <span class="comment">#正定对称矩阵</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">for</span> iter <span class="keyword">in</span> range(self.maxIter):</span><br><span class="line">         <span class="comment"># 算法6.2——(2）</span></span><br><span class="line">         self._cal_Gw()</span><br><span class="line">         <span class="keyword">if</span> self._cal_g_l2() &lt; self.epsion:</span><br><span class="line">             <span class="keyword">break</span></span><br><span class="line">         <span class="comment"># 算法6.2——(3）</span></span><br><span class="line">         p_k = - (self.B ** <span class="number">-1</span>) * np.reshape(self.g,(self.n,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">         <span class="comment"># np.linalg.solve()</span></span><br><span class="line">         <span class="comment"># 算法6.2——(4）</span></span><br><span class="line">         r_k = self._liear_search(p_k)</span><br><span class="line">         <span class="comment"># 算法6.2——(5）</span></span><br><span class="line">         old_g = copy.deepcopy(self.g)</span><br><span class="line">         old_w = copy.deepcopy(self.w)</span><br><span class="line"></span><br><span class="line">         self.w = self.w + r_k * p_k</span><br><span class="line">         <span class="comment"># 算法6.2——(6）</span></span><br><span class="line">         self._cal_Gw()</span><br><span class="line">         <span class="keyword">if</span> self._cal_g_l2() &lt; self.epsion:</span><br><span class="line">             <span class="keyword">break</span></span><br><span class="line">         y_k = self.g - old_g</span><br><span class="line">         fai_k = self.w - old_w</span><br><span class="line"></span><br><span class="line">         y_k = np.reshape(y_k,(self.n,<span class="number">1</span>))</span><br><span class="line">         fai_k = np.reshape(fai_k,(self.n,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">         temp1 = np.dot(y_k,y_k.T) / float((np.dot(y_k.T,fai_k).reshape(<span class="number">1</span>)[<span class="number">0</span>]))</span><br><span class="line">         temp2 = np.dot(np.dot(np.dot(self.B,fai_k),fai_k.T),self.B) / float(np.dot(np.dot(fai_k.T,self.B),fai_k).reshape(<span class="number">1</span>)[<span class="number">0</span>])</span><br><span class="line">         self.B =self.B + temp1 - temp2</span><br></pre></td></tr></table></figure></p>
+<p><strong>代码说明</strong>: <code># 算法6.2——(4）r_k = self._liear_search(p_k)</code> 求步长r_k的过程中是需要满足如下条件：<br><img src="http://p6wp21cg8.bkt.clouddn.com/逻辑斯谛回归和最大熵模型/28.png" width="60%" height="20%" align="center" alt="图28"></p>
+<blockquote>
+<p>其中，求r_k的思路是:因为p_k和w_k是已知的，r_k未知，所以求f对r_k求导，令导数为0，求出r_k。此处求导极为复杂，不知道其他大神有什么简便求解算法，忘告知，感谢。</p>
+</blockquote>
+<h4 id="4总结"><a href="#4总结" class="headerlink" title="4总结"></a>4总结</h4><blockquote>
+<p>1.最大熵模型和逻辑斯谛回归模型对于求解分类问题都是概率模型P(Y|X).对概率模型的求解方式，都可以使用极大似然估计方法求参数。<br>2.最大熵模型的关键是需要将分类问题建立在<strong>最大熵原理</strong>上，从而构建出一个凸优化问题。第二个关键点是特征函数的抽取的过程中，是相当于在优化问题上附加了约束条件。这时候对参数的求解就是带约束条件的凸优化问题，需要引入拉格朗日函数进行求解。将原始问题进行对偶转换。这点与线性支持向量机的参数求解相似，都是带约束条件的凸优化问题。</p>
+</blockquote>
+<h4 id="5参考链接"><a href="#5参考链接" class="headerlink" title="5参考链接"></a>5参考链接</h4><p><a href="https://blog.csdn.net/wds2006sdo/article/details/53106579" target="_blank" rel="noopener">用Python实现最大熵模型-改进的迭代尺度算法IIS</a><br><a href="https://blog.csdn.net/itplus/article/details/21897443" target="_blank" rel="noopener">牛顿法与拟牛顿法学习笔记（四）BFGS 算法</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/">机器学习算法——逻辑斯谛回归模型&最大熵模型</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年05月15日 - 17:05</p>
+<p><span>最后更新:</span>2018年05月17日 - 11:05</p>
+<p><span>原始链接:</span><a href="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/" title="机器学习算法——逻辑斯谛回归模型&最大熵模型">https://jianwenjun.xyz/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/最大熵模型/" rel="tag"><i class="fa fa-tag"></i> 最大熵模型</a>
+          
+            <a href="/tags/逻辑斯谛回归/" rel="tag"><i class="fa fa-tag"></i> 逻辑斯谛回归</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/05/机器学习算法——感知机-支持向量机/" rel="next" title="机器学习算法——感知机&支持向量机">
+                <i class="fa fa-chevron-left"></i> 机器学习算法——感知机&支持向量机
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2逻辑斯谛回归模型"><span class="nav-number">2.</span> <span class="nav-text">2逻辑斯谛回归模型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1逻辑斯谛分布"><span class="nav-number">2.1.</span> <span class="nav-text">2.1逻辑斯谛分布</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2算法模型"><span class="nav-number">2.2.</span> <span class="nav-text">2.2算法模型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3学习算法"><span class="nav-number">2.3.</span> <span class="nav-text">2.3学习算法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4模型代码实现"><span class="nav-number">2.4.</span> <span class="nav-text">2.4模型代码实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3最大熵模型"><span class="nav-number">3.</span> <span class="nav-text">3最大熵模型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1最大熵原理"><span class="nav-number">3.1.</span> <span class="nav-text">3.1最大熵原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2最大熵模型的构建"><span class="nav-number">3.2.</span> <span class="nav-text">3.2最大熵模型的构建</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3学习算法"><span class="nav-number">3.3.</span> <span class="nav-text">3.3学习算法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4模型代码实现——BFGS算法实现"><span class="nav-number">3.4.</span> <span class="nav-text">3.4模型代码实现——BFGS算法实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4总结"><span class="nav-number">4.</span> <span class="nav-text">4总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5参考链接"><span class="nav-number">5.</span> <span class="nav-text">5参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共64.3k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
