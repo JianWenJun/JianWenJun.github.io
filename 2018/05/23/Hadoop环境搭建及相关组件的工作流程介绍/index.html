@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hadoop," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
+<meta name="keywords" content="Hadoop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop环境搭建及相关组件的工作流程介绍">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/10.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/8.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/11.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/12.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/13.jpg">
+<meta property="og:updated_time" content="2018-05-24T03:17:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hadoop环境搭建及相关组件的工作流程介绍">
+<meta name="twitter:description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/"/>
+
+
+
+
+
+  <title>Hadoop环境搭建及相关组件的工作流程介绍 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Hadoop环境搭建及相关组件的工作流程介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-23T21:00:36+08:00">
+                2018-05-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" class="leancloud_visitors" data-flag-title="Hadoop环境搭建及相关组件的工作流程介绍">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,923
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  21 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。<a id="more"></a><br>建议先理解各个组件的工作流程，再去配置环境会更容易理解。</p>
+<h4 id="2Hadoop单机伪分布配置"><a href="#2Hadoop单机伪分布配置" class="headerlink" title="2Hadoop单机伪分布配置"></a>2Hadoop单机伪分布配置</h4><blockquote>
+<p>说明：Windows的上一台虚拟机VM,系统Centos6.5,系统用户zkpk,超级用户root</p>
+</blockquote>
+<p><strong>a.配置主机名(root)</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit /etc/sysconfig/network</span><br><span class="line">    NETWORKING=yes #启动网络</span><br><span class="line">    HOSTNAME=master #主机名</span><br><span class="line">命令：hostname master</span><br><span class="line">查看命令：hostname</span><br></pre></td></tr></table></figure></p>
+<p><strong>b.配置网络(root)</strong><br>这块主要是看虚拟机的网络配置设置可以选择桥接模式，NET模式。虚拟机网络连接区别<a href="https://jingyan.baidu.com/article/3f16e003cd0a0d2591c103b4.html" target="_blank" rel="noopener">桥接、主机、Net</a><br>这里虚拟机的网络配置选择NET模式。<br>关闭防火墙：<code>service iptables stop</code><br><strong>c.配置hosts列表(root)</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit /etc/hosts</span><br><span class="line">    192.168.1.77 master</span><br></pre></td></tr></table></figure></p>
+<p><strong>d.免秘钥登录(zkpk)</strong><br>su zkpk<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">前提安装ssh： sudo apt-get install ssh</span><br><span class="line">命令：ssh-keygen -t rsa</span><br><span class="line">命令：cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</span><br><span class="line">命令：chmod 600 ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></p>
+<p><strong>e.java环境准备(zkpk)</strong> 软件<code>jdk-7u71-linux-x64.gz</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">命令：tar -xvf /usr/java/jdk-7u71-linux-x64.gz</span><br><span class="line">命令：gedit /home/zkpk/.bash_profile</span><br><span class="line">    export JAVA_HOME=/usr/java/jdk1.7.0_71/ </span><br><span class="line">    export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line">命令：source /home/zkpk/.bash_profile</span><br><span class="line">验证：java -version</span><br></pre></td></tr></table></figure></p>
+<p><strong>f.Hadoop安装(zkpk)</strong> 软件<code>hadoop-2.6.0-cdh5.7.0.tar.gz</code><br><a href="http://archive-primary.cloudera.com/cdh5/cdh/5/" target="_blank" rel="noopener">下载地址</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">命令：tar -xvf ~/hadoop-2.6.0-cdh5.7.0.tar.gz</span><br><span class="line">重命名命令：mv hadoop-2.6.0-cdh5.7.0 hadoop</span><br><span class="line">命令：cd hadoop</span><br><span class="line">命令：gedit ~/.bash_profile</span><br><span class="line">    export HADOOP_HOME=/home/zkpk/app/hadoop</span><br><span class="line">    export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">命令：source ~/.bash_profile</span><br></pre></td></tr></table></figure></p>
+<p><strong>g.Hadoop配置文件的设置(zkpk)</strong><br>1)当前目录是hadoop.设置Hadoop的java运行环境,对应的文件etc/hadoop/hadoop-env.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/hadoop-env.sh</span><br><span class="line">    # set to the root of your Java installation</span><br><span class="line">    export JAVA_HOME=/usr/java/jdk1.7.0_71/</span><br></pre></td></tr></table></figure></p>
+<p>2)当前目录是hadoop.设置Hadoop中的HDFS：etc/hadoop/core-site.xml和etc/hadoop/hdfs-site.xml.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/core-site.xml</span><br><span class="line">#hadoop v2.0</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:8020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- Hadoop 文件缓存位置 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line">命令：gedit etc/hadoop/hdfs-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- # Hadoop 块副本信息 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;1&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>3.1).启动hdfs,当前目录hadoop<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a.格式化文件系统(仅第一次执行即可，不可重复执行否则hdfs文件系统将重新清空，格式化了)</span><br><span class="line">命令：hdfs namenode -format</span><br><span class="line">b.启动 NameNode daemon and DataNode daemon</span><br><span class="line">命令：sbin/start-dfs.sh</span><br><span class="line">验证启动成功：jps</span><br><span class="line">浏览器验证：master:50070</span><br><span class="line">c.关闭 NameNode daemon and DataNode daemon</span><br><span class="line">命令：sbin/stop-dfs.sh</span><br></pre></td></tr></table></figure></p>
+<p>3.2)Hadoop中HDFS shell使用————操作分布式文件系统</p>
+<blockquote>
+<p>描述：此时有两个文件系统——本机文件系统和部署在本机上的分布式文件系统HDFS</p>
+</blockquote>
+<p>常用命令：<code>ls get mkdir rm put</code><br>方式一：hdfs dfs + commmond<br>方式二：hadoop fs + commmond<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># a.将本机文件系统中的hello.txt放入到本机上的分布式文件系统HDFS中的/目录下</span><br><span class="line">命令： hadoop fs -put /home/zkpk/app/demo/hello.txt /</span><br><span class="line"># b.查看本机上的分布式文件系统HDFS中的/目录下的hello.txt文件</span><br><span class="line">命令： hadoop fs -text /hello.txt</span><br><span class="line"># c.在本机上的分布式文件系统HDFS中创建文件目录</span><br><span class="line">命令： hadoop fs -mkdir /test/a/b</span><br><span class="line"># d.在本机上的分布式文件系统HDFS中查看文件</span><br><span class="line">命令： hadoop fs -ls -R /test</span><br><span class="line"># e.将本机文件系统中的hello.txt放入到本机上的分布式文件系统HDFS中的 /test/a目录下</span><br><span class="line">命令： hadoop fs -copyFromLocal /home/zkpk/app/demo/hello.txt /test/a</span><br><span class="line"># f.将本机上的分布式文件系统HDFS中的/test/a目录下的hello.txt 放置到本机文件系统下</span><br><span class="line">命令： hadoop fs -copyToLocal/get  /test/a/hello.txt /home/zkpk/app/demo/h.txt</span><br><span class="line"># g.删除本机上的分布式文件系统HDFS中的/test目录</span><br><span class="line">命令： hadoop fs -rm -R /test</span><br></pre></td></tr></table></figure></p>
+<p><strong>h.yarn资源调度器的设置(zkpk)</strong><br>当前目录是hadoop<br>1)设置etc/hadoop/mapred-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/mapred-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置MapReduce是运行在yarn上的 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>2)设置etc/hadoop/yarn-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/yarn-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置yarn上的应用程序是MapReduce,启动的服务是MapReduce --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>3)启动yarn<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a.启动ResourceManager daemon 和 NodeManager daemon</span><br><span class="line">命令：sbin/start-yarn.sh</span><br><span class="line">验证启动成功：jps</span><br><span class="line">浏览器验证：master:8088</span><br><span class="line">b.关闭ResourceManager daemon 和 NodeManager daemon</span><br><span class="line">命令：sbin/stop-yarn.sh</span><br></pre></td></tr></table></figure></p>
+<p>4)提交MapReduce任务到yarn上运行<br>使用命令<code>hadoop jar + jar包名</code></p>
+<h4 id="3Hadoop分布式配置"><a href="#3Hadoop分布式配置" class="headerlink" title="3Hadoop分布式配置"></a>3Hadoop分布式配置</h4><blockquote>
+<p>说明,一台Windows上，开启了3个虚拟机VM1，VM2，VM3各个虚拟机在机器中充当的角色如下:<br>VM1 master：192.168.1.77，NameNode,DataNode,NodeManager,ResourceManager<br>VM1 slave1：192.168.1.105 DataNode,NodeManager<br>VM1 slave2：192.168.1.107 DataNode,NodeManager</p>
+</blockquote>
+<p><strong>a.配置主机名(root)</strong><br>同单机伪分布配置，在3台机器上都需要配置，对应设置自己对应的主机名。<br><strong>b.配置网络(root)</strong><br>此处需要将虚拟机的网络配置设置为桥接模式。也需要关闭防火墙，命令同单机伪分布。<br><strong>c.配置hosts列表(root)</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit /etc/hosts</span><br><span class="line">    192.168.1.77 master </span><br><span class="line">    192.168.1.105 slave1</span><br><span class="line">    192.168.1.107 slave2</span><br></pre></td></tr></table></figure></p>
+<p><strong>d.免秘钥登录(zkpk)</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1)在master,slave1,slave2 VM上运行:</span><br><span class="line">前提安装ssh： sudo apt-get install ssh</span><br><span class="line">命令：ssh-keygen -t rsa</span><br><span class="line">2)在master运行:</span><br><span class="line">命令：cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</span><br><span class="line">命令：chmod 600 ~/.ssh/authorized_keys</span><br><span class="line">最后将master上的authorized_keys拷贝到另外两台机器</span><br><span class="line">命令：scp  ~/.ssh/authorized_keys zkpk@slave1:~/.ssh/</span><br><span class="line">命令：scp  ~/.ssh/authorized_keys zkpk@slave2:~/.ssh/</span><br></pre></td></tr></table></figure></p>
+<p><strong>e.java环境准备(zkpk)</strong> 软件<code>jdk-7u71-linux-x64.gz</code><br><strong>f.Hadoop安装(zkpk)</strong> 软件<code>hadoop-2.6.0-cdh5.7.0.tar.gz</code><br><a href="http://archive-primary.cloudera.com/cdh5/cdh/5/" target="_blank" rel="noopener">下载地址</a><br>e.f两步设置同单机伪分布配置，都只在master VM上设置好。<br><strong>g.HDFS配置和YARN配置</strong><br>这些都只在master VM上设置，当前目录为hadoop。<br>1)设置Hadoop的java运行环境,对应的文件etc/hadoop/hadoop-env.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/hadoop-env.sh</span><br><span class="line">    # set to the root of your Java installation</span><br><span class="line">    export JAVA_HOME=/usr/java/jdk1.7.0_71/</span><br></pre></td></tr></table></figure></p>
+<p>2)设置HDFS相关配置。当前目录为hadoop</p>
+<blockquote>
+<p>mkdir -p ../hadoop_tmp/dfs/data<br>mkdir -p ../hadoop_tmp/dfs/name</p>
+</blockquote>
+<p>设置etc/hadoop/core-site.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/core-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应的URI --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:8020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>设置etc/hadoop/hdfs-site.xml.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/hdfs-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应Block副本数 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置HDFS的DataNode和NameNode对应的存放目录 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/name&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.data.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/data&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>3)设置yarn配置<br>设置etc/hadoop/mapred-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">命令：cp etc/hadoop/mapred-site.xml.template etc/hadoop/mapred-site.xml</span><br><span class="line">命令：gedit etc/hadoop/mapred-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置MapReduce是运行在yarn上的 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>设置etc/hadoop/yarn-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/yarn-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置yarn上的应用程序是MapReduce,启动的服务是MapReduce --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置yarn的resourcemanager是运行在主机master上 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>h设置分布式集群的从节点关系</strong><br>设置etc/hadoop/slaves文件。<br>通常情况下，选择集群中的一台机器充当NameNode，并选择一台机器充当ResourceManager。 其余的机器同时充当DataNode和NodeManager，并被称为从机。然后将从机的主机名写入gedit etc/hadoop/slaves文件中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/slaves</span><br><span class="line">master </span><br><span class="line">slave1</span><br><span class="line">slave2</span><br></pre></td></tr></table></figure></p>
+<p>说明：因为master上运行了NodeManager和DataNode，所以需要将master添加到这上面。</p>
+<p><strong>i将上述Hadoop的相关文件复制到其他节点机器</strong><br>主要包括java环境的设置，Hadoop安装环境,只在master上复制操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1）先拷贝java相关的</span><br><span class="line">命令：sudo scp -r /usr/java/jdk1.7.0_71 root@slave1:/usr/java/jdk1.7.0_71/</span><br><span class="line">命令：sudo scp -r /usr/java/jdk1.7.0_71 root@slave2:/usr/java/jdk1.7.0_71/</span><br><span class="line">2）拷贝Hadoop相关的</span><br><span class="line">slave1和slave2需要有NameNode和DataNode对应的存储文件夹/home/zkpk/app/hadoop_tmp/dfs/node和/home/zkpk/app/hadoop_tmp/dfs/name,没有需要先创建</span><br><span class="line">命令：sudo  -r /home/zkpk/app/hadoop zkpk@slave1:/home/zkpk/app/hadoop</span><br><span class="line">命令：sudo  -r /home/zkpk/app/hadoop zkpk@slave2:/home/zkpk/app/hadoop</span><br><span class="line">3）拷贝配置文件/home/zkpk/.bash_profile</span><br><span class="line">命令：sudo  -r /home/zkpk/.bash_profile zkpk@slave1:/home/zkpk/</span><br><span class="line">命令：sudo  -r /home/zkpk/.bash_profile zkpk@slave2:/home/zkpk/</span><br><span class="line">4)slave1和slave2下分别运行</span><br><span class="line">命令：source /home/zkpk/.bash_profile</span><br></pre></td></tr></table></figure></p>
+<p><strong>j启动整个分布式集群</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">启动命令：./sbin/start-all.sh</span><br><span class="line">验证命令：jps</span><br><span class="line">终止命令：./sbin/stop-all.sh</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg" width="50%" height="65%" align="center" alt="图9"></p>
+<h4 id="4HDFS读写流程"><a href="#4HDFS读写流程" class="headerlink" title="4HDFS读写流程"></a>4HDFS读写流程</h4><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/10.png" width="95%" height="65%" align="center" alt="图9"></p>
+<h5 id="4-1写数据"><a href="#4-1写数据" class="headerlink" title="4.1写数据"></a>4.1写数据</h5><p>Client：发起写请求,获取到block的大小信息，副本个数信息。然后切分文件成多个block<br>NameNode:全局协调所有的请求，对于每个block，计算出block存储的DataNode的位置<br>DataNode：pipline数据存储</p>
+<h5 id="4-2读数据"><a href="#4-2读数据" class="headerlink" title="4.2读数据"></a>4.2读数据</h5><p>Client：发送NameNode出文件名。从DataNode读取出数据<br>NameNode:回送文件包含的块列表，每个块对应的DataNode信息。<br>DataNode：数据存储</p>
+<blockquote>
+<p>1.写过程<br>Client发送写请求，并指定block的大小信息，副本个数信息，然后Client将大文件切分为多个block，并将要存储的block信息发送到NameNode，待NameNode计算好block存储的位置后，一个一个将block和该block副本位置发送到NameNode指定的DataNode位置。<br>NameNode，接收写请求和block的信息，副本个数信息。根据各个DataNode的存储资源情况计算出block存储的DataNode的位置。<br>DataNode，接收Client发送过来的block块和该block副本位置，并将该block复制到另外一个DataNode作为一个副本。存储完成后需要通知NameNode。<br>2.读过程<br>Client发送读请求，并指定文件名，将该请求和文件名发送给NameNode。<br>NameNode接收Client请求和文件名，计算出文件的元信息(文件的block存储位置，block信息，副本信息)，并将文件的元信息反馈回Client。<br>Client接收到文件的元信息后，将从对应的DataNode上的下载block，最后将所有的block组合成文件。</p>
+</blockquote>
+<h4 id="5YARN资源调度流程"><a href="#5YARN资源调度流程" class="headerlink" title="5YARN资源调度流程"></a>5YARN资源调度流程</h4><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/8.png" width="85%" height="65%" align="center" alt="图8"></p>
+<h5 id="5-1YARN架构中包含的重要概念"><a href="#5-1YARN架构中包含的重要概念" class="headerlink" title="5.1YARN架构中包含的重要概念"></a>5.1YARN架构中包含的重要概念</h5><p>YARN:多个不同的计算框架可以共享同一个HDFS集群上的数据，享受整体的资源调度。<br>XXX on YARN 的好处：与其他计算框架共享集群资源，按资源需要分配，进而提高集群资源的利用率<br>XXX：Spark、MapReduce、Storm、Flink<br><strong>1）ResourceManager: RM</strong></p>
+<blockquote>
+<p>整个集群同一时间提供服务的RM只有一个，负责集群资源的统一管理和调度<br>处理客户端的请求： 提交一个作业、杀死一个作业<br>监控我们的NM，一旦某个NM挂了，那么该NM上运行的任务需要告诉我们的AM来如何进行处理<br>ResourceManager包含一个ApplicationManager和Resource Scheduler.其中ApplicationManager负责分配ApplicationMaster运行的Container资源，并与Container对应的NodeManager通信。ApplicationManager也负责与ApplicationMaster通信了解Job的运行状态。Resource Scheduler负责Job中的任务资源分配。</p>
+</blockquote>
+<p><strong>2) NodeManager: NM</strong></p>
+<blockquote>
+<p>整个集群中有多个，负责自己本身节点资源管理和使用<br>定时向RM汇报本节点的资源使用情况<br>接收并处理来自RM的各种命令：启动Container<br>处理来自AM的命令<br>单个节点的资源管理</p>
+</blockquote>
+<p><strong>3) ApplicationMaster: AM</strong></p>
+<blockquote>
+<p>每个应用程序对应一个：MR、Spark，负责应用程序的管理<br>为应用程序向RM申请资源（core、memory），分配给内部task<br>需要与NM通信：启动/停止task，task是运行在container里面，AM也是运行在container里面</p>
+</blockquote>
+<p><strong>4) Container</strong></p>
+<blockquote>
+<p>封装了CPU、Memory等资源的一个容器<br>是一个任务运行环境的抽象</p>
+</blockquote>
+<p><strong>5) Client</strong></p>
+<blockquote>
+<p>提交作业、查询作业的运行进度、杀死作业</p>
+</blockquote>
+<h5 id="5-2YARN执行过程"><a href="#5-2YARN执行过程" class="headerlink" title="5.2YARN执行过程"></a>5.2YARN执行过程</h5><blockquote>
+<p>执行过程<br>1.Client向Yarn中的RM提交一个Job(MP/Spark作业)，RM为该Job分配第一个Container资源，并与Container对应的NodeManager通信<br>2.RM与NodeManager通信，请求启动分配的Container(AM),当Job是MP的job时，对应的是MP的AM。<br>3.AM容器启动后向RM注册，以便用户可以通过RM查看Job的运行状态。并且AM(MP)将为Job中的各个任务如(Map任务、Reduce任务)向RM申请资源(采用轮询的方式向RM申请和领取资源)。<br>4.当AM申请到资源后，AM将则与资源对应的NodeManager通信，要求NM启动Container来运行任务。<br>5.各个任务需要需要向AM汇报运行状态和进度。</p>
+</blockquote>
+<h4 id="6MapReduce的工作过程"><a href="#6MapReduce的工作过程" class="headerlink" title="6MapReduce的工作过程"></a>6MapReduce的工作过程</h4><h5 id="6-1MapReduce2-x运行过程"><a href="#6-1MapReduce2-x运行过程" class="headerlink" title="6.1MapReduce2.x运行过程"></a>6.1MapReduce2.x运行过程</h5><p>此处的MapReduce是运行在YARN上的，作为YARN上的一个应用程序，也就是<strong>5.2YARN执行过程</strong>中的Client，MapReduce向YARN中提交的是一个Job。</p>
+<h5 id="6-2MapReduce编程模型过程"><a href="#6-2MapReduce编程模型过程" class="headerlink" title="6.2MapReduce编程模型过程"></a>6.2MapReduce编程模型过程</h5><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/11.png" width="90%" height="65%" align="center" alt="图11"></p>
+<blockquote>
+<p><strong>1)编程模型图说明(从左往右说明)</strong><br><strong>首先，</strong>从HDFS中读取出file,使用InputFormat接口将file进行切片处理得到多个Split，然后InputFormat将Split转换为对应的&lt;k1, v1&gt;作为Mapper的输入。一个Split对应一个&lt;k1, v1&gt;对应一个Mapper。<br><strong>其次，</strong>经过Mapper Task处理后输出&lt;k2, v2&gt;，经由Shuffle进行一定程度的组合得到&lt;k2, {v2,…}&gt;，作为Reduce的输入，Reduce进行K的合并操作，输出 &lt;k3, v3&gt;。后面会详细叙述Shuffle的过程。<br><strong>最后，</strong>，在得到 &lt;k3, v3&gt;后经OutputFormat转换为HDFS的文件存储到相应的HDFS目录下。<br><strong>2)Map和Reduce的输入输出数据格式</strong><br>(input) &lt;k1, v1&gt; -&gt; map -&gt; &lt;k2, v2&gt; -&gt; combine -&gt; &lt;k2, v2&gt; -&gt; reduce -&gt; &lt;k3, v3&gt; (output)<br>其中的K,V必须实现Writable可序列化接口,其中K还必须实现WriteableComparable接口。<br><strong>3)核心概念</strong><br><strong>Split：</strong>MapReduce中最小的计算单元<br><strong>Block：</strong>HDFS中的最小存储单元,默认情况下，Split和Block是一一对应关系。<br><strong>InputFormat:</strong>将输入文件进行分片处理，并转化为键值对形式。<br><strong>OutputFormat：</strong>将键值对转化为文件输出<br><strong>Combiner:</strong> 本地的Reduce，先将Mapper找你的相同的Key先做一部分处理，减少了MapTask输出的数量量。使用场景求和，次数 ,不能用平均数。<br><strong>Partitioner:</strong>决定MapTask输出的数据交由那个ReduceTask处理，默认的情况下分发的key的hash值对Reduce Task个数取模。</p>
+</blockquote>
+<h6 id="6-2-1MapReduce中的Shuffle过程详解"><a href="#6-2-1MapReduce中的Shuffle过程详解" class="headerlink" title="6.2.1MapReduce中的Shuffle过程详解"></a>6.2.1MapReduce中的Shuffle过程详解</h6><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/12.jpg" width="95%" height="65%" align="center" alt="图12"></p>
+<blockquote>
+<p>借助参考链接中的说明：</p>
+</blockquote>
+<p><strong>为什么MapReduce计算模型需要Shuffle过程？</strong>MapReduce计算模型一般包括两个重要的阶段：Map是映射，负责数据的过滤分发；Reduce是规约，负责数据的计算归并。Reduce的数据来源于Map，Map的输出即是Reduce的输入，Reduce需要通过Shuffle来获取数据。<br>从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程.<br><strong>Spill过程</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/13.jpg" width="95%" height="65%" align="center" alt="图13"><br><strong>说明：</strong>1.每个Map任务不断地以&lt;key, value&gt;对的形式把数据输出到在内存中构造的一个环形数据结构中kvbuffer。使用环形数据结构是为了更有效地使用内存空间，在内存中放置尽可能多的数据.<br>2.把Kvbuffer中的数据按照partition值和key两个关键字升序排序，移动的只是索引数据，排序结果是Kvmeta中数据按照partition为单位聚集在一起，同一partition内的按照key有序。<br>3.当每个Map任务不断地以&lt;key, value&gt;加入到内存的kvbuffer中时，并进行排序后，当kvbuffer中的内存使用空间达到一定程度时，将kvmate的数据写到<strong>磁盘上</strong>。<br>4.最后把所有的数据都输出到磁盘上，最后merge成一个文件。<br>Map端的Shuffle过程到此结束。<br><strong>Copy过程</strong><br>Reduce任务通过HTTP向各个Map任务拖取它所需要的数据。如果map中的partition值设置了，将会把Map最后的输出，输送到指定的Reduce上供Reduce拖取(复制到内存)。<br><strong>Sort</strong><br>Map的输出数据已经是有序的，Merge进行一次合并排序，所谓Reduce端的sort过程就是这个合并的过程。<br>Reduce端的Shuffle过程至此结束。</p>
+<blockquote>
+<p>上面只是根据自己的理解记录的，如果不是很清楚可以查看参考链接。</p>
+</blockquote>
+<p><strong>kvbuffer数据结构介绍：</strong></p>
+<blockquote>
+<p>1.kvmeta,存放&lt;K,V&gt;数据.<br>2.kvindex,牵引数据，四元组(value的起始位置、key的起始位置、partition值、value的长度),大小4个int.</p>
+</blockquote>
+<h5 id="6-3MapReduce中的Jobhistory配置记录"><a href="#6-3MapReduce中的Jobhistory配置记录" class="headerlink" title="6.3MapReduce中的Jobhistory配置记录"></a>6.3MapReduce中的Jobhistory配置记录</h5><p>1.需要设置etc/hadoop/mapred-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/mapred-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置MapReduce的Jobhistory服务 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置MapReduce的Jobhistory web服务 --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19988&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">    &lt;!-- 设置MapReduce的Jobhistory 历史存放目录 --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.done-dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/history/done&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;   </span><br><span class="line">    &lt;!-- 设置MapReduce的Jobhistory 正在执行的job历史目录 --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.intermediate-done-dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19988&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;     </span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>启动：./sbin/mr-jobhistory-daemon.sh start historyserver</p>
+</blockquote>
+<p>此时YARN的聚合日志功能也需要开启：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/yarn-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置yarn的日志聚合 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.log-aggregation-enable&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;true&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<h4 id="问题集"><a href="#问题集" class="headerlink" title="问题集"></a>问题集</h4><p><strong>Hadoop中HDFS javaAPI测试问题记录</strong></p>
+<blockquote>
+<p><strong>编程环境：</strong>两台电脑(同一个局域网),一台Windows里装了3个VM Centos虚拟机，VM网络模式NET模式,并将上面3台VM进行了上面的<strong>分布式集群配置</strong><br>Windows：192.168.1.108<br>VM1 master：192.168.1.77<br>VM1 slave1：192.168.1.105<br>VM1 slave2：192.168.1.107<br>一台Mac: 192.168.1.115<br>在MAC的IDEA中使用HDFS API来操作VM中的HDFS。</p>
+</blockquote>
+<p>VM网络连接设置的区别<a href="https://jingyan.baidu.com/article/3f16e003cd0a0d2591c103b4.html" target="_blank" rel="noopener">桥接、主机、Net</a></p>
+<blockquote>
+<p>ping相连的结果：<br>1)VM网络模式NET模式<br><strong>问题1：</strong>mac 能ping通Windows。Mac ping不通VM1，VM2，VM3。<br>Windows，VM1，VM2，VM3能ping通mac.<br><strong>方法：</strong>将VM网络模式设置为桥接模式<br>2)VM网络模式桥接模式<br>此时需要先设置VM的静态IP地址，子网掩码等信息。<br>修改命令：vi  /etc/sysconfig/network-scripts/ifcfg-eth0<br><strong>如果虚拟机是克隆的需要更改mac地址，把mac地址修改为当前VM网卡的mac地址</strong><br>BOOTPROTO=static   #启用静态IP地址<br>ONBOOT=yes  #开启自动启用网络连接<br>IPADDR=192.168.21.129  #设置IP地址<br>NETMASK=255.255.255.0  #设置子网掩码<br>GATEWAY=192.168.21.2   #设置网关<br>DNS1=8.8.8.8 #设置主DNS<br>DNS2=8.8.4.4 #设置备DNS<br>IPV6INIT=no  #禁止IPV6</p>
+</blockquote>
+<blockquote>
+<p>注意<code>虚拟机克隆etho网络恢复</code>的问题</p>
+</blockquote>
+<p><strong>问题2：</strong>VMware ping 不通主机和主机ping不通虚拟机解决，此时VM网络连接模式是桥接模式。<br>方法：桥接模式，需要到性能网络编辑器中指定桥接模式桥接到当前的网卡上，不用自动模式。<br>主机的网络中心设在禁用VMnet8 和VMnet1<br><strong>问题3：</strong>Mac中IDEA 调用HDFS API”hdfs://192.168.1.77:8020”连接不上VM中的HDFS<br>方法：HDFS的寄托的VM上需要关闭防火墙<br>(root模式下)service iptables stop<br>永久关闭：chkconfig iptables off</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a href="https://blog.csdn.net/techchan/article/details/53405519" target="_blank" rel="noopener">彻底理解MapReduce shuffle过程原理</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/">Hadoop环境搭建及相关组件的工作流程介绍</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年05月23日 - 21:05</p>
+<p><span>最后更新:</span>2018年05月24日 - 11:05</p>
+<p><span>原始链接:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" title="Hadoop环境搭建及相关组件的工作流程介绍">https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag"><i class="fa fa-tag"></i> Hadoop</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/15/机器学习算法——逻辑斯谛回归-最大熵模型/" rel="next" title="机器学习算法——逻辑斯谛回归模型&最大熵模型">
+                <i class="fa fa-chevron-left"></i> 机器学习算法——逻辑斯谛回归模型&最大熵模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2Hadoop单机伪分布配置"><span class="nav-number">2.</span> <span class="nav-text">2Hadoop单机伪分布配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3Hadoop分布式配置"><span class="nav-number">3.</span> <span class="nav-text">3Hadoop分布式配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4HDFS读写流程"><span class="nav-number">4.</span> <span class="nav-text">4HDFS读写流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1写数据"><span class="nav-number">4.1.</span> <span class="nav-text">4.1写数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2读数据"><span class="nav-number">4.2.</span> <span class="nav-text">4.2读数据</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5YARN资源调度流程"><span class="nav-number">5.</span> <span class="nav-text">5YARN资源调度流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#5-1YARN架构中包含的重要概念"><span class="nav-number">5.1.</span> <span class="nav-text">5.1YARN架构中包含的重要概念</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-2YARN执行过程"><span class="nav-number">5.2.</span> <span class="nav-text">5.2YARN执行过程</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6MapReduce的工作过程"><span class="nav-number">6.</span> <span class="nav-text">6MapReduce的工作过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#6-1MapReduce2-x运行过程"><span class="nav-number">6.1.</span> <span class="nav-text">6.1MapReduce2.x运行过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-2MapReduce编程模型过程"><span class="nav-number">6.2.</span> <span class="nav-text">6.2MapReduce编程模型过程</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#6-2-1MapReduce中的Shuffle过程详解"><span class="nav-number">6.2.1.</span> <span class="nav-text">6.2.1MapReduce中的Shuffle过程详解</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-3MapReduce中的Jobhistory配置记录"><span class="nav-number">6.3.</span> <span class="nav-text">6.3MapReduce中的Jobhistory配置记录</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题集"><span class="nav-number">7.</span> <span class="nav-text">问题集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考链接"><span class="nav-number">8.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共69.2k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
