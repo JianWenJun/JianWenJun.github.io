@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要记录的是Spark的3种运行模式及对应的模式环境搭建过程和流程介绍。3种模式都是经过实践记录详细的操作过程和注意事项。">
+<meta name="keywords" content="Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark环境搭建及相关工作流程介绍">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要记录的是Spark的3种运行模式及对应的模式环境搭建过程和流程介绍。3种模式都是经过实践记录详细的操作过程和注意事项。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/spark/1.png">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/spark/2.jpeg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/spark/4.jpeg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/spark/5.jpeg">
+<meta property="og:updated_time" content="2018-05-27T08:27:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark环境搭建及相关工作流程介绍">
+<meta name="twitter:description" content="1前言本篇博客主要记录的是Spark的3种运行模式及对应的模式环境搭建过程和流程介绍。3种模式都是经过实践记录详细的操作过程和注意事项。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/spark/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/"/>
+
+
+
+
+
+  <title>Spark环境搭建及相关工作流程介绍 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spark环境搭建及相关工作流程介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-26T15:09:57+08:00">
+                2018-05-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/26/Spark环境搭建及相关工作流程介绍/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/05/26/Spark环境搭建及相关工作流程介绍/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/26/Spark环境搭建及相关工作流程介绍/" class="leancloud_visitors" data-flag-title="Spark环境搭建及相关工作流程介绍">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3,311
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  15 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要记录的是Spark的3种运行模式及对应的模式环境搭建过程和流程介绍。3种模式都是经过实践记录详细的操作过程和注意事项。<a id="more"></a><br>在进行环境的配置过程中，建议先理解每个模式下的工作流程，然后再进行环境搭建，这样容易加深理解。由于Spark on YARN是搭建在HDFS分布式环境下的，所以此处可以参考一下<a href="https://jianwenjun.xyz/2018/05/23/Hadoop%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/">Hadoop环境搭建及相关组件的工作流程介绍</a>进行环境搭建，对应的软件<a href="https://pan.baidu.com/s/1dDam9HN7gkhHl6qErw21VA" target="_blank" rel="noopener">下载地址</a>密码: k9ir</p>
+<h4 id="2Spark一些核心概念"><a href="#2Spark一些核心概念" class="headerlink" title="2Spark一些核心概念"></a>2Spark一些核心概念</h4><blockquote>
+<p><strong>Application:</strong> 用户编写的Spark应用程序，同等于MapReduce需要处理的一个或多个任务job。由Driver程序和Executor程序组成。<br><strong>Driver:</strong>运行Application的main函数并创建SparkContext，SparkContext的目的是为了准备Spark应用程序的运行环境。SparkContext负责资源的申请、任务分配和监控等。<br><strong>Exector:</strong>为某Application而在Worker Node上运行的一个进程，负责运行Task。每个Application都有各自独立的一批Executor。 在Spark on Yarn模式下，Exector的进程名称为CoarseGrainedExecuor Backend,一个CoarseGrainedExecuor Backend进程有且只有一个Exector对象，负责将Task包装成taskRunner,并从线程池中抽取出一个空闲线程运行Task.<br><strong>Cluster Manager</strong>:集群管理器,指的是集群上获取资源的外部服务，主要要3种类型。<br>a.Standalone:spark原生的资源管理，由Master负责资源的分配。<br>b.Apache Mesos<br>c.Hadoop Yarn:主要指的是Yarn中的ResourceManager和NodeManager的资源管理调度框架。<br><strong>Worker</strong>：集群中可以运行Application代码的节点，类似于Yarn中的NodeManager节点。<br><strong>Task</strong>:Application的运行基本单位，Executor上的工作单元，类似于MapReduce中的MapTask和ReduceTask。多个Task组成一个Stage，而Task的调度和管理由TaskSchedule负责。<br><strong>Job</strong>:包含多个Task组成的并行计算由Spark Action原子操作触发产生，一个Application可以包含多个Job。每个Job包含多个Stage。<br><strong>State</strong>：每个Job会拆分为多组Task，作为一个TaskSet，称为Stage。Stage的划分和调度有DAGScheduler负责。有Shuffle Map Stage和Result Stage两种。<br><strong>RDD</strong>：Spark基本计算单元，是Spark最核心的东西。主要有Transformation和Action操作。它是能够被并行操作的数据集合。其存储级别可以是内存，磁盘，可通过spark.storage.StorageLevel设置。<br><strong>DAGScheduler</strong>:根据job构建基于Staged的DAG，并提交Stage给TaskSchedule。其划分Stage的依据是RDD之间的依赖关系。<br><strong>TaskScheduler</strong>：将TaskSet提交给Worder集群运行，每个Exector运行上面Task就在此分配。</p>
+</blockquote>
+<h4 id="3Spark各个模式运行配置及详细介绍"><a href="#3Spark各个模式运行配置及详细介绍" class="headerlink" title="3Spark各个模式运行配置及详细介绍"></a>3Spark各个模式运行配置及详细介绍</h4><p><img src="http://p6wp21cg8.bkt.clouddn.com/spark/1.png" width="95%" height="65%" align="center" alt="图1"><br><strong>图说明</strong>：上图为Spark的基本运行流程图，不管是Spark什么模式运行，基本运行流程图如上所示，可能发生变化的就是各个组件的存放的节点位置和称呼不一样，但基本功能和运行流程不变。涉及到的核心概念如上。<br>a.各个模式涉及到的变化</p>
+<blockquote>
+<p><strong>local:</strong> 上图所有组件的运行都是在本地机上，且用线程的形式来完成分布式的任务。<br><strong>Standalone:</strong> 需要将Spark部署到相关节点，需要指定master机器和Worder机器。此时的资源分配由master节点完成。<br><strong>Yarn-Cluster:</strong> Driver和Exector都运行在Yarn集群，此时Spark运行流程图中的称呼master和执行任务的Worder不在使用，而是NodeManager，资源分布调度的是ResourceManager，且YARN中的运用程序管理ApplicationMaster管理Spark中的Driver，其中Driver在该ApplicationMaster的节点中。<br><strong>Yarn-client:</strong>只有Exector运行在Yarn集群上。此时Spark运行流程图中的称呼master和执行任务的Worder不在使用，而是NodeManager，资源分布调度的是ResourceManager。此时YARN中的运行程序管理ApplicationMaster管理Spark中的Driver。其中Driver在Client的机器上。</p>
+</blockquote>
+<p>b.spark各个模式下的应用程序的提交<br><strong>两种方式</strong>：<code>spark-shell</code>和<code>spark-submit</code><br><strong>说明</strong>：总的来说，最后提交方式都是通过spark-submit的方式来提交，<code>spark-shell</code>运行的时候先进行了一些初始化的配置，然后再通过spark-submit的方式来进行提交应用程序。不过<code>spark-shell</code>是交互式的方式来进行应用的提交。接下来对各个模式下的部署和验证的实例使用<code>spark-submit</code>的方式进行。<br><strong>参考</strong>：各个模式下的提交具体参数说明<a href="http://spark.apache.org/docs/2.2.0/submitting-applications.html" target="_blank" rel="noopener">查看地址</a><br>c.总的来说，Spark运行模式取决于传递个SparkContext的<code>deplyMode</code>和<code>master</code> 参数的设置。</p>
+<blockquote>
+<p><code>--master</code>+ 参数：local、yarn-client、yarn-cluster<br><code>--deploy-mode</code>+参数：cluster、client</p>
+</blockquote>
+<p><strong>spark-submit提交示例：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">在$SPARK_HOME目录下：</span><br><span class="line">命令：./bin/spark-submit \</span><br><span class="line">  --class &lt;main-class&gt; \</span><br><span class="line">  --master &lt;master-url&gt; \</span><br><span class="line">  --deploy-mode &lt;deploy-mode&gt; \</span><br><span class="line">  --conf &lt;key&gt;=&lt;value&gt; \</span><br><span class="line">  ... # other options</span><br><span class="line">  &lt;application-jar&gt; \</span><br><span class="line">  [application-arguments]</span><br><span class="line">命令参数说明：</span><br><span class="line">application-jar:为应用程序的jar包</span><br><span class="line">application-arguments:为应用程序中的调用参数</span><br></pre></td></tr></table></figure></p>
+<h5 id="3-1Spark-本地模式介绍"><a href="#3-1Spark-本地模式介绍" class="headerlink" title="3.1Spark 本地模式介绍"></a>3.1Spark 本地模式介绍</h5><p><strong>说明：</strong>所有程序都运行在一个JVM中，启动提交应用程序后，会产生一个SparkSubmit进程，既是客户提交任务的Client进程、又是Spark的driver程序、还充当着Spark执行Task的Executor角色。<br><strong>软件准备：</strong> <code>jdk-8u171-linux-x64.tar.gz</code>,<code>scala-2.11.8.tgz</code>,<code>spark-2.2.0-bin-2.6.0-cdh5.7.0.tgz</code>(这块是自己编译好的spark包)<br><strong>情景说明：</strong>VM1(master)192.168.1.77上运行的和进行如下配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">步骤1：分别解压到/home/zkpk/app/文件下</span><br><span class="line">步骤2：gedit /home/zkpk/.bash_profile</span><br><span class="line">    #java</span><br><span class="line">    export JAVA_HOME=/usr/java/jdk1.8.0_171</span><br><span class="line">    export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line">    </span><br><span class="line">    #spark</span><br><span class="line">    export SPARK_HOME=/home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0</span><br><span class="line">    export PATH=$SPARK_HOME/bin:$PATH</span><br><span class="line">    </span><br><span class="line">    #scala</span><br><span class="line">    export SCALA_PATH=/home/zkpk/app/scala-2.11.8</span><br><span class="line">    export PATH=$SCALA_PATH/bin:$PATH</span><br></pre></td></tr></table></figure></p>
+<p><strong>本地应用程序提交示例</strong>：终端的当前目录是$SPARK_HOME<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">命令：./bin/spark-submit --class org.apache.spark.examples.JavaWordCount --master local /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/examples/jars/spark-examples_2.11-2.2.0.jar file:///home/zkpk/app/data/words.txt</span><br><span class="line">结果：spark: 972</span><br><span class="line">    hadoop: 1834</span><br><span class="line">    li: 972</span><br><span class="line">    welcome: 1836</span><br><span class="line">    jian: 1944</span><br><span class="line">或者命令：./bin/spark-shell --master local</span><br><span class="line">接下来使用scala语言进行交互式的运行。</span><br><span class="line">验证查看：http://localhost:4040</span><br></pre></td></tr></table></figure></p>
+<h5 id="3-2Spark-standalone模式介绍"><a href="#3-2Spark-standalone模式介绍" class="headerlink" title="3.2Spark standalone模式介绍"></a>3.2Spark standalone模式介绍</h5><p>说明：集群模式为1 master + n worker。<br>前提：集群的网络主机名，hosts都已经设置好了。<br>情景：3台VM虚拟机</p>
+<blockquote>
+<p>VM1主机名master，ip:192.168.1.77，充当standalon集群中的master,worker<br>VM2主机名slave1，ip:192.168.1.103，充当standalon集群中的worker.<br>VM3主机名slave2，ip:192.168.1.102，充当standalon集群中的worker.<br>各个VM的java版本是：jdk1.8.0_171<br>Scala版本是：scala-2.11.8<br>Spark版本是：spark-2.2.0-bin-2.6.0-cdh5.7.0</p>
+</blockquote>
+<blockquote>
+<p>方法是：先配置好Master上的再复制到其他的主机上</p>
+</blockquote>
+<p>1.配置$SPARK_HOME/conf/spark-env.sh(master)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：cp /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh.template /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh</span><br><span class="line">命令：gedit /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh</span><br><span class="line">    JAVA_HOME=/usr/java/jdk1.8.0_171</span><br><span class="line">    SCALA_HOME=/home/zkpk/app/scala-2.11.8</span><br><span class="line">    SPARK_MASTER_HOST=master #设置spark的master主机，重要</span><br><span class="line">    SPARK_WORKER_CORES=2    #设置每个worker的核数</span><br><span class="line">    SPARK_WORKER_MEMORY=2g</span><br><span class="line">    SPARK_WORKER_INSTANCES=1 #每个节点的worker 进程数量</span><br></pre></td></tr></table></figure></p>
+<p>2.设置$SPARK_HOME/conf/spark-env.sh/slaves(master)<br>主要是设置sparkd的从节点主机名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">命令：cp /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/slaves.template /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/slaves</span><br><span class="line">命令：gedit /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/slaves</span><br><span class="line">    master</span><br><span class="line">    slave1</span><br><span class="line">    slave2</span><br></pre></td></tr></table></figure></p>
+<p>3.将Master的集群配置复制到其他节点<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">命令：scp -r /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0 zkpk@slave1:/home/zkpk/app/</span><br><span class="line">命令：scp -r /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0 zkpk@slave2:/home/zkpk/app/</span><br><span class="line">命令：scp -r /home/zkpk/app/scala-2.11.8 zkpk@slave1:/home/zkpk/app/</span><br><span class="line">命令：scp -r /home/zkpk/app/scala-2.11.8 zkpk@slave2:/home/zkpk/app/</span><br><span class="line">复制配置文件：</span><br><span class="line">命令：scp /home/zkpk/.bash_profile zkpk@slave1:/home/zkpk/.bash_profile</span><br><span class="line">命令：scp /home/zkpk/.bash_profile zkpk@slave2:/home/zkpk/.bash_profile</span><br><span class="line">再到各个主机slave1和slave2的主机下的终端分别运行：</span><br><span class="line">命令：source /home/zkpk/.bash_profile</span><br></pre></td></tr></table></figure></p>
+<p>4.启动spark集群<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">命令：/home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/sbin/start-all.sh</span><br><span class="line">start-all.sh该脚本的工作：会在master机器上启动master进程，在$SPARK_HOME/conf/slaves文件配置的所有hostname的机器上启动worker进程。</span><br><span class="line">浏览器查看：master:8080</span><br><span class="line">或者命令查看：jps</span><br><span class="line">或者启动方式：</span><br><span class="line">命令：/home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/sbin/start-master.sh</span><br><span class="line">命令：/home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/sbin/start-slaves.sh</span><br></pre></td></tr></table></figure></p>
+<p>5.应用程序提交示例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：spark-submit --class org.apache.spark.examples.JavaWordCount --master spark://master:7077 /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/examples/jars/spark-examples_2.11-2.2.0.jar file:///home/zkpk/app/data/words.txt</span><br><span class="line">结果：</span><br><span class="line">spark: 972</span><br><span class="line">hadoop: 1834</span><br><span class="line">li: 972</span><br><span class="line">welcome: 1836</span><br><span class="line">jian: 1944</span><br><span class="line">注意：这里的file:///home/zkpk/app/data/words.txt文件存放在master节点上，需要复复制存放到各个节点的相同目录文件下，不过由于master VM 本身也是worker所以如果只放在master上也是能运行出结果的。所以这时候需要使用到hadoop HDFS文件系统，将更好。</span><br></pre></td></tr></table></figure></p>
+<p>6.standalone模式下的运行流程图<br><img src="http://p6wp21cg8.bkt.clouddn.com/spark/2.jpeg" width="95%" height="65%" align="center" alt="图2"></p>
+<h5 id="3-3Spark-YARN模式介绍"><a href="#3-3Spark-YARN模式介绍" class="headerlink" title="3.3Spark YARN模式介绍"></a>3.3Spark YARN模式介绍</h5><p><strong>说明：</strong>此模式需要建立在Hadoop集群上，文件存储于HDFS上，资源调度YARN，并行计算框架Spark.<br>此时Spark集群并不在是master和n个worker的形式，资源调度上是1个ResourceManager和n个NodeManager,文件系统是NameNode和DataNode的形式。Spark YARN模式有两种形式Client和集群模式。<br><strong>前提：</strong>集群的网络主机名，hosts都已经设置好了，Window有3个VM和Mac同处一个局域网下，VM采用桥接模式。<br>情景：3台VM虚拟机(Windows上)。</p>
+<blockquote>
+</blockquote>
+<p>VM1主机名master，ip:192.168.1.77，HDFS中的NameNode和DataNode，YARN中的ResourceManager和NodeManager。<br>VM2主机名slave1，ip:192.168.1.103，HDFS中的DataNode，YARN中的NodeManager。<br>VM3主机名slave2，ip:192.168.1.102，HDFS中的DataNode，YARN中的NodeManager。<br>各个VMjava版本是：jdk1.8.0_171<br>Scala版本是：scala-2.11.8<br>Spark版本是：spark-2.2.0-bin-2.6.0-cdh5.7.0</p>
+<p>1.设置spark-env.sh,各个节点下都需要设置好<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">命令：cp /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh.template /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh</span><br><span class="line">命令：gedit /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/conf/spark-env.sh</span><br><span class="line">      HADOOP_HOME=/home/zkpk/app/hadoop</span><br><span class="line">      HADOOP_CONF_DIR=/home/zkpk/app/hadoop/etc/hadoop</span><br></pre></td></tr></table></figure></p>
+<p>2.HDFS上述要求的分布式环境搭建<br>参考上篇博客<a href="https://jianwenjun.xyz/2018/05/23/Hadoop%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/">Hadoop环境搭建及相关组件的工作流程介绍</a><br>,其中需要注意的是java环境已经换成1.8了，相应的地方需要更改$HADOOP_HOME/etc/hadoop/hadoop-env.sh中的java环境地址。<br>需要注意修改的地方是$HADOOP_HOME/etc/hadoop/yarn-site.xml(每个节点都需要修改)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit $HADOOP_HOME/etc/hadoop/yarn-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- Site specific YARN configuration properties --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle,spark_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services.spark_shuffle.class&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;org.apache.spark.network.yarn.YarnShuffleService&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;spark.shuffle.service.port&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;7338&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line">注意：为避免NodeManger启动不了,各个节点需要拷贝$&#123;SPARK_HOME&#125;/yarn/spark-2.2.0-yarn-shuffle.jar”到“$&#123;HADOOP_HOME&#125;/share/hadoop/yarn/lib/”目录下</span><br></pre></td></tr></table></figure></p>
+<p>3.启动Spark on Yarn(master节点下)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1,首先启动Hadoop分布式。</span><br><span class="line">命令：$HADOOP_HOME/sbin/start-all.sh</span><br><span class="line">此时查看运行的进程命令：jps</span><br><span class="line">有：NodeManager,NameNode,Jps,DataNode,ResourceManager</span><br><span class="line">浏览器端查看：http://master:50070 -&gt;HDFS文件</span><br><span class="line">            http://master:8088 -&gt;运行调度</span><br><span class="line">2.关闭任务：$HADOOP_HOME/sbin/stop-all.sh</span><br></pre></td></tr></table></figure></p>
+<p>4.应用程序提交示例，Spark on Yarn运行模式有两种运行情况。<br>a.spark on yarn-client模式<br>driver运行在提交作业的机器上(可以看到程序打印日志)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">命令：spark-submit --class org.apache.spark.examples.JavaWordCount --master yarn --deploy-mode client /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/examples/jars/spark-examples_2.11-2.2.0.jar hdfs://192.168.1.77:8020/words.txt</span><br></pre></td></tr></table></figure></p>
+<p>运行流程如下(摘自网上)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/spark/4.jpeg" width="95%" height="65%" align="center" alt="图4"><br>b.spark on yarn-cluster模式<br>driver运行在集群上某个机器上（看不到日志，只可以看到running状态）,Driver在AppMaster执行.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">命令：spark-submit --class org.apache.spark.examples.JavaWordCount --master yarn --deploy-mode cluster /home/zkpk/app/spark-2.2.0-bin-2.6.0-cdh5.7.0/examples/jars/spark-examples_2.11-2.2.0.jar hdfs://192.168.1.77:8020/words.txt</span><br></pre></td></tr></table></figure></p>
+<p>运行流程如下(摘自网上)：<br><img src="http://p6wp21cg8.bkt.clouddn.com/spark/5.jpeg" width="95%" height="65%" align="center" alt="图5"></p>
+<h4 id="4问题"><a href="#4问题" class="headerlink" title="4问题"></a>4问题</h4><p><strong>描述：</strong>HDFS分布式启动问题，有时候DataNode能启动，NameNode不能启动，有时候刚好相反。<br><strong>解决：</strong>清空hadoop HDFS设置的tmp文件夹，清空logs文件夹。再格式化HDFS，最后启动，问题能解决。<br><strong>脚本</strong>：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>我的Hadoop home目录为/home/zkpk/app/hadoop</span><br><span class="line">cd /home/zkpk/app</span><br><span class="line">rm -r ./hadoop_tmp/</span><br><span class="line">echo 'delete tmp ~'</span><br><span class="line">rm -r ./hadoop/logs/</span><br><span class="line">echo 'delete logs ~'</span><br><span class="line">mkdir -p ./hadoop_tmp/dfs/data</span><br><span class="line">mkdir -p ./hadoop_tmp/dfs/name</span><br><span class="line">hdfs namenode -format</span><br><span class="line">/home/zkpk/app/hadoop/sbin/start-dfs.sh</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/05/26/Spark环境搭建及相关工作流程介绍/">Spark环境搭建及相关工作流程介绍</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年05月26日 - 15:05</p>
+<p><span>最后更新:</span>2018年05月27日 - 16:05</p>
+<p><span>原始链接:</span><a href="/2018/05/26/Spark环境搭建及相关工作流程介绍/" title="Spark环境搭建及相关工作流程介绍">https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" rel="next" title="Hadoop环境搭建及相关组件的工作流程介绍">
+                <i class="fa fa-chevron-left"></i> Hadoop环境搭建及相关组件的工作流程介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2Spark一些核心概念"><span class="nav-number">2.</span> <span class="nav-text">2Spark一些核心概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3Spark各个模式运行配置及详细介绍"><span class="nav-number">3.</span> <span class="nav-text">3Spark各个模式运行配置及详细介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1Spark-本地模式介绍"><span class="nav-number">3.1.</span> <span class="nav-text">3.1Spark 本地模式介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2Spark-standalone模式介绍"><span class="nav-number">3.2.</span> <span class="nav-text">3.2Spark standalone模式介绍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3Spark-YARN模式介绍"><span class="nav-number">3.3.</span> <span class="nav-text">3.3Spark YARN模式介绍</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4问题"><span class="nav-number">4.</span> <span class="nav-text">4问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共72.5k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+

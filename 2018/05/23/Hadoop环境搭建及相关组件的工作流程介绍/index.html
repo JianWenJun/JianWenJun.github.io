@@ -108,7 +108,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/11.png">
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/12.jpg">
 <meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/13.jpg">
-<meta property="og:updated_time" content="2018-05-24T03:17:59.000Z">
+<meta property="og:updated_time" content="2018-05-26T12:53:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop环境搭建及相关组件的工作流程介绍">
 <meta name="twitter:description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
@@ -391,7 +391,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  4,923
+                  4,940
                 </span>
               
 
@@ -459,8 +459,8 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <blockquote>
 <p>mkdir -p ../hadoop_tmp/dfs/data<br>mkdir -p ../hadoop_tmp/dfs/name</p>
 </blockquote>
-<p>设置etc/hadoop/core-site.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/core-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应的URI --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:8020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
-<p>设置etc/hadoop/hdfs-site.xml.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/hdfs-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应Block副本数 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置HDFS的DataNode和NameNode对应的存放目录 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/name&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.data.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/data&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>设置etc/hadoop/core-site.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/core-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应的URI --&gt;</span><br><span class="line">     &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:8020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
+<p>设置etc/hadoop/hdfs-site.xml.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/hdfs-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置HDFS对应Block副本数 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置HDFS的DataNode和NameNode对应的存放目录 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/name&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt; </span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;/home/zkpk/app/hadoop_tmp/dfs/data&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
 <p>3)设置yarn配置<br>设置etc/hadoop/mapred-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">命令：cp etc/hadoop/mapred-site.xml.template etc/hadoop/mapred-site.xml</span><br><span class="line">命令：gedit etc/hadoop/mapred-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置MapReduce是运行在yarn上的 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
 <p>设置etc/hadoop/yarn-site.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/yarn-site.xml</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;!-- 设置yarn上的应用程序是MapReduce,启动的服务是MapReduce --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;!-- 设置yarn的resourcemanager是运行在主机master上 --&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure></p>
 <p><strong>h设置分布式集群的从节点关系</strong><br>设置etc/hadoop/slaves文件。<br>通常情况下，选择集群中的一台机器充当NameNode，并选择一台机器充当ResourceManager。 其余的机器同时充当DataNode和NodeManager，并被称为从机。然后将从机的主机名写入gedit etc/hadoop/slaves文件中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">命令：gedit etc/hadoop/slaves</span><br><span class="line">master </span><br><span class="line">slave1</span><br><span class="line">slave2</span><br></pre></td></tr></table></figure></p>
@@ -561,7 +561,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p><span>本文标题:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/">Hadoop环境搭建及相关组件的工作流程介绍</a></p>
 <p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
 <p><span>发布时间:</span>2018年05月23日 - 21:05</p>
-<p><span>最后更新:</span>2018年05月24日 - 11:05</p>
+<p><span>最后更新:</span>2018年05月26日 - 20:05</p>
 <p><span>原始链接:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" title="Hadoop环境搭建及相关组件的工作流程介绍">https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/</a>
 <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/"  aria-label="复制成功！"></i></span>
 </p>
@@ -616,6 +616,10 @@ showConfirmButton: true
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/26/Spark环境搭建及相关工作流程介绍/" rel="prev" title="Spark环境搭建及相关工作流程介绍">
+                Spark环境搭建及相关工作流程介绍 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -704,7 +708,7 @@ showConfirmButton: true
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -726,7 +730,7 @@ showConfirmButton: true
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -833,7 +837,7 @@ showConfirmButton: true
 网站访问量<span id="busuanzi_value_site_uv"></span>次
 </span>
 <i class="fa fa-user-md"></i>
-<span class="post-count">博客全站共69.2k字</span>
+<span class="post-count">博客全站共72.5k字</span>
 </div>
 
 
