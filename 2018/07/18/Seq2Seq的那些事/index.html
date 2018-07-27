@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要记录的是使用Tensorflow搭建Seq2Seq模型，主要包括3个部分的叙述:第一，Seq2Seq模型的训练过程及原理。第二，复现基于SouGouS新闻语料库的文本摘要的应用。第三，Seq2Seq模型中存在的问题及相应的Trick。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Seq2Seq的那些事">
+<meta property="og:url" content="https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要记录的是使用Tensorflow搭建Seq2Seq模型，主要包括3个部分的叙述:第一，Seq2Seq模型的训练过程及原理。第二，复现基于SouGouS新闻语料库的文本摘要的应用。第三，Seq2Seq模型中存在的问题及相应的Trick。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/1.svg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/3.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/4.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/5.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/2.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/6.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/12.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/8.gif">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/9.gif">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/10.gif">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/11.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/13.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/15.jpg">
+<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/16.jpg">
+<meta property="og:updated_time" content="2018-07-27T16:35:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Seq2Seq的那些事">
+<meta name="twitter:description" content="1前言本篇博客主要记录的是使用Tensorflow搭建Seq2Seq模型，主要包括3个部分的叙述:第一，Seq2Seq模型的训练过程及原理。第二，复现基于SouGouS新闻语料库的文本摘要的应用。第三，Seq2Seq模型中存在的问题及相应的Trick。">
+<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/seq2seq/1.svg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/"/>
+
+
+
+
+
+  <title>Seq2Seq的那些事 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Seq2Seq的那些事</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-18T22:14:47+08:00">
+                2018-07-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/" itemprop="url" rel="index">
+                    <span itemprop="name">NLP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/18/Seq2Seq的那些事/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/07/18/Seq2Seq的那些事/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/18/Seq2Seq的那些事/" class="leancloud_visitors" data-flag-title="Seq2Seq的那些事">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4,867
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  19 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要记录的是使用Tensorflow搭建Seq2Seq模型，主要包括3个部分的叙述:第一，Seq2Seq模型的训练过程及原理。第二，复现基于SouGouS新闻语料库的文本摘要的应用。第三，Seq2Seq模型中存在的问题及相应的Trick。<a id="more"></a><br>本篇博客参考多篇博客完成，主要是作为自己的学习笔记使用，但最终还是掺杂自己的理解和自己的亲身实现过程。后面会给出参考博客的链接。</p>
+<h4 id="2浅谈Seq2Seq"><a href="#2浅谈Seq2Seq" class="headerlink" title="2浅谈Seq2Seq"></a>2浅谈Seq2Seq</h4><h5 id="2-1Seq2Seq概要"><a href="#2-1Seq2Seq概要" class="headerlink" title="2.1Seq2Seq概要"></a>2.1Seq2Seq概要</h5><p>一般来说,Seq2Seq模型主要是用来解决将一个序列X转化为另一个序列Y的一类问题，此处有点类似于隐马尔科夫模型，通过一系列随机变量X，去预测另外一系列随机变量Y。但是不同的是，隐马尔科夫模型中的随机序列与随机变量系列一一对应而Seq2Seq模型则并不是指一一对应的关系。Seq2Seq模型主要的应用包括机器翻译，自动摘要等一些端到端的生成应用。</p>
+<blockquote>
+<p>目前来说，对于Seq2Seq生成模型来说，主要的思路是将该问题作为条件语言模型，在已知输入序列和前序生成序列的条件下,最大化下一目标词的概率，而最终希望得到的是整个输出序列的生成出现的概率最大：<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/1.svg" width="30%" height="20%" align="center" alt="图1"><br>说明：1.其中T表示输出序列的时间序列大小，y<sub>1:t-1</sub>表示输出序列的前t-1个时间点对应的输出，X为输入序列。通常情况下，训练模型的时候y<sub>1:t-1</sub>使用的是ground truth tokens，然而在测试过程中，ground truth tokens便不可知，需要使用前期预测到的y‘<sub>1:t-1</sub>来表示，这将会引发<strong>问题7 Exposure Bias</strong>，相应的解决的trick会在第4部分提出。<br>2.在预测输出序列的每个token时，采用的都是最大化下一目标词(token)的概率，来得到token，对于整个句子或者说序列来说，这种解法是贪心策略，带来的是<strong>局部最佳</strong>。对于一个端到端的生成应用来说，将会追求整个序列的最佳，换句话说，希望最后的生成序列的tokens顺序排列的联合概率最大，找到一个全局最优。</p>
+</blockquote>
+<h5 id="2-2Seq2Seq模型推导"><a href="#2-2Seq2Seq模型推导" class="headerlink" title="2.2Seq2Seq模型推导"></a>2.2Seq2Seq模型推导</h5><p>Seq2Seq模型是基于输入序列，预测未知输出序列的模型。它有两个部分组成，对输入序列的Encoder编码阶段和生成输出序列的Decoder解码阶段。定义输入序列[x<sub>1</sub>,x<sub>2</sub>,…,x<sub>m</sub>],由m个固定长度为d的向量构成；输出序列为[y<sub>1</sub>,y<sub>2</sub>,…,y<sub>n</sub>],由n个固定长度为d的向量构成；<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/3.jpg" width="45%" height="50%" align="center" alt="图2"><br>上图中可以看出，Encoder使用RNN编码后形成语义向量C.再将C作为输出序列模型Decoder的输入。解码过程中每一个时间点t的输入是上一个时刻隐层状态h<sub>t-1</sub>和中间语义向量C和上一个时刻的预测输出y<sub>t-1</sub>.之后将每个时刻的y<sub>t</sub>相乘得到整个序列出现的概率。其中f是非线性的激活函数。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/4.jpg" width="45%" height="25%" align="center" alt="图4"><br>最后Seq2Seq两个部分(Encoder和Decoder)联合训练的<strong>目标函数是最大化条件似然函数</strong>。其中θ为模型的参数，N为训练集的样本个数。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/5.jpg" width="45%" height="20%" align="center" alt="图5"><br>下图为网上某篇博客上的图，展示的是一个机器翻译的多层Seq2Seq的模型。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/2.jpg" width="90%" height="50%" align="center" alt="图2"></p>
+<h5 id="2-3Seq2Seq模型上的Attention注意力机制"><a href="#2-3Seq2Seq模型上的Attention注意力机制" class="headerlink" title="2.3Seq2Seq模型上的Attention注意力机制"></a>2.3Seq2Seq模型上的Attention注意力机制</h5><p>尽管Seq2Seq中的Encoder可以将RNN替换成LSTM来增强最终语义向量C对长的输入序列的信息表上，但是由于传统的Seq2Seq模型对输入序列进行编码输出的语义向量C是固定的，一个向量并不能很好的编码出输入序列所有包含的信息，而解码阶段则受限于该固定长度的向量表示。因此，此篇论文中<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/1409.0473" target="_blank" rel="noopener">Neural Machine Translation by Jointly Learning to Align and Translate</a>引入Attention机制。</p>
+<blockquote>
+<p>论文中提出，将Encoder中的每一个时刻的隐藏状态都保存至一个列表中[h<sub>1</sub>,h<sub>2</sub>,…,h<sub>m</sub>],在Decoder解码每一个时刻i的输出时，都需要计算Encoder的每个时刻的隐藏状态h<sub>i</sub>与Decoder的输出时刻的前一个时刻的关系s<sub>i-1</sub>的关系，进而得到Encoder的每个时刻的隐藏状态对Decoder该时刻的影响程度。如此，Decoder的每个时刻的输出都将获得不同的Encoder的序列隐藏状态对它的影响，从而得到不同的语义向量C<sub>i</sub>。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/6.jpg" width="60%" height="80%" align="center" alt="图2"><br><strong>如上图</strong>,Decoder阶段的每个时刻的隐藏状态s<sub>i</sub>，都会根据由Encoder阶段的隐藏状态序列对Decoder阶段上一个时刻(i-1)的隐藏状态的影响也就是我们的语义向量C<sub>i</sub>和上一时刻的的状态s<sub>i-1</sub>，上一个时刻的输出y<sub>i-1</sub>三者通过一个非线性函数得出。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/12.jpg" width="28%" height="20%" align="center" alt="图12"><br>其中，C<sub>i</sub>是根据Encoder编码阶段的各个隐藏状态(向量)的权重和。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/8.gif" width="28%" height="20%" align="center" alt="图8"><br>其中，每个时刻的权重a<sub>ij</sub>表示Encoder编码阶段的第j个隐藏状态对Decoder解码阶段的第i个隐藏状态的权重影响。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/9.gif" width="28%" height="20%" align="center" alt="图9"><br>其中，e<sub>ij</sub>为Encoder编码阶段的第j个隐藏状态和Decoder解码阶段的第i-1个隐藏状态的联合前馈网络关系。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/10.gif" width="28%" height="20%" align="center" alt="图10"><br><strong>整个计算C<sub>i</sub>的过程为：</strong>分别计算Encoder编码阶段的每个隐藏状态和Decoder解码阶段的第i-1个隐藏状态前馈关系，再进行Softmax归一化处理计算出该Encoder编码阶段的隐藏状态的权重a<sub>ij</sub>，最后将所有的Encoder编码阶段的隐藏状态的进行权重加和。</p>
+</blockquote>
+<h4 id="3基于Seq2Seq模型的文本摘要应用复现"><a href="#3基于Seq2Seq模型的文本摘要应用复现" class="headerlink" title="3基于Seq2Seq模型的文本摘要应用复现"></a>3基于Seq2Seq模型的文本摘要应用复现</h4><p>本次实践主要是采用SouGouS新闻语料库，基于Seq2Seq模型进行的文本摘要的代码实现，尽管网上已经有大神已经实现了的，但是自己能跟着大神的代码走一遍，理解一遍，将会比只看不动手来的强。因为其中涉及到很多细节性的编码问题和细节性的模型处理问题。主要参考<a href="https://blog.csdn.net/rockingdingo/article/details/55224282" target="_blank" rel="noopener">rockingdingo</a>大神的实现。python版本为2.7.X.</p>
+<h5 id="3-1SouGouS新闻语料库处理"><a href="#3-1SouGouS新闻语料库处理" class="headerlink" title="3.1SouGouS新闻语料库处理"></a>3.1SouGouS新闻语料库处理</h5><p>数据集<a href="http://www.sogou.com/labs/resource/cs.php" target="_blank" rel="noopener">下载地址</a>选择的是精简版下载。<br><strong>step1 提取出新闻内容和标题</strong><br><code>cat ./news_sohusite_xml.dat | iconv -f gbk -t utf-8 -c | grep &quot;&lt;content&gt;&quot;  &gt; corpus.txt</code><br><code>cat ./news_sohusite_xml.dat | iconv -f gbk -t utf-8 -c | grep &quot;&lt;contenttitle&gt;&quot;  &gt; corpus_title.txt</code><br><strong>step2 选出了10万行数据样本</strong><br><code>head -10000  corpus.txt &gt;corpus_10000.txt</code><br><code>head -10000  corpus_title.txt &gt;corpus_title_10000.txt</code><br><strong>step3 数据预处理</strong><br>主要的工作为：文本的清洗工作，特征字符的删除，日期替换，数字替换。词汇表的建立，语句的分词工作，将语句的分词替换成词汇表的词的id组成。<a href="www.baidu.com">data_util.py</a>.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 文本的预处理工作</span></span><br><span class="line"><span class="comment"># step1 获取出文本内容</span></span><br><span class="line">data_content,data_title = get_title_content(content_fp,title_fp)</span><br><span class="line">ndexs = np.arange(len(data_content))</span><br><span class="line"><span class="comment"># step2 文本清洗工作</span></span><br><span class="line"><span class="keyword">for</span> index,content,title <span class="keyword">in</span> zip(indexs,data_content,data_title):</span><br><span class="line">    data_content[index] = remove_tag(content).encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    data_title[index] = remove_tag(title).encode(<span class="string">'utf-8'</span>)</span><br><span class="line"><span class="comment"># step3 划分数据，训练集，验证集，测试集</span></span><br><span class="line">get_train_dev_sets(data_content,data_title,train_rate=<span class="number">0.7</span>,dev_rate=<span class="number">0.1</span>,</span><br><span class="line">                    tr_con_path=src_train_path,tr_title_path=dest_train_path,</span><br><span class="line">                       dev_con_path=src_dev_path,dev_title_path=dest_dev_path,</span><br><span class="line">                       test_con_path=src_test_path,test_title_path=dest_test_path</span><br><span class="line">                       )</span><br><span class="line"><span class="comment"># step4 将各个样本的语句进行切分，并将各个语句中的词转换成词汇表中该词对应的id.</span></span><br><span class="line">prepare_headline_data(root_path,vocabulary_size=<span class="number">80000</span>,tokenizer=jieba_tokenizer)</span><br></pre></td></tr></table></figure></p>
+<h5 id="3-2Seq2Seq-Attention模型搭建"><a href="#3-2Seq2Seq-Attention模型搭建" class="headerlink" title="3.2Seq2Seq+Attention模型搭建"></a>3.2Seq2Seq+Attention模型搭建</h5><p>Tensorfolw Github提供了一个基于Seq2Seq模型实现的<a href="https://github.com/tensorflow/models/blob/master/research/textsum/README.md" target="_blank" rel="noopener">textSum</a>可参考其做一定程度的修改。构建模型的文件是<a href="https://github.com/JianWenJun/MLDemo/blob/master/NLP/Seq2Seq/seq2seq_model.py" target="_blank" rel="noopener">seq2seq_model.py</a>.<br><strong>step1 Encoder+Decoder+attention层的构建</strong><br>tensorflow中提供了5个构造seq2seq函数,这里使用的是embedding_attention_seq2seq主要介绍内部详细实现。文件为<a href="https://github.com/JianWenJun/MLDemo/blob/master/NLP/Seq2Seq/seq2seq_attn.py" target="_blank" rel="noopener">seq2seq_attn.py</a></p>
+<blockquote>
+<p>basic_rnn_seq2seq：最简单版本，输入和输出都是embedding的形式；最后一步的state vector作为decoder的initial state；encoder和decoder用相同的RNN cell， 但不共享权值参数；<br>tied_rnn_seq2seq：同1，但是encoder和decoder共享权值参数<br>embedding_rnn_seq2seq：同1，但输入和输出改为id的形式，函数会在内部创建分别用于encoder和decoder的embedding matrix<br>embedding_tied_rnn_seq2seq：同2，但输入和输出改为id形式，函数会在内部创建分别用于encoder和decoder的embedding matrix<br>embedding_attention_seq2seq：同3，但多了attention机制.</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.Encoder编码器的构造,size为隐藏层单元数,num_layers为LSTM的层数</span></span><br><span class="line">single_cell = tf.contrib.rnn.GRUCell(size)</span><br><span class="line"><span class="keyword">if</span> use_lstm:</span><br><span class="line">    single_cell = tf.contrib.rnn.BasicLSTMCell(size, state_is_tuple=<span class="keyword">True</span>)</span><br><span class="line">cell = single_cell</span><br><span class="line"><span class="keyword">if</span> num_layers &gt; <span class="number">1</span>:</span><br><span class="line">    cell = tf.contrib.rnn.MultiRNNCell([single_cell] * num_layers, state_is_tuple=<span class="keyword">True</span>)</span><br><span class="line"><span class="comment"># 1.1进入tf.contrib.legacy_seq2seq.embedding_attention_seq2seq部分</span></span><br><span class="line"><span class="comment">#num_encoder_symbols为编码器部分的词汇表的大小，embedding_size为词向量的大小，encoder_outputs为输入的各个句子的各个词对应的ids</span></span><br><span class="line">encoder_cell = core_rnn_cell.EmbeddingWrapper(cell,</span><br><span class="line">        embedding_classes=num_encoder_symbols,embedding_size=embedding_size)</span><br><span class="line"><span class="comment">#encoder_outputs为编码器的输出, encoder_state为编码器的隐藏层的状态</span></span><br><span class="line">encoder_outputs, encoder_state = core_rnn.static_rnn(encoder_cell, encoder_inputs, dtype=dtype)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.Decoder解码器的构造+attention,output_projection为Decoder的输出参数元组(W, B)</span></span><br><span class="line"><span class="comment"># num_decoder_symbols为Decoder端的词汇表大小</span></span><br><span class="line"><span class="keyword">from</span> tensorflow.python.ops <span class="keyword">import</span> array_ops</span><br><span class="line">output_size = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">if</span> output_projection <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        decoder_cell = core_rnn_cell.OutputProjectionWrapper(cell, num_decoder_symbols)</span><br><span class="line">        output_size = num_decoder_symbols</span><br><span class="line"><span class="comment"># 2.1 将编码器的输出进行concat操作，作为attention的输入</span></span><br><span class="line">top_states = [array_ops.reshape(e, [<span class="number">-1</span>, <span class="number">1</span>, cell.output_size]) <span class="keyword">for</span> e <span class="keyword">in</span> encoder_outputs]</span><br><span class="line">attention_states = array_ops.concat(top_states, <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 2.2embedding_attention_decoder函数是构造encoder和attention的计算关系</span></span><br><span class="line"><span class="keyword">return</span> embedding_attention_decoder(</span><br><span class="line">          decoder_inputs,</span><br><span class="line">          encoder_state,</span><br><span class="line">          attention_states,</span><br><span class="line">          cell,</span><br><span class="line">          num_decoder_symbols,</span><br><span class="line">          embedding_size,</span><br><span class="line">          num_heads=num_heads,</span><br><span class="line">          output_size=output_size,</span><br><span class="line">          output_projection=output_projection,</span><br><span class="line">          feed_previous=feed_previous,</span><br><span class="line">          initial_state_attention=initial_state_attention)</span><br></pre></td></tr></table></figure>
+<p><strong>step2 seq2seq的损失函数</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 真实的labels,此处采用的loss函数为sampled_softmax_loss,后面会讲述到为什么是这个loss</span></span><br><span class="line">labels = tf.reshape(labels, [<span class="number">-1</span>, <span class="number">1</span>])</span><br><span class="line">local_w_t = tf.cast(w_t, tf.float32)</span><br><span class="line">local_b = tf.cast(b, tf.float32)</span><br><span class="line">local_inputs = tf.cast(inputs, tf.float32)</span><br><span class="line">loss_op = tf.cast(tf.nn.sampled_softmax_loss(</span><br><span class="line">                weights=local_w_t,</span><br><span class="line">                biases=local_b,</span><br><span class="line">                labels=labels,</span><br><span class="line">                inputs=local_inputs,</span><br><span class="line">                num_sampled=num_samples,</span><br><span class="line">                num_classes=self.target_vocab_size),</span><br><span class="line">            tf.float32)</span><br></pre></td></tr></table></figure></p>
+<p><strong>step3 梯度计算和优化</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Gradients and SGD update operation for training the model.</span></span><br><span class="line"><span class="comment"># 1.获取出tf session中trainable=True的参数变量。</span></span><br><span class="line">params = tf.trainable_variables()</span><br><span class="line"><span class="comment"># 2.设置参数更新优化器</span></span><br><span class="line">opt = tf.train.GradientDescentOptimizer(self.learning_rate)</span><br><span class="line"><span class="comment"># 3.求参数的梯度值，其中self.losses[b]为目标值(代价函数的表达式)</span></span><br><span class="line">gradients = tf.gradients(self.losses[b], params)</span><br><span class="line"><span class="comment"># 4.梯度修剪，修正梯度值，用于控制梯度爆炸的问题。梯度爆炸和梯度弥散的原因一样，</span></span><br><span class="line"><span class="comment">#都是因为链式法则求导的关系，导致梯度的指数级衰减。为了避免梯度爆炸，需要对梯度进行修剪。</span></span><br><span class="line">clipped_gradients, norm = tf.clip_by_global_norm(gradients,max_gradient_norm)</span><br><span class="line"><span class="comment"># 5.求取更新参数的tensorflow的节点</span></span><br><span class="line">self.updates.append(opt.apply_gradients(zip(clipped_gradients, params), global_step=self.global_step))</span><br></pre></td></tr></table></figure></p>
+<p><strong>step4 模型训练</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 4.1 根据随机选取的bucket_id，批量选出输入模型的三类feed数据，编码器的inputs和解码器的inputs,target_weights对encoder_inputs进行指示，为1表示已经预测的，为0表示PAD部分。</span><br><span class="line">encoder_inputs, decoder_inputs, target_weights = model.get_batch(</span><br><span class="line">          train_set, bucket_id)</span><br><span class="line"># 4.2 训练的Feed数据的构造</span><br><span class="line">input_feed = &#123;&#125;</span><br><span class="line">for l in xrange(encoder_size):</span><br><span class="line">    input_feed[self.encoder_inputs[l].name] = encoder_inputs[l]</span><br><span class="line">for l in xrange(decoder_size):</span><br><span class="line">    input_feed[self.decoder_inputs[l].name] = decoder_inputs[l]</span><br><span class="line">    input_feed[self.target_weights[l].name] = target_weights[l]</span><br><span class="line"># 4.3 由于目标词是由于Decoder左移一位了，所以需要再添加一位</span><br><span class="line">last_target = self.decoder_inputs[decoder_size].name</span><br><span class="line">input_feed[last_target] = np.zeros([self.batch_size], dtype=np.int32)</span><br><span class="line">train_ops = [self.updates[bucket_id],  # Update Op that does SGD.</span><br><span class="line">             self.gradient_norms[bucket_id],  # Gradient norm.</span><br><span class="line">             self.losses[bucket_id]]  # Loss for this batch.</span><br><span class="line">outputs = session.run(train_ops, input_feed)</span><br></pre></td></tr></table></figure></p>
+<h4 id="4Seq2Seq模型中存在的问题及相应解决的trick"><a href="#4Seq2Seq模型中存在的问题及相应解决的trick" class="headerlink" title="4Seq2Seq模型中存在的问题及相应解决的trick"></a>4Seq2Seq模型中存在的问题及相应解决的trick</h4><p><strong>问题1：tensorflow中的seq2seq例子为什么需要bucket？</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>在处理序列问题时，每个batch中的句子的长度其实是不一的，通常做法是取batch中语句最长的length作为序列的固定的长度，不足的补PAD。如果batch里面存在一个非常长的句子，那么其他的句子的都需要按照这个作为输入序列的长度，训练模型时这将造成不必要的计算浪费。<br><strong>加入bucket的trick：</strong>相当于对序列的长度做一个分段，切分成多个固定长度的输入序列，比如说小于100为一个bucket,大于100小于150为另一个bucket…。每一个bucket都是一个固定的computation graph。这样一来，对于模型输入序列的固定长度将不再单一，从一定程度上减少了计算资源的浪费。</p>
+</blockquote>
+<p><strong>问题2：Sampled Softmax</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>Seq2Seq模型的代价函数的loss便是sampled_softmax_loss。为什么不是softmax_loss呢？我们都知道对于Seq2Seq模型来说，输入和输出序列的class便是词汇表的大小，而对于训练集来说，输入和输出的词汇表的大小是比较大的。为了减少计算每个词的softmax的时候的资源压力，通常会减少词汇表的大小，但是便会带来另外一个问题，由于词汇表的词量的减少，语句的Embeding的id表示时容易大频率的出现未登录词‘UNK’。于是，希望寻找到一个能使seq2seq模型使用较大词汇表，但又不怎么影响计算效率的解决办法。<br><strong>trick：</strong><a href="https://arxiv.org/abs/1412.2007" target="_blank" rel="noopener">《On Using Very Large Target Vocabulary for Neural Machine Translation》</a>论文中提出了计算词汇表的softmax的时候，并不采用全部的词汇表中的词，而是进行一定手段的sampled的采样，从而近似的表示词汇表的loss输出。sampled采样需要定义好候选分布Q。即按照什么分布去采样。</p>
+</blockquote>
+<p><strong>问题3：Encoder阶段的Beam Search</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>我们知道在Seq2Seq模型的最终目的是希望生成的序列发生的概率最大，也就是生成序列的联合概率最大。在实际预测输出序列的每个token的时候，采用的都是最大化下一目标词(token)的概率，因为Decoder的当前时刻的输出是根据前一时刻的输出，上一个时刻的隐藏状态和语义向量C<sub>i</sub>.通过依次求每个时刻的条件概率最大来近似获得生成序列的发生最大的概率，这种做法属于贪心思维的做法，获得是局部最优的生成序列。<br><strong>trick：</strong><a href="https://arxiv.org/abs/1606.02960" target="_blank" rel="noopener">《Sequence-to-Sequence Learning as Beam-Search Optimization》</a>论文中提出Beam-Search来优化上述的局部最优化问题。Beam-Search属全局解码算法，Encoder解码的目的是要得到生成序列的概率最大，可以把它看作是图上的一个最优路径问题：每一个时刻对应的节点大小为整个词汇表，路径长度为输出序列的长度。可以由动态规划的思想求得生成序列发生的最大概率。假设词汇表的大小为v,输出序列的长度为n.设t时刻各个节点(各个词w)对应的最优路径为d<sub>t</sub>=[d<sub>1</sub>,d<sub>2</sub>,…,d<sub>v</sub>].则下一个时刻(t+1)的各个节点对应的最优路径为d<sub>t</sub>加上t时刻的各个节点(各个词w)到(t+1)的各个节点(各个词w)的最短距离,算法的复杂度为o(nv^2).因为词汇表的大小v比较大，容易造成算法的复杂度比较大。为了降低算法的复杂度，采用Beam Search算法，每步t只保留K个最优解(之前是保留每个时刻的整个词汇表各个节点的最优解)，算法复杂度为o(nKv).<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/11.jpg" width="28%" height="20%" align="center" alt="图11"></p>
+</blockquote>
+<p><strong>问题4：Exposure Bias</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>Seq2Seq模型训练的过程中，编码部分的下一个时刻的输出，是需要根据上一个时刻的输出和上一个时刻的隐藏状态和语义变量C<sub>i</sub>.此时上一个时刻的输出使用的是真实的token。而在验证Seq2Seq模型的时候，由于不知道上一个时刻的真实token，上一个时刻的输出使用的是上上个时刻的预测的输出token。这将引发Exposure Bias(曝光偏差问题)。<br><strong>trick：</strong> 使用Beam Search的Encoder的方式也能一定程度上降低Exposure Bias问题，因为其考虑了全局解码概率，而不仅仅依赖与前一个词的输出，所以模型前一个预测错误而带来的误差传递的可能性就降低了。论文<a href="https://arxiv.org/abs/1506.03099" target="_blank" rel="noopener">Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks</a>中提出了DAD的方法，论文中提到Exposure Bias的主要问题是训练过程中模型不曾接触过自己预测的结果，在测试过程中一旦预测出现错误，那么模型将进入一个训练过程中从未见过的状态，从而导致误差传播。论文中提出了一个训练过程逐渐地迫使模型处理自己的错误，因为在测试过程中这是必须经历的。DAD提出了一种退火算法来解决这个问题，在训练过程中引入一个概率值参数ε<sub>i</sub> ,每次以ε<sub>i</sub>的概率选取真实的token作为输入， 1-ε<sub>i</sub>的概率选取自己的prediction作为输入。逐渐降低ε<sub>i</sub>，最终模型全都利用自己的prediction作为下一步的输入，和测试过程一致。</p>
+</blockquote>
+<p><strong>问题5：OOV和低频词</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>OOV表示的是词汇表外的未登录词，低频词则是词汇表中的出现次数较低的词。在Decoder阶段时预测的词来自于词汇表，这就造成了未登录词难以生成，低频词也比较小的概率被预测生成。<br><strong>trick：</strong>论文<a href="https://arxiv.org/abs/1602.06023" target="_blank" rel="noopener">Abstractive Text Summarization using Seq2Seq RNNs and Beyond</a>中使用Pointer-Generator机制来解决OOV和低频词问题。由于文本摘要的任务的特点，很多OOV 或者不常见的的词其实可以从输入序列中找到，因此一个很自然的想法就是去预测一个开关（switch）的概率P(s<sub>i</sub>=1)=f(h<sub>i</sub>,y<sub>i-1</sub>,c<sub>i</sub>)，如果开关打开了，就是正常地预测词表；如果开关关上了，就需要去原文中指向一个位置作为输出。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/13.jpg" width="80%" height="40%" align="center" alt="图13"><br>17年的论文<a href="https://arxiv.org/pdf/1704.04368.pdf" target="_blank" rel="noopener">Get To The Point: Summarization with Pointer-Generator Networks</a>使用Pointer-Generator Networks)使用Pointer-Generator Networks解决OOV问题，pointer-generator network相当于在每次摘要生成过程中，都会把原文中的词汇动态地加入到词表中去。</p>
+</blockquote>
+<p><strong>问题6：连续生成重复词的问题</strong></p>
+<blockquote>
+<p><strong>问题描述：</strong>在Seq2Seq的解码阶段，生成序列是很可能会生成连续的重复词。<br><strong>trick：</strong>论文<a href="https://arxiv.org/pdf/1704.04368.pdf" target="_blank" rel="noopener">Get To The Point: Summarization with Pointer-Generator Networks</a>使用Pointer-Generator Networks)中使用Coverage mechanism来缓解重复词的问题，模型中维护一个Coverage向量，这个向量是过去所有预测步计算的attention分布的累加和，表示着该模型已经关注过原文的哪些词,并且让这个coverage向量影响当前步的attention计算。其中c<sub>i</sub>表示之前时刻的预测的attention分布和。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/15.jpg" width="50%" height="30%" align="center" alt="图15"><br>此外，该论文中添加了一个coverage loss用于惩罚对重复的attention。a<sub>i</sub>表示当前时刻的attention，c<sub>i</sub>表示之前时刻的预测计算的attention分布的累加和。<br><img src="http://p6wp21cg8.bkt.clouddn.com/seq2seq/16.jpg" width="50%" height="30%" align="center" alt="图14"></p>
+</blockquote>
+<h4 id="5参考链接"><a href="#5参考链接" class="headerlink" title="5参考链接"></a>5参考链接</h4><p><a href="https://blog.csdn.net/zhangxb35/article/details/78626799" target="_blank" rel="noopener">Text Summarization 综述</a><br><a href="https://github.com/tensorflow/models/blob/master/research/textsum/README.md" target="_blank" rel="noopener">Google实现的Text_Sum</a><br><a href="https://blog.csdn.net/u012436149/article/details/52976413" target="_blank" rel="noopener">tensorflow学习笔记（十一）：seq2seq Model相关接口介绍</a><br><a href="https://arxiv.org/pdf/1406.1078.pdf" target="_blank" rel="noopener">Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2018/07/18/Seq2Seq的那些事/">Seq2Seq的那些事</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2018年07月18日 - 22:07</p>
+<p><span>最后更新:</span>2018年07月28日 - 00:07</p>
+<p><span>原始链接:</span><a href="/2018/07/18/Seq2Seq的那些事/" title="Seq2Seq的那些事">https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/13/蚂蚁金融NLP竞赛——文本语义相似度赛题总结/" rel="next" title="蚂蚁金融NLP竞赛——文本语义相似度赛题总结">
+                <i class="fa fa-chevron-left"></i> 蚂蚁金融NLP竞赛——文本语义相似度赛题总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2浅谈Seq2Seq"><span class="nav-number">2.</span> <span class="nav-text">2浅谈Seq2Seq</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1Seq2Seq概要"><span class="nav-number">2.1.</span> <span class="nav-text">2.1Seq2Seq概要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2Seq2Seq模型推导"><span class="nav-number">2.2.</span> <span class="nav-text">2.2Seq2Seq模型推导</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3Seq2Seq模型上的Attention注意力机制"><span class="nav-number">2.3.</span> <span class="nav-text">2.3Seq2Seq模型上的Attention注意力机制</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3基于Seq2Seq模型的文本摘要应用复现"><span class="nav-number">3.</span> <span class="nav-text">3基于Seq2Seq模型的文本摘要应用复现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1SouGouS新闻语料库处理"><span class="nav-number">3.1.</span> <span class="nav-text">3.1SouGouS新闻语料库处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2Seq2Seq-Attention模型搭建"><span class="nav-number">3.2.</span> <span class="nav-text">3.2Seq2Seq+Attention模型搭建</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4Seq2Seq模型中存在的问题及相应解决的trick"><span class="nav-number">4.</span> <span class="nav-text">4Seq2Seq模型中存在的问题及相应解决的trick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5参考链接"><span class="nav-number">5.</span> <span class="nav-text">5参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共82.1k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
