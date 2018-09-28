@@ -1,3 +1,4 @@
+https://jianwenjun.xyz/2018/09/28/机器学习中你需要了解的各种熵/
 https://jianwenjun.xyz/2018/07/18/Seq2Seq的那些事/
 https://jianwenjun.xyz/2018/07/13/蚂蚁金融NLP竞赛——文本语义相似度赛题总结/
 https://jianwenjun.xyz/2018/05/26/Spark环境搭建及相关工作流程介绍/
@@ -17,4 +18,3 @@ https://jianwenjun.xyz/2018/03/02/TensorFlow实现多层感知机及可视化训
 https://jianwenjun.xyz/2017/12/31/Java并发编程基础（二）/
 https://jianwenjun.xyz/2017/12/25/Centos7在虚拟机中扩展磁盘空间/
 https://jianwenjun.xyz/2017/12/02/Java并发编程基础（一）/
-https://jianwenjun.xyz/2017/11/18/初识Java并发/
