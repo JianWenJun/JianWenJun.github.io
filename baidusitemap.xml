@@ -4,216 +4,19 @@
 
     
   <url>
-    <loc>https://jianwenjun.xyz/2018/09/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E4%BD%A0%E9%9C%80%E8%A6%81%E4%BA%86%E8%A7%A3%E7%9A%84%E5%90%84%E7%A7%8D%E7%86%B5/</loc>
-    <lastmod>2018-09-28T08:07:20.000Z</lastmod>
+    <loc>https://jianwenjun.xyz/2018/04/10/Hexo-Coding-Github%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2Error%E5%85%A8%E9%9B%86/</loc>
+    <lastmod>2018-12-31T10:47:20.000Z</lastmod>
     <data>
         <display>
-        <title>机器学习中你需要了解的各种熵</title>
-        <pubTime>2018-09-28T02:13:25.000Z</pubTime>
+        <title>Hexo+Coding+Github部署个人博客Error全集</title>
+        <pubTime>2018-04-10T09:45:30.000Z</pubTime>
         
-        <tag>熵</tag>
+        <tag>Hexo</tag>
          
          
            
              
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/07/18/Seq2Seq%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B/</loc>
-    <lastmod>2018-07-27T16:35:10.000Z</lastmod>
-    <data>
-        <display>
-        <title>Seq2Seq的那些事</title>
-        <pubTime>2018-07-18T14:14:47.000Z</pubTime>
-        
-         
-           
-             
-              <breadCrumb title="NLP" url="https://jianwenjun.xyz/categories/NLP/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/07/13/%E8%9A%82%E8%9A%81%E9%87%91%E8%9E%8DNLP%E7%AB%9E%E8%B5%9B%E2%80%94%E2%80%94%E6%96%87%E6%9C%AC%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%B5%9B%E9%A2%98%E6%80%BB%E7%BB%93/</loc>
-    <lastmod>2018-07-13T13:58:52.000Z</lastmod>
-    <data>
-        <display>
-        <title>蚂蚁金融NLP竞赛——文本语义相似度赛题总结</title>
-        <pubTime>2018-07-13T01:19:01.000Z</pubTime>
-        
-        <tag>语义相似度</tag>
-         
-        <tag>文本挖掘</tag>
-         
-         
-           
-             
-              <breadCrumb title="NLP" url="https://jianwenjun.xyz/categories/NLP/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/05/26/Spark%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/</loc>
-    <lastmod>2018-05-27T08:35:25.000Z</lastmod>
-    <data>
-        <display>
-        <title>Spark环境搭建及相关工作流程介绍</title>
-        <pubTime>2018-05-26T07:09:57.000Z</pubTime>
-        
-        <tag>Spark</tag>
-         
-         
-           
-             
-              <breadCrumb title="大数据" url="https://jianwenjun.xyz/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/05/23/Hadoop%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/</loc>
-    <lastmod>2018-05-26T12:53:57.000Z</lastmod>
-    <data>
-        <display>
-        <title>Hadoop环境搭建及相关组件的工作流程介绍</title>
-        <pubTime>2018-05-23T13:00:36.000Z</pubTime>
-        
-        <tag>Hadoop</tag>
-         
-         
-           
-             
-              <breadCrumb title="大数据" url="https://jianwenjun.xyz/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/05/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E6%96%AF%E8%B0%9B%E5%9B%9E%E5%BD%92-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B/</loc>
-    <lastmod>2018-05-17T03:03:06.000Z</lastmod>
-    <data>
-        <display>
-        <title>机器学习算法——逻辑斯谛回归模型&最大熵模型</title>
-        <pubTime>2018-05-15T09:14:23.000Z</pubTime>
-        
-        <tag>最大熵模型</tag>
-         
-        <tag>逻辑斯谛回归</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/05/05/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94%E6%84%9F%E7%9F%A5%E6%9C%BA-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/</loc>
-    <lastmod>2018-05-15T08:30:53.000Z</lastmod>
-    <data>
-        <display>
-        <title>机器学习算法——感知机&支持向量机</title>
-        <pubTime>2018-05-05T09:14:39.000Z</pubTime>
-        
-        <tag>感知机</tag>
-         
-        <tag>SVM</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/05/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%89/</loc>
-    <lastmod>2018-05-04T08:12:53.000Z</lastmod>
-    <data>
-        <display>
-        <title>决策树相关算法——XGBoost原理分析及实例实现(三)</title>
-        <pubTime>2018-05-02T10:12:48.000Z</pubTime>
-        
-        <tag>决策树</tag>
-         
-        <tag>集成学习</tag>
-         
-        <tag>XGBoost</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/04/27/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%BA%8C/</loc>
-    <lastmod>2018-04-28T11:13:32.000Z</lastmod>
-    <data>
-        <display>
-        <title>决策树相关算法——XGBoost原理分析及实例实现(二)</title>
-        <pubTime>2018-04-27T03:34:42.000Z</pubTime>
-        
-        <tag>决策树</tag>
-         
-        <tag>集成学习</tag>
-         
-        <tag>XGBoost</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/04/26/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%80/</loc>
-    <lastmod>2018-04-27T11:57:15.000Z</lastmod>
-    <data>
-        <display>
-        <title>决策树相关算法——XGBoost原理分析及实例实现(一)</title>
-        <pubTime>2018-04-26T03:34:34.000Z</pubTime>
-        
-        <tag>决策树</tag>
-         
-        <tag>集成学习</tag>
-         
-        <tag>XGBoost</tag>
-         
-         
-           
-             
-              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+              <breadCrumb title="问题集" url="https://jianwenjun.xyz/categories/%E9%97%AE%E9%A2%98%E9%9B%86/"/>
           
         </display>
     </data>
@@ -222,7 +25,7 @@
     
   <url>
     <loc>https://jianwenjun.xyz/2018/04/12/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94Boosting%E4%B9%8BAdaboost-GBDT%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%9E%E7%8E%B0/</loc>
-    <lastmod>2018-04-19T06:31:08.000Z</lastmod>
+    <lastmod>2018-12-31T10:44:54.000Z</lastmod>
     <data>
         <display>
         <title>决策树相关算法——Boosting之Adaboost&GBDT详细分析与实现</title>
@@ -245,6 +48,241 @@
     </data>
     </url>
 
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/04/26/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%80/</loc>
+    <lastmod>2018-12-31T10:43:39.000Z</lastmod>
+    <data>
+        <display>
+        <title>决策树相关算法——XGBoost原理分析及实例实现(一)</title>
+        <pubTime>2018-04-26T03:34:34.000Z</pubTime>
+        
+        <tag>决策树</tag>
+         
+        <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/04/27/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%BA%8C/</loc>
+    <lastmod>2018-12-31T10:43:22.000Z</lastmod>
+    <data>
+        <display>
+        <title>决策树相关算法——XGBoost原理分析及实例实现(二)</title>
+        <pubTime>2018-04-27T03:34:42.000Z</pubTime>
+        
+        <tag>决策树</tag>
+         
+        <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/05/02/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94XGBoost%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E5%AE%9E%E4%BE%8B%E5%AE%9E%E7%8E%B0-%E4%B8%89/</loc>
+    <lastmod>2018-12-31T10:42:23.000Z</lastmod>
+    <data>
+        <display>
+        <title>决策树相关算法——XGBoost原理分析及实例实现(三)</title>
+        <pubTime>2018-05-02T10:12:48.000Z</pubTime>
+        
+        <tag>决策树</tag>
+         
+        <tag>集成学习</tag>
+         
+        <tag>XGBoost</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/05/05/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94%E6%84%9F%E7%9F%A5%E6%9C%BA-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/</loc>
+    <lastmod>2018-12-31T10:41:16.000Z</lastmod>
+    <data>
+        <display>
+        <title>机器学习算法——感知机&支持向量机</title>
+        <pubTime>2018-05-05T09:14:39.000Z</pubTime>
+        
+        <tag>感知机</tag>
+         
+        <tag>SVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/05/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94%E9%80%BB%E8%BE%91%E6%96%AF%E8%B0%9B%E5%9B%9E%E5%BD%92-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B/</loc>
+    <lastmod>2018-12-31T10:40:22.000Z</lastmod>
+    <data>
+        <display>
+        <title>机器学习算法——逻辑斯谛回归模型&最大熵模型</title>
+        <pubTime>2018-05-15T09:14:23.000Z</pubTime>
+        
+        <tag>最大熵模型</tag>
+         
+        <tag>逻辑斯谛回归</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/05/23/Hadoop%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/</loc>
+    <lastmod>2018-12-31T10:39:15.000Z</lastmod>
+    <data>
+        <display>
+        <title>Hadoop环境搭建及相关组件的工作流程介绍</title>
+        <pubTime>2018-05-23T13:00:36.000Z</pubTime>
+        
+        <tag>Hadoop</tag>
+         
+         
+           
+             
+              <breadCrumb title="大数据" url="https://jianwenjun.xyz/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/05/26/Spark%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E4%BB%8B%E7%BB%8D/</loc>
+    <lastmod>2018-12-31T10:38:08.000Z</lastmod>
+    <data>
+        <display>
+        <title>Spark环境搭建及相关工作流程介绍</title>
+        <pubTime>2018-05-26T07:09:57.000Z</pubTime>
+        
+        <tag>Spark</tag>
+         
+         
+           
+             
+              <breadCrumb title="大数据" url="https://jianwenjun.xyz/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/07/13/%E8%9A%82%E8%9A%81%E9%87%91%E8%9E%8DNLP%E7%AB%9E%E8%B5%9B%E2%80%94%E2%80%94%E6%96%87%E6%9C%AC%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E5%BA%A6%E8%B5%9B%E9%A2%98%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2018-12-31T10:34:29.000Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金融NLP竞赛——文本语义相似度赛题总结</title>
+        <pubTime>2018-07-13T01:19:01.000Z</pubTime>
+        
+        <tag>语义相似度</tag>
+         
+        <tag>文本挖掘</tag>
+         
+         
+           
+             
+              <breadCrumb title="NLP" url="https://jianwenjun.xyz/categories/NLP/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/07/18/Seq2Seq%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B/</loc>
+    <lastmod>2018-12-31T10:33:02.000Z</lastmod>
+    <data>
+        <display>
+        <title>Seq2Seq的那些事</title>
+        <pubTime>2018-07-18T14:14:47.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="NLP" url="https://jianwenjun.xyz/categories/NLP/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/09/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E4%BD%A0%E9%9C%80%E8%A6%81%E4%BA%86%E8%A7%A3%E7%9A%84%E5%90%84%E7%A7%8D%E7%86%B5/</loc>
+    <lastmod>2018-12-31T10:30:12.000Z</lastmod>
+    <data>
+        <display>
+        <title>机器学习中你需要了解的各种熵</title>
+        <pubTime>2018-09-28T02:13:25.000Z</pubTime>
+        
+        <tag>熵</tag>
+         
+         
+           
+             
+              <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://jianwenjun.xyz/2018/12/31/%E6%96%87%E6%9C%AC%E7%94%9F%E6%88%90%E4%B9%8B%E8%87%AA%E5%8A%A8%E6%A0%87%E9%A2%98/</loc>
+    <lastmod>2018-12-31T07:52:32.000Z</lastmod>
+    <data>
+        <display>
+        <title>文本生成之自动标题</title>
+        <pubTime>2018-12-31T08:16:33.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="NLP" url="https://jianwenjun.xyz/categories/NLP/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
     
   <url>
     <loc>https://jianwenjun.xyz/2018/04/05/%E5%86%B3%E7%AD%96%E6%A0%91%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95%E2%80%94%E2%80%94Bagging%E4%B9%8B%E5%9F%BA%E4%BA%8ECART%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E%E4%B8%8E%E5%AE%9E%E7%8E%B0/</loc>
@@ -392,26 +430,6 @@
            
              
               <breadCrumb title="ML&amp;DL" url="https://jianwenjun.xyz/categories/ML-DL/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://jianwenjun.xyz/2018/04/10/Hexo-Coding-Github%E9%83%A8%E7%BD%B2%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2Error%E5%85%A8%E9%9B%86/</loc>
-    <lastmod>2018-04-11T13:53:34.000Z</lastmod>
-    <data>
-        <display>
-        <title>Hexo+Coding+Github部署个人博客Error全集</title>
-        <pubTime>2018-04-10T09:45:30.000Z</pubTime>
-        
-        <tag>Hexo</tag>
-         
-         
-           
-             
-              <breadCrumb title="问题集" url="https://jianwenjun.xyz/categories/%E9%97%AE%E9%A2%98%E9%9B%86/"/>
           
         </display>
     </data>

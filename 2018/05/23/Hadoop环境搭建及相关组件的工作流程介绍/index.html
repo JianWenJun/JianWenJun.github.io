@@ -102,17 +102,17 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <meta property="og:site_name" content="小简铺子">
 <meta property="og:description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/10.png">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/8.png">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/11.png">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/12.jpg">
-<meta property="og:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/13.jpg">
-<meta property="og:updated_time" content="2018-05-26T12:53:57.000Z">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/9.jpg">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/10.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/8.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/11.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/12.jpg">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/13.jpg">
+<meta property="og:updated_time" content="2018-12-31T10:39:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hadoop环境搭建及相关组件的工作流程介绍">
 <meta name="twitter:description" content="1前言本篇博客主要是记录Hadoop环境配置包括单机伪分布环境搭建，分布式环境搭建和Hadoop相关组件的工作流程介绍，包括HDFS读写流程，YARN的资源调度流程，MapReduce工作流程。">
-<meta name="twitter:image" content="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg">
+<meta name="twitter:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/9.jpg">
 
 
 
@@ -467,14 +467,14 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p>说明：因为master上运行了NodeManager和DataNode，所以需要将master添加到这上面。</p>
 <p><strong>i将上述Hadoop的相关文件复制到其他节点机器</strong><br>主要包括java环境的设置，Hadoop安装环境,只在master上复制操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1）先拷贝java相关的</span><br><span class="line">命令：sudo scp -r /usr/java/jdk1.7.0_71 root@slave1:/usr/java/jdk1.7.0_71/</span><br><span class="line">命令：sudo scp -r /usr/java/jdk1.7.0_71 root@slave2:/usr/java/jdk1.7.0_71/</span><br><span class="line">2）拷贝Hadoop相关的</span><br><span class="line">slave1和slave2需要有NameNode和DataNode对应的存储文件夹/home/zkpk/app/hadoop_tmp/dfs/node和/home/zkpk/app/hadoop_tmp/dfs/name,没有需要先创建</span><br><span class="line">命令：sudo  -r /home/zkpk/app/hadoop zkpk@slave1:/home/zkpk/app/hadoop</span><br><span class="line">命令：sudo  -r /home/zkpk/app/hadoop zkpk@slave2:/home/zkpk/app/hadoop</span><br><span class="line">3）拷贝配置文件/home/zkpk/.bash_profile</span><br><span class="line">命令：sudo  -r /home/zkpk/.bash_profile zkpk@slave1:/home/zkpk/</span><br><span class="line">命令：sudo  -r /home/zkpk/.bash_profile zkpk@slave2:/home/zkpk/</span><br><span class="line">4)slave1和slave2下分别运行</span><br><span class="line">命令：source /home/zkpk/.bash_profile</span><br></pre></td></tr></table></figure></p>
 <p><strong>j启动整个分布式集群</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">启动命令：./sbin/start-all.sh</span><br><span class="line">验证命令：jps</span><br><span class="line">终止命令：./sbin/stop-all.sh</span><br></pre></td></tr></table></figure></p>
-<p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/9.jpg" width="50%" height="65%" align="center" alt="图9"></p>
-<h4 id="4HDFS读写流程"><a href="#4HDFS读写流程" class="headerlink" title="4HDFS读写流程"></a>4HDFS读写流程</h4><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/10.png" width="95%" height="65%" align="center" alt="图9"></p>
+<p><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/9.jpg" width="50%" height="65%" align="center" alt="图9"></p>
+<h4 id="4HDFS读写流程"><a href="#4HDFS读写流程" class="headerlink" title="4HDFS读写流程"></a>4HDFS读写流程</h4><p><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/10.png" width="95%" height="65%" align="center" alt="图9"></p>
 <h5 id="4-1写数据"><a href="#4-1写数据" class="headerlink" title="4.1写数据"></a>4.1写数据</h5><p>Client：发起写请求,获取到block的大小信息，副本个数信息。然后切分文件成多个block<br>NameNode:全局协调所有的请求，对于每个block，计算出block存储的DataNode的位置<br>DataNode：pipline数据存储</p>
 <h5 id="4-2读数据"><a href="#4-2读数据" class="headerlink" title="4.2读数据"></a>4.2读数据</h5><p>Client：发送NameNode出文件名。从DataNode读取出数据<br>NameNode:回送文件包含的块列表，每个块对应的DataNode信息。<br>DataNode：数据存储</p>
 <blockquote>
 <p>1.写过程<br>Client发送写请求，并指定block的大小信息，副本个数信息，然后Client将大文件切分为多个block，并将要存储的block信息发送到NameNode，待NameNode计算好block存储的位置后，一个一个将block和该block副本位置发送到NameNode指定的DataNode位置。<br>NameNode，接收写请求和block的信息，副本个数信息。根据各个DataNode的存储资源情况计算出block存储的DataNode的位置。<br>DataNode，接收Client发送过来的block块和该block副本位置，并将该block复制到另外一个DataNode作为一个副本。存储完成后需要通知NameNode。<br>2.读过程<br>Client发送读请求，并指定文件名，将该请求和文件名发送给NameNode。<br>NameNode接收Client请求和文件名，计算出文件的元信息(文件的block存储位置，block信息，副本信息)，并将文件的元信息反馈回Client。<br>Client接收到文件的元信息后，将从对应的DataNode上的下载block，最后将所有的block组合成文件。</p>
 </blockquote>
-<h4 id="5YARN资源调度流程"><a href="#5YARN资源调度流程" class="headerlink" title="5YARN资源调度流程"></a>5YARN资源调度流程</h4><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/8.png" width="85%" height="65%" align="center" alt="图8"></p>
+<h4 id="5YARN资源调度流程"><a href="#5YARN资源调度流程" class="headerlink" title="5YARN资源调度流程"></a>5YARN资源调度流程</h4><p><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/8.png" width="85%" height="65%" align="center" alt="图8"></p>
 <h5 id="5-1YARN架构中包含的重要概念"><a href="#5-1YARN架构中包含的重要概念" class="headerlink" title="5.1YARN架构中包含的重要概念"></a>5.1YARN架构中包含的重要概念</h5><p>YARN:多个不同的计算框架可以共享同一个HDFS集群上的数据，享受整体的资源调度。<br>XXX on YARN 的好处：与其他计算框架共享集群资源，按资源需要分配，进而提高集群资源的利用率<br>XXX：Spark、MapReduce、Storm、Flink<br><strong>1）ResourceManager: RM</strong></p>
 <blockquote>
 <p>整个集群同一时间提供服务的RM只有一个，负责集群资源的统一管理和调度<br>处理客户端的请求： 提交一个作业、杀死一个作业<br>监控我们的NM，一旦某个NM挂了，那么该NM上运行的任务需要告诉我们的AM来如何进行处理<br>ResourceManager包含一个ApplicationManager和Resource Scheduler.其中ApplicationManager负责分配ApplicationMaster运行的Container资源，并与Container对应的NodeManager通信。ApplicationManager也负责与ApplicationMaster通信了解Job的运行状态。Resource Scheduler负责Job中的任务资源分配。</p>
@@ -499,15 +499,15 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p>执行过程<br>1.Client向Yarn中的RM提交一个Job(MP/Spark作业)，RM为该Job分配第一个Container资源，并与Container对应的NodeManager通信<br>2.RM与NodeManager通信，请求启动分配的Container(AM),当Job是MP的job时，对应的是MP的AM。<br>3.AM容器启动后向RM注册，以便用户可以通过RM查看Job的运行状态。并且AM(MP)将为Job中的各个任务如(Map任务、Reduce任务)向RM申请资源(采用轮询的方式向RM申请和领取资源)。<br>4.当AM申请到资源后，AM将则与资源对应的NodeManager通信，要求NM启动Container来运行任务。<br>5.各个任务需要需要向AM汇报运行状态和进度。</p>
 </blockquote>
 <h4 id="6MapReduce的工作过程"><a href="#6MapReduce的工作过程" class="headerlink" title="6MapReduce的工作过程"></a>6MapReduce的工作过程</h4><h5 id="6-1MapReduce2-x运行过程"><a href="#6-1MapReduce2-x运行过程" class="headerlink" title="6.1MapReduce2.x运行过程"></a>6.1MapReduce2.x运行过程</h5><p>此处的MapReduce是运行在YARN上的，作为YARN上的一个应用程序，也就是<strong>5.2YARN执行过程</strong>中的Client，MapReduce向YARN中提交的是一个Job。</p>
-<h5 id="6-2MapReduce编程模型过程"><a href="#6-2MapReduce编程模型过程" class="headerlink" title="6.2MapReduce编程模型过程"></a>6.2MapReduce编程模型过程</h5><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/11.png" width="90%" height="65%" align="center" alt="图11"></p>
+<h5 id="6-2MapReduce编程模型过程"><a href="#6-2MapReduce编程模型过程" class="headerlink" title="6.2MapReduce编程模型过程"></a>6.2MapReduce编程模型过程</h5><p><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/11.png" width="90%" height="65%" align="center" alt="图11"></p>
 <blockquote>
 <p><strong>1)编程模型图说明(从左往右说明)</strong><br><strong>首先，</strong>从HDFS中读取出file,使用InputFormat接口将file进行切片处理得到多个Split，然后InputFormat将Split转换为对应的&lt;k1, v1&gt;作为Mapper的输入。一个Split对应一个&lt;k1, v1&gt;对应一个Mapper。<br><strong>其次，</strong>经过Mapper Task处理后输出&lt;k2, v2&gt;，经由Shuffle进行一定程度的组合得到&lt;k2, {v2,…}&gt;，作为Reduce的输入，Reduce进行K的合并操作，输出 &lt;k3, v3&gt;。后面会详细叙述Shuffle的过程。<br><strong>最后，</strong>，在得到 &lt;k3, v3&gt;后经OutputFormat转换为HDFS的文件存储到相应的HDFS目录下。<br><strong>2)Map和Reduce的输入输出数据格式</strong><br>(input) &lt;k1, v1&gt; -&gt; map -&gt; &lt;k2, v2&gt; -&gt; combine -&gt; &lt;k2, v2&gt; -&gt; reduce -&gt; &lt;k3, v3&gt; (output)<br>其中的K,V必须实现Writable可序列化接口,其中K还必须实现WriteableComparable接口。<br><strong>3)核心概念</strong><br><strong>Split：</strong>MapReduce中最小的计算单元<br><strong>Block：</strong>HDFS中的最小存储单元,默认情况下，Split和Block是一一对应关系。<br><strong>InputFormat:</strong>将输入文件进行分片处理，并转化为键值对形式。<br><strong>OutputFormat：</strong>将键值对转化为文件输出<br><strong>Combiner:</strong> 本地的Reduce，先将Mapper找你的相同的Key先做一部分处理，减少了MapTask输出的数量量。使用场景求和，次数 ,不能用平均数。<br><strong>Partitioner:</strong>决定MapTask输出的数据交由那个ReduceTask处理，默认的情况下分发的key的hash值对Reduce Task个数取模。</p>
 </blockquote>
-<h6 id="6-2-1MapReduce中的Shuffle过程详解"><a href="#6-2-1MapReduce中的Shuffle过程详解" class="headerlink" title="6.2.1MapReduce中的Shuffle过程详解"></a>6.2.1MapReduce中的Shuffle过程详解</h6><p><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/12.jpg" width="95%" height="65%" align="center" alt="图12"></p>
+<h6 id="6-2-1MapReduce中的Shuffle过程详解"><a href="#6-2-1MapReduce中的Shuffle过程详解" class="headerlink" title="6.2.1MapReduce中的Shuffle过程详解"></a>6.2.1MapReduce中的Shuffle过程详解</h6><p><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/12.jpg" width="95%" height="65%" align="center" alt="图12"></p>
 <blockquote>
 <p>借助参考链接中的说明：</p>
 </blockquote>
-<p><strong>为什么MapReduce计算模型需要Shuffle过程？</strong>MapReduce计算模型一般包括两个重要的阶段：Map是映射，负责数据的过滤分发；Reduce是规约，负责数据的计算归并。Reduce的数据来源于Map，Map的输出即是Reduce的输入，Reduce需要通过Shuffle来获取数据。<br>从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程.<br><strong>Spill过程</strong><br><img src="http://p6wp21cg8.bkt.clouddn.com/hadoop/13.jpg" width="95%" height="65%" align="center" alt="图13"><br><strong>说明：</strong>1.每个Map任务不断地以&lt;key, value&gt;对的形式把数据输出到在内存中构造的一个环形数据结构中kvbuffer。使用环形数据结构是为了更有效地使用内存空间，在内存中放置尽可能多的数据.<br>2.把Kvbuffer中的数据按照partition值和key两个关键字升序排序，移动的只是索引数据，排序结果是Kvmeta中数据按照partition为单位聚集在一起，同一partition内的按照key有序。<br>3.当每个Map任务不断地以&lt;key, value&gt;加入到内存的kvbuffer中时，并进行排序后，当kvbuffer中的内存使用空间达到一定程度时，将kvmate的数据写到<strong>磁盘上</strong>。<br>4.最后把所有的数据都输出到磁盘上，最后merge成一个文件。<br>Map端的Shuffle过程到此结束。<br><strong>Copy过程</strong><br>Reduce任务通过HTTP向各个Map任务拖取它所需要的数据。如果map中的partition值设置了，将会把Map最后的输出，输送到指定的Reduce上供Reduce拖取(复制到内存)。<br><strong>Sort</strong><br>Map的输出数据已经是有序的，Merge进行一次合并排序，所谓Reduce端的sort过程就是这个合并的过程。<br>Reduce端的Shuffle过程至此结束。</p>
+<p><strong>为什么MapReduce计算模型需要Shuffle过程？</strong>MapReduce计算模型一般包括两个重要的阶段：Map是映射，负责数据的过滤分发；Reduce是规约，负责数据的计算归并。Reduce的数据来源于Map，Map的输出即是Reduce的输入，Reduce需要通过Shuffle来获取数据。<br>从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程.<br><strong>Spill过程</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/hadoop/13.jpg" width="95%" height="65%" align="center" alt="图13"><br><strong>说明：</strong>1.每个Map任务不断地以&lt;key, value&gt;对的形式把数据输出到在内存中构造的一个环形数据结构中kvbuffer。使用环形数据结构是为了更有效地使用内存空间，在内存中放置尽可能多的数据.<br>2.把Kvbuffer中的数据按照partition值和key两个关键字升序排序，移动的只是索引数据，排序结果是Kvmeta中数据按照partition为单位聚集在一起，同一partition内的按照key有序。<br>3.当每个Map任务不断地以&lt;key, value&gt;加入到内存的kvbuffer中时，并进行排序后，当kvbuffer中的内存使用空间达到一定程度时，将kvmate的数据写到<strong>磁盘上</strong>。<br>4.最后把所有的数据都输出到磁盘上，最后merge成一个文件。<br>Map端的Shuffle过程到此结束。<br><strong>Copy过程</strong><br>Reduce任务通过HTTP向各个Map任务拖取它所需要的数据。如果map中的partition值设置了，将会把Map最后的输出，输送到指定的Reduce上供Reduce拖取(复制到内存)。<br><strong>Sort</strong><br>Map的输出数据已经是有序的，Merge进行一次合并排序，所谓Reduce端的sort过程就是这个合并的过程。<br>Reduce端的Shuffle过程至此结束。</p>
 <blockquote>
 <p>上面只是根据自己的理解记录的，如果不是很清楚可以查看参考链接。</p>
 </blockquote>
@@ -561,7 +561,7 @@ border-left-color: #1E92FB;    /*左边框颜色*/
 <p><span>本文标题:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/">Hadoop环境搭建及相关组件的工作流程介绍</a></p>
 <p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
 <p><span>发布时间:</span>2018年05月23日 - 21:05</p>
-<p><span>最后更新:</span>2018年05月26日 - 20:05</p>
+<p><span>最后更新:</span>2018年12月31日 - 18:12</p>
 <p><span>原始链接:</span><a href="/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/" title="Hadoop环境搭建及相关组件的工作流程介绍">https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/</a>
 <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2018/05/23/Hadoop环境搭建及相关组件的工作流程介绍/"  aria-label="复制成功！"></i></span>
 </p>
@@ -708,7 +708,7 @@ showConfirmButton: true
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">32</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -837,7 +837,7 @@ showConfirmButton: true
 网站访问量<span id="busuanzi_value_site_uv"></span>次
 </span>
 <i class="fa fa-user-md"></i>
-<span class="post-count">博客全站共84.3k字</span>
+<span class="post-count">博客全站共84.8k字</span>
 </div>
 
 
