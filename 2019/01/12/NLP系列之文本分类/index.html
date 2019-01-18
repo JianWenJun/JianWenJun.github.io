@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+.pace .pace-progress {
+background: #1E92FB; /*进度条颜色*/
+height: 3px;
+}
+.pace .pace-progress-inner {
+box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+}
+.pace .pace-activity {
+border-top-color: #1E92FB;    /*上边框颜色*/
+border-left-color: #1E92FB;    /*左边框颜色*/
+}
+</style>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1前言本篇博客主要是记录自然语言处理中的文本分类任务中常见的基础模型的使用及分析。Github上brightmart大佬已经整理出很完整的一套文本分类任务的基础模型及对应的模型代码实现。网上也有部分博客将brightmart写的模型实现步骤进行翻译整理出来了。本着尊重原创的原则，后面都列出了参考链接，在此也感谢参考链接上的作者。本文将对之前文本分类基础模型的博客和文献进行整理，此外再加上自己的一部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP系列之文本分类">
+<meta property="og:url" content="https://jianwenjun.xyz/2019/01/12/NLP系列之文本分类/index.html">
+<meta property="og:site_name" content="小简铺子">
+<meta property="og:description" content="1前言本篇博客主要是记录自然语言处理中的文本分类任务中常见的基础模型的使用及分析。Github上brightmart大佬已经整理出很完整的一套文本分类任务的基础模型及对应的模型代码实现。网上也有部分博客将brightmart写的模型实现步骤进行翻译整理出来了。本着尊重原创的原则，后面都列出了参考链接，在此也感谢参考链接上的作者。本文将对之前文本分类基础模型的博客和文献进行整理，此外再加上自己的一部">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/%E5%AF%B9%E6%AF%94%E5%9B%BE1.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/fastText.JPG">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/2.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/TextCNN.JPG">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/bi-directionalRNN.JPG ">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/RCNN.JPG ">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/HAN.JPG ">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/4.png">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/attention_is_all_you_need.JPG">
+<meta property="og:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/6.jpg">
+<meta property="og:updated_time" content="2019-01-18T11:22:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NLP系列之文本分类">
+<meta name="twitter:description" content="1前言本篇博客主要是记录自然语言处理中的文本分类任务中常见的基础模型的使用及分析。Github上brightmart大佬已经整理出很完整的一套文本分类任务的基础模型及对应的模型代码实现。网上也有部分博客将brightmart写的模型实现步骤进行翻译整理出来了。本着尊重原创的原则，后面都列出了参考链接，在此也感谢参考链接上的作者。本文将对之前文本分类基础模型的博客和文献进行整理，此外再加上自己的一部">
+<meta name="twitter:image" content="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/%E5%AF%B9%E6%AF%94%E5%9B%BE1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jianwenjun.xyz/2019/01/12/NLP系列之文本分类/"/>
+
+
+
+
+
+  <title>NLP系列之文本分类 | 小简铺子</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小简铺子</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jianwenjun.xyz/2019/01/12/NLP系列之文本分类/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ComeOnJian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/me.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小简铺子">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NLP系列之文本分类</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-12T15:03:22+08:00">
+                2019-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/" itemprop="url" rel="index">
+                    <span itemprop="name">NLP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/12/NLP系列之文本分类/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2019/01/12/NLP系列之文本分类/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/01/12/NLP系列之文本分类/" class="leancloud_visitors" data-flag-title="NLP系列之文本分类">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>             
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">|</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  6,618
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  28 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="1前言"><a href="#1前言" class="headerlink" title="1前言"></a>1前言</h4><p>本篇博客主要是记录自然语言处理中的文本分类任务中常见的基础模型的使用及分析。Github上<code>brightmart</code>大佬已经整理出很完整的一套文本分类任务的基础模型及对应的模型代码实现。网上也有部分博客将<code>brightmart</code>写的模型实现步骤进行翻译整理出来了。本着尊重原创的原则，后面都列出了参考链接，在此也感谢参考链接上的作者。本文将对之前文本分类基础模型的博客和文献进行整理，此外再加上自己的一部分<strong>模型分析</strong>。毕竟还是需要有自己的东西在这里的，这样才能做到又学到了又进行思考了。<a id="more"></a></p>
+<h4 id="2文本分类任务"><a href="#2文本分类任务" class="headerlink" title="2文本分类任务"></a>2文本分类任务</h4><p><strong>2.1</strong> 文本分类是自然语言处理中很基础的任务，是学习自然语言处理入门的很好的实际操作的任务，笔记当时就是从文本分类开始动手实践。文本分类的任务主要是把根据给出的文本(包括长文本，比如说资讯、新闻、文档等，也包括短文本，比如说评论，微博等)利用自然语言处理技术对文本进行归类整理，简单点说就是说给文本进行类别标注。<br><strong>2.2</strong> 常见的文本分类模型有基于机器学习的分类方法和基于深度学习的分类方法。对于基于机器学习的分类方法，显然特征的提取和特征的选择过程将会对分类效果起到至关重要的作用。在文本的特征提取上，基于词级层面的TF-IDF特征，n-gram特征，主题词和关键词特征。基于句子级别的有句式，句子长度等特征。基于语义层面的特征可以使用word2vec预训练语料库得到词向量，使用词向量合理的构造出文本的词向量作为文本的语义特征。对于基于深度学习的文本分类方法，显然模型的结构和模型的参数将会对分类效果起到至关作用。在模型结构上常用的基础的神经网络模型有CNN，RNN，GRU，Attention机制，Dropout等。在模型参数的调节上，一方面需要设定好模型的参数学习率，另一位方面需要根据模型的使用特点和要分析的文本内容进行调节。<br><strong>说明：</strong> 本文通过介绍brightmart在基础神经网络在文本分类上的实验来进行相关的模型介绍和模型分析，该实验主要是在2017年知乎看山杯的一道竞赛题，竞赛内容是对<a href="https://biendata.com/competition/zhihu/" target="_blank" rel="noopener">知乎上的问题进行分类</a>，当然此次任务属性文本分类中多标签分类，属于文本分类的范畴。<br><strong>2.3各个基模型的实验结果</strong><br><code>brightmart</code>使用以下的基础模型在上述数据集上进行了大量实验，实验结果如下。以下很多模型比较基础，都是非常经典的模型，作为实验的基准模型BaseLine是非常合适的。如果想继续提升实验结果，可能就需要根据数据的特征进行模型的改进或者模型的集成工作了。<br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/%E5%AF%B9%E6%AF%94%E5%9B%BE1.png" width="100%" height="35%" align="center" alt="实验对比图"></p>
+<h4 id="3基础文本分类模型的介绍及分析"><a href="#3基础文本分类模型的介绍及分析" class="headerlink" title="3基础文本分类模型的介绍及分析"></a>3基础文本分类模型的介绍及分析</h4><p>本部分主要对基础的文本分类进行介绍，主要分为模型结构的论文来源介绍，模型结构，模型的实现步骤，代码的主要实现(也是来自brightmart的项目)和最后关于模型的分析。</p>
+<h5 id="3-1FastText"><a href="#3-1FastText" class="headerlink" title="3.1FastText"></a>3.1FastText</h5><p><strong>3.1.1论文来源</strong><br>《Bag of Tricks for Efficient Text Classification》<br><strong>3.1.2模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/fastText.JPG" width="95%" height="35%" align="center" alt="fasttext"><strong>3.1.3模型的实现步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，FastText的模型的实现步骤为：<br>1.embedding–&gt;2.average–&gt;3.linear classifier(没有经过激活函数)-&gt; SoftMax分类</p>
+</blockquote>
+<p><strong>3.1.4模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 其中None表示你的batch_size大小</span></span><br><span class="line"><span class="comment">#1.get emebedding of words in the sentence</span></span><br><span class="line">sentence_embeddings = tf.nn.embedding_lookup(self.Embedding,self.sentence)  <span class="comment"># [None,self.sentence_len,self.embed_size]</span></span><br><span class="line"><span class="comment">#2.average vectors, to get representation of the sentence</span></span><br><span class="line">self.sentence_embeddings = tf.reduce_mean(sentence_embeddings, axis=<span class="number">1</span>)  <span class="comment"># [None,self.embed_size]</span></span><br><span class="line"><span class="comment">#3.linear classifier layer</span></span><br><span class="line">logits = tf.matmul(self.sentence_embeddings, self.W) + self.b <span class="comment">#[None, self.label_size]==tf.matmul([None,self.embed_size],[self.embed_size,self.label_size])</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>3.1.5模型的分析</strong> </p>
+<blockquote>
+<p>FastText的模型结构相对是比较简单的，是一个有监督的训练模型。我们知道FastText训练不仅可以得到分类的效果，如果语料充足的话，可以训练得到词向量。<br><strong>1.</strong> FastText模型结构简单，因为最后对文本的分类都是直接经过线性层来进行分类的，可以说是完成线性的，最后是没有经过激活函数。因此句子结构比较简单的文本分类任务来说，FastText是可以进行的。对于复杂的分类任务，比如说情感分类等，由于网络模型需要学习到语句的语义，语序等特征，显然对于简单的线性层分类是不足的，因此还是需要引入复杂的非线性结构层。正因为模型结构简单，模型训练速度是相对较快的。<br><strong>2.</strong> FastText引入了N gram特征。从FastText前面的模型结构中，第二层计算的是词向量的平均值，此步骤将会忽略掉文本的词序特征。显然对于文本的分类任务中，这将会损失掉词序特征的。因此，在FastText词向量中引入了N gram的词向量。具体做法是，在N gram也当做一个词，因此也对应着一个词向量，在第二层计算词向量的均值的时候，也需要把N gram对应的词向量也加进来进行计算平均值。通过训练分类模型，这样可以得到词向量和N gram对应的词向量。期间也会存在一个问题，N gram的量其实远比word大的多。因此FastText采用Hash桶的方式，把所有的N gram都哈希到buckets个桶中，哈希到同一个桶的所有n-gram共享一个embedding vector。这点可以联想到，在处理UNK的词向量的时候，也可以使用类似的思想进行词向量的设置。<br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/2.png" width="100%" height="35%" align="center" alt="词向量图"></p>
+</blockquote>
+<h5 id="3-2TextCNN"><a href="#3-2TextCNN" class="headerlink" title="3.2TextCNN"></a>3.2TextCNN</h5><p><strong>3.2.1论文来源</strong><br>《Convolutional Neural Networks for Sentence Classification》<br><strong>3.2.2模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/TextCNN.JPG" width="100%" height="40%" align="center" alt="词向量图"><strong>3.2.3模型的实现步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，TextCNN的模型的实现步骤为：<br>1.embedding—&gt;2.conv—&gt;3.max pooling—&gt;4.fully connected layer——–&gt;5.softmax</p>
+</blockquote>
+<p><strong>3.2.4模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.=====&gt;get emebedding of words in the sentence</span></span><br><span class="line">self.embedded_words = tf.nn.embedding_lookup(self.Embedding,self.input_x)<span class="comment">#[None,sentence_length,embed_size]</span></span><br><span class="line">self.sentence_embeddings_expanded=tf.expand_dims(self.embedded_words,<span class="number">-1</span>) <span class="comment">#[None,sentence_length,embed_size,1). expand dimension so meet input requirement of 2d-conv</span></span><br><span class="line"><span class="comment"># 2.=====&gt;loop each filter size. for each filter, do:convolution-pooling layer(a.create filters,b.conv,c.apply nolinearity,d.max-pooling)---&gt;</span></span><br><span class="line"><span class="comment"># you can use:tf.nn.conv2d;tf.nn.relu;tf.nn.max_pool; feature shape is 4-d. feature is a new variable</span></span><br><span class="line"><span class="comment">#if self.use_mulitple_layer_cnn: # this may take 50G memory.</span></span><br><span class="line">        <span class="comment">#    print("use multiple layer CNN")</span></span><br><span class="line">        <span class="comment">#    h=self.cnn_multiple_layers()</span></span><br><span class="line">        <span class="comment">#else: # this take small memory, less than 2G memory.</span></span><br><span class="line">print(<span class="string">"use single layer CNN"</span>)</span><br><span class="line">h=self.cnn_single_layer()</span><br><span class="line"><span class="comment">#5. logits(use linear layer)and predictions(argmax)</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"output"</span>):</span><br><span class="line">    logits = tf.matmul(h,self.W_projection) + self.b_projection  <span class="comment">#shape:[None, self.num_classes]==tf.matmul([None,self.embed_size],[self.embed_size,self.num_classes])</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>3.2.5模型的分析</strong><br>笔者之前详细介绍过一篇TextCNN实现的博客，可以查看<a href="https://blog.csdn.net/u014732537/article/details/79573174" target="_blank" rel="noopener">卷积神经网络(TextCNN)在句子分类上的实现</a></p>
+<blockquote>
+<p>深度学习与机器学习的最重要的不同之处便是：深度学习使用神经网络代替人工的进行特征的抽取。所以，最终模型的效果的好坏，其实是和神经网络的特征抽取的能力强弱相关。在文本处理上，特征抽取能力主要有句法特征提取能力；语义特征提取能力；长距离特征捕获能力；任务综合特征抽取能力。上面四个角度是从NLP的特征抽取器能力强弱角度来评判的，另外再加入并行计算能力及运行效率，这是从是否方便大规模实用化的角度来看的。<br><strong>1.</strong> TextCNN神经网络主要以CNN网络对文本信息进行特征的抽取，在图像的处理上，CNN的特征抽取能力是非常强的。我们把词向量的维度和文本的长度当成另一个维度是可以构成一个矩阵的，于是，CNN便可以在文本进行卷积核的计算(文本的特征抽取)。此时，卷积核的大小就相当于N gram的特征了。<br><strong>2.</strong> TextCNN中的实现步骤中是有max pooling的一步的。具体过程是多个卷积核对文本进行滑动获取语义特征，而CNN中的卷积核是能保留特征之间的相对位置的，因为卷积核是滑动的，从左至右滑动，因此捕获到的特征也是如此顺序排列，所以它在结构上已经记录了相对位置信息了。但是卷积层后面立即接上Pooling层的话，Max Pooling的操作逻辑是：从一个卷积核获得的特征向量里只选中并保留最强的那一个特征，所以到了Pooling层，位置信息就被损失掉了(信息损失)。因此在对应需要捕获文本的词序信息特征时，pooling层应该需要添加上位置信息。</p>
+</blockquote>
+<h5 id="3-3TextRNN-LSTM"><a href="#3-3TextRNN-LSTM" class="headerlink" title="3.3TextRNN/LSTM"></a>3.3TextRNN/LSTM</h5><p><strong>3.3.1模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/bi-directionalRNN.JPG " width="100%" height="40%" align="center" alt="词向量图"><strong>3.3.2模型的步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，TextRNN/LSTM的模型的实现步骤为：<br>1.embedding—&gt;2.bi-directional lstm—&gt;3.concat output—&gt;4.average/last output—–&gt;5.softmax layer</p>
+</blockquote>
+<p><strong>3.3.3模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1.get emebedding of words in the sentence</span></span><br><span class="line">self.embedded_words = tf.nn.embedding_lookup(self.Embedding,self.input_x) <span class="comment">#shape:[None,sentence_length,embed_size]</span></span><br><span class="line"><span class="comment">#2. Bi-lstm layer</span></span><br><span class="line"><span class="comment"># define lstm cess:get lstm cell output</span></span><br><span class="line">lstm_fw_cell=rnn.BasicLSTMCell(self.hidden_size) <span class="comment">#forward direction cell</span></span><br><span class="line">lstm_bw_cell=rnn.BasicLSTMCell(self.hidden_size) <span class="comment">#backward direction cell</span></span><br><span class="line"><span class="keyword">if</span> self.dropout_keep_prob <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">    lstm_fw_cell=rnn.DropoutWrapper(lstm_fw_cell,output_keep_prob=self.dropout_keep_prob)</span><br><span class="line">    lstm_bw_cell=rnn.DropoutWrapper(lstm_bw_cell,output_keep_prob=self.dropout_keep_prob)</span><br><span class="line"><span class="comment"># bidirectional_dynamic_rnn: input: [batch_size, max_time, input_size]</span></span><br><span class="line"><span class="comment">#                            output: A tuple (outputs, output_states)</span></span><br><span class="line"><span class="comment">#                                    where:outputs: A tuple (output_fw, output_bw) containing the forward and the backward rnn output `Tensor`.</span></span><br><span class="line">outputs,_=tf.nn.bidirectional_dynamic_rnn(lstm_fw_cell,lstm_bw_cell,self.embedded_words,dtype=tf.float32) <span class="comment">#[batch_size,sequence_length,hidden_size] #creates a dynamic bidirectional recurrent neural network</span></span><br><span class="line">print(<span class="string">"outputs:===&gt;"</span>,outputs) <span class="comment">#outputs:(&lt;tf.Tensor 'bidirectional_rnn/fw/fw/transpose:0' shape=(?, 5, 100) dtype=float32&gt;, &lt;tf.Tensor 'ReverseV2:0' shape=(?, 5, 100) dtype=float32&gt;))</span></span><br><span class="line"><span class="comment">#3. concat output</span></span><br><span class="line">output_rnn=tf.concat(outputs,axis=<span class="number">2</span>) <span class="comment">#[batch_size,sequence_length,hidden_size*2]</span></span><br><span class="line"><span class="comment">#4.1 average</span></span><br><span class="line"><span class="comment">#self.output_rnn_last=tf.reduce_mean(output_rnn,axis=1) #[batch_size,hidden_size*2]</span></span><br><span class="line"><span class="comment">#4.2 last output</span></span><br><span class="line">self.output_rnn_last=output_rnn[:,<span class="number">-1</span>,:] <span class="comment">##[batch_size,hidden_size*2] #TODO</span></span><br><span class="line">print(<span class="string">"output_rnn_last:"</span>, self.output_rnn_last) <span class="comment"># &lt;tf.Tensor 'strided_slice:0' shape=(?, 200) dtype=float32&gt;</span></span><br><span class="line"><span class="comment">#5. logits(use linear layer)</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"output"</span>): <span class="comment">#inputs: A `Tensor` of shape `[batch_size, dim]`.  The forward activations of the input network.</span></span><br><span class="line">    logits = tf.matmul(self.output_rnn_last, self.W_projection) + self.b_projection  <span class="comment"># [batch_size,num_classes]</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>3.3.4模型的分析</strong></p>
+<blockquote>
+<p><strong>1.</strong> RNN是典型的序列模型结构，它是线性序列结构，它不断从前往后收集输入信息，但这种线性序列结构在反向传播的时候存在优化困难问题，因为反向传播路径太长，容易导致严重的梯度消失或梯度爆炸问题。为了解决这个问题，引入了LSTM和GRU模型，通过增加中间状态信息直接向后传播，由原来RNN的迭代乘法结构变为后面的加法结构，以此缓解梯度消失问题。于是上面是有LSTM或GRU来代替RNN。<br><strong>2.</strong> RNN的线性序列结构，让RNN能很好的对不定长文本的输入进行接纳，将文本序列当做随着时间变换的序列状态，很好的接纳文本的从前向后的输入。在LSTM中引入门控制机制，从而使该序列模型能存储之前网络的特征，这对于捕获长距离特征非常有效。所以RNN特别适合NLP这种线形序列应用场景，这是RNN为何在NLP界如此流行的根本原因。<br><strong>3.</strong> 因为RNN的序列结构，t时刻的状态是依赖t-1时刻的网络状态的，这对于网络大规模的并行进行是很不友好的。也就是说RNN的高效并行计算能力是比较差的。当然<strong>可以对RNN结构进行一定程度上的改进</strong>，使之拥有一定程度的并行能力。</p>
+</blockquote>
+<h5 id="3-4RCNN"><a href="#3-4RCNN" class="headerlink" title="3.4RCNN"></a>3.4RCNN</h5><p><strong>3.4.1论文来源</strong><br>《Recurrent Convolutional Neural Network for Text Classification》<br><strong>3.4.2模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/RCNN.JPG " width="100%" height="40%" align="center" alt="词向量图"><strong>3.4.3模型的步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，RCNN的模型的实现步骤为：<br>1.emebedding–&gt;2.recurrent structure (convolutional layer)—&gt;3.max pooling—&gt;4.fully connected layer+softmax</p>
+</blockquote>
+<p><strong>3.4.4模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1.get emebedding of words in the sentence</span></span><br><span class="line">self.embedded_words = tf.nn.embedding_lookup(self.Embedding,self.input_x) <span class="comment">#shape:[None,sentence_length,embed_size]</span></span><br><span class="line"><span class="comment">#2. Bi-lstm layer</span></span><br><span class="line">output_conv=self.conv_layer_with_recurrent_structure() <span class="comment">#shape:[None,sentence_length,embed_size*3]</span></span><br><span class="line"><span class="comment">#3. max pooling</span></span><br><span class="line"><span class="comment">#print("output_conv:",output_conv) #(3, 5, 8, 100)</span></span><br><span class="line">output_pooling=tf.reduce_max(output_conv,axis=<span class="number">1</span>) <span class="comment">#shape:[None,embed_size*3]</span></span><br><span class="line"><span class="comment">#print("output_pooling:",output_pooling) #(3, 8, 100)</span></span><br><span class="line"><span class="comment">#4. logits(use linear layer)</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"dropout"</span>):</span><br><span class="line">    h_drop=tf.nn.dropout(output_pooling,keep_prob=self.dropout_keep_prob) <span class="comment">#[None,num_filters_total]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"output"</span>): <span class="comment">#inputs: A `Tensor` of shape `[batch_size, dim]`.  The forward activations of the input network.</span></span><br><span class="line">    logits = tf.matmul(h_drop, self.W_projection) + self.b_projection  <span class="comment"># [batch_size,num_classes]</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">conv_layer_with_recurrent_structure</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        input:self.embedded_words:[None,sentence_length,embed_size]</span></span><br><span class="line"><span class="string">        :return: shape:[None,sentence_length,embed_size*3]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment">#1. get splitted list of word embeddings</span></span><br><span class="line">        embedded_words_split=tf.split(self.embedded_words,self.sequence_length,axis=<span class="number">1</span>) <span class="comment">#sentence_length个[None,1,embed_size]</span></span><br><span class="line">        embedded_words_squeezed=[tf.squeeze(x,axis=<span class="number">1</span>) <span class="keyword">for</span> x <span class="keyword">in</span> embedded_words_split]<span class="comment">#sentence_length个[None,embed_size]</span></span><br><span class="line">        embedding_previous=self.left_side_first_word</span><br><span class="line">        context_left_previous=tf.zeros((self.batch_size,self.embed_size))</span><br><span class="line">        <span class="comment">#2. get list of context left</span></span><br><span class="line">        context_left_list=[]</span><br><span class="line">        <span class="keyword">for</span> i,current_embedding_word <span class="keyword">in</span> enumerate(embedded_words_squeezed):<span class="comment">#sentence_length个[None,embed_size]</span></span><br><span class="line">            context_left=self.get_context_left(context_left_previous, embedding_previous) <span class="comment">#[None,embed_size]</span></span><br><span class="line">            context_left_list.append(context_left) <span class="comment">#append result to list</span></span><br><span class="line">            embedding_previous=current_embedding_word <span class="comment">#assign embedding_previous</span></span><br><span class="line">            context_left_previous=context_left <span class="comment">#assign context_left_previous</span></span><br><span class="line">        <span class="comment">#3. get context right</span></span><br><span class="line">        embedded_words_squeezed2=copy.copy(embedded_words_squeezed)</span><br><span class="line">        embedded_words_squeezed2.reverse()</span><br><span class="line">        embedding_afterward=self.right_side_last_word</span><br><span class="line">        context_right_afterward = tf.zeros((self.batch_size, self.embed_size))</span><br><span class="line">        context_right_list=[]</span><br><span class="line">        <span class="keyword">for</span> j,current_embedding_word <span class="keyword">in</span> enumerate(embedded_words_squeezed2):</span><br><span class="line">            context_right=self.get_context_right(context_right_afterward,embedding_afterward)</span><br><span class="line">            context_right_list.append(context_right)</span><br><span class="line">            embedding_afterward=current_embedding_word</span><br><span class="line">            context_right_afterward=context_right</span><br><span class="line">        <span class="comment">#4.ensemble left,embedding,right to output</span></span><br><span class="line">        output_list=[]</span><br><span class="line">        <span class="keyword">for</span> index,current_embedding_word <span class="keyword">in</span> enumerate(embedded_words_squeezed):</span><br><span class="line">            representation=tf.concat([context_left_list[index],current_embedding_word,context_right_list[index]],axis=<span class="number">1</span>)</span><br><span class="line">            <span class="comment">#print(i,"representation:",representation)</span></span><br><span class="line">            output_list.append(representation) <span class="comment">#shape:sentence_length个[None,embed_size*3]</span></span><br><span class="line">        <span class="comment">#5. stack list to a tensor</span></span><br><span class="line">        <span class="comment">#print("output_list:",output_list) #(3, 5, 8, 100)</span></span><br><span class="line">        output=tf.stack(output_list,axis=<span class="number">1</span>) <span class="comment">#shape:[None,sentence_length,embed_size*3]</span></span><br><span class="line">        <span class="comment">#print("output:",output)</span></span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></table></figure></p>
+<p><strong>3.4.5模型的分析</strong></p>
+<blockquote>
+<p><strong>1.</strong> 从RCNN的模型结构来看，做出重大改变的是词向量的表示，以往的词向量的表示即是简单的一个词的[word embedding],而RCNN中的表示为[left context; word embedding, right context],从词向量中引入上下文语境。具体的left context=activation(pre left context<em>Wl+ pre word embedding </em> Ww)。right context则反过来为之。<br><strong>2.</strong> RCNN比TextRNN实验的效果是好的，改进后的word embedding起到了很重要的作用。一个词用一个词向量来表示这其实是有一定的局限性的，当遇到一词多意的时候，使用一个词向量来表示一个词，此时就显得不那么恰当了，因为使用一个词向量来表示，这相当于对所有的词义进行了平均获得的。我们可以理解这种一词一个向量的表示为静态词向量。而RCNN中则在原词向量上添加左右context，这相当于引入了词的语境，可以理解为对原单个词向量进行了一定程度上的调整，让一词多义的表示成为可能。</p>
+</blockquote>
+<h5 id="3-5Hierarchical-Attention-Network"><a href="#3-5Hierarchical-Attention-Network" class="headerlink" title="3.5Hierarchical Attention Network"></a>3.5Hierarchical Attention Network</h5><p><strong>3.5.1论文来源</strong><br>《Hierarchical Attention Networks for Document Classification》<br><strong>3.5.2模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/HAN.JPG " width="100%" height="40%" align="center" alt="词向量图"><strong>3.5.3模型的步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，HAN的模型的实现步骤为：<br>1.emebedding–&gt;2.word encoder(bi-directional GRU)—&gt;3.word Attention—&gt;4.Sentence Encoder(bi-directional GRU)—&gt;5.Sentence Attetion—&gt;6.fC+Softmax</p>
+</blockquote>
+<p><strong>3.5.4模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1.1 embedding of words</span></span><br><span class="line">input_x = tf.split(self.input_x, self.num_sentences,axis=<span class="number">1</span>)  <span class="comment"># a list. length:num_sentences.each element is:[None,self.sequence_length/num_sentences]</span></span><br><span class="line">input_x = tf.stack(input_x, axis=<span class="number">1</span>)  <span class="comment"># shape:[None,self.num_sentences,self.sequence_length/num_sentences]</span></span><br><span class="line">self.embedded_words = tf.nn.embedding_lookup(self.Embedding,input_x)  <span class="comment"># [None,num_sentences,sentence_length,embed_size]</span></span><br><span class="line">embedded_words_reshaped = tf.reshape(self.embedded_words, shape=[<span class="number">-1</span>, self.sequence_length,self.embed_size])  <span class="comment"># [batch_size*num_sentences,sentence_length,embed_size]</span></span><br><span class="line"><span class="comment"># 1.2 forward gru</span></span><br><span class="line">hidden_state_forward_list = self.gru_forward_word_level(embedded_words_reshaped)  <span class="comment"># a list,length is sentence_length, each element is [batch_size*num_sentences,hidden_size]</span></span><br><span class="line"><span class="comment"># 1.3 backward gru</span></span><br><span class="line">hidden_state_backward_list = self.gru_backward_word_level(embedded_words_reshaped)  <span class="comment"># a list,length is sentence_length, each element is [batch_size*num_sentences,hidden_size]</span></span><br><span class="line"><span class="comment"># 1.4 concat forward hidden state and backward hidden state. hidden_state: a list.len:sentence_length,element:[batch_size*num_sentences,hidden_size*2]</span></span><br><span class="line">self.hidden_state = [tf.concat([h_forward, h_backward], axis=<span class="number">1</span>) <span class="keyword">for</span> h_forward, h_backward <span class="keyword">in</span></span><br><span class="line">                     zip(hidden_state_forward_list, hidden_state_backward_list)]  <span class="comment"># hidden_state:list,len:sentence_length,element:[batch_size*num_sentences,hidden_size*2]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.Word Attention</span></span><br><span class="line"><span class="comment"># for each sentence.</span></span><br><span class="line">sentence_representation = self.attention_word_level(self.hidden_state)  <span class="comment"># output:[batch_size*num_sentences,hidden_size*2]</span></span><br><span class="line">sentence_representation = tf.reshape(sentence_representation, shape=[<span class="number">-1</span>, self.num_sentences, self.hidden_size * <span class="number">2</span>])  <span class="comment"># shape:[batch_size,num_sentences,hidden_size*2]</span></span><br><span class="line"><span class="comment">#with tf.name_scope("dropout"):#TODO</span></span><br><span class="line"><span class="comment">#    sentence_representation = tf.nn.dropout(sentence_representation,keep_prob=self.dropout_keep_prob)  # shape:[None,hidden_size*4]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.Sentence Encoder</span></span><br><span class="line"><span class="comment"># 3.1) forward gru for sentence</span></span><br><span class="line">hidden_state_forward_sentences = self.gru_forward_sentence_level(sentence_representation)  <span class="comment"># a list.length is sentence_length, each element is [None,hidden_size]</span></span><br><span class="line"><span class="comment"># 3.2) backward gru for sentence</span></span><br><span class="line">hidden_state_backward_sentences = self.gru_backward_sentence_level(sentence_representation)  <span class="comment"># a list,length is sentence_length, each element is [None,hidden_size]</span></span><br><span class="line"><span class="comment"># 3.3) concat forward hidden state and backward hidden state</span></span><br><span class="line"><span class="comment"># below hidden_state_sentence is a list,len:sentence_length,element:[None,hidden_size*2]</span></span><br><span class="line">self.hidden_state_sentence = [tf.concat([h_forward, h_backward], axis=<span class="number">1</span>) <span class="keyword">for</span> h_forward, h_backward <span class="keyword">in</span> zip(hidden_state_forward_sentences, hidden_state_backward_sentences)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4.Sentence Attention</span></span><br><span class="line">document_representation = self.attention_sentence_level(self.hidden_state_sentence)  <span class="comment"># shape:[None,hidden_size*4]</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"dropout"</span>):</span><br><span class="line">    self.h_drop = tf.nn.dropout(document_representation,keep_prob=self.dropout_keep_prob)  <span class="comment"># shape:[None,hidden_size*4]</span></span><br><span class="line"><span class="comment"># 5. logits(use linear layer)and predictions(argmax)</span></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">"output"</span>):</span><br><span class="line">    logits = tf.matmul(self.h_drop, self.W_projection) + self.b_projection  <span class="comment"># shape:[None,self.num_classes]==tf.matmul([None,hidden_size*2],[hidden_size*2,self.num_classes])</span></span><br><span class="line"><span class="keyword">return</span> logits</span><br></pre></td></tr></table></figure></p>
+<p><strong>3.5.5模型的分析</strong></p>
+<blockquote>
+<p><strong>1.</strong> Hierarchical Attention Network(HAN)分层对文本进行构建模型(Encoder)，此外在每层加上了两个Attention层，分别表示对文本中的按错和句子的重要性进行建模。HAN比较适用于长文本的分类，长文本包括多个句子，句子中包括多个词，适用于对文本的分层建模。首先，HAN考虑到文本的层次结构：词构成句，句子构成文档。因此，对文本的建模时也针对这两部分。因为一个句子中每个词对分类的结果影响的不一样，一个句子对文本分类的结果影响也不一样。所以，引入Attention机制，这样每个词，每个句子的对分类的结果的影响将不会一样。具体计算的公式如下：<br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/4.png" width="45%" height="35%" align="center" alt="attention"></p>
+</blockquote>
+<h5 id="3-6Transformer"><a href="#3-6Transformer" class="headerlink" title="3.6Transformer"></a>3.6Transformer</h5><p><strong>3.6.1论文来源</strong><br>《Attention Is All You Need》<br><strong>3.6.2模型结构</strong><br><img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/attention_is_all_you_need.JPG" width="95%" height="35%" align="center" alt="transformer"><strong>3.6.3模型的步骤</strong> </p>
+<blockquote>
+<p>从模型的结构可以看出，Transformer的模型的实现步骤为：<br>1.word embedding&amp;position embedding–&gt;2.Encoder(2.1multi head self attention-&gt;2.2LayerNorm-&gt;2.3position wise fully connected feed forward network-&gt;2.4LayerNorm)—&gt;3.linear classifie</p>
+</blockquote>
+<p><strong>3.6.4模型的关键实现代码</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">input_x_embeded = tf.nn.embedding_lookup(self.Embedding,self.input_x)  <span class="comment">#[None,sequence_length, embed_size]</span></span><br><span class="line">input_x_embeded=tf.multiply(input_x_embeded,tf.sqrt(tf.cast(self.d_model,dtype=tf.float32)))</span><br><span class="line">input_mask=tf.get_variable(<span class="string">"input_mask"</span>,[self.sequence_length,<span class="number">1</span>],initializer=self.initializer)</span><br><span class="line">input_x_embeded=tf.add(input_x_embeded,input_mask) <span class="comment">#[None,sequence_length,embed_size].position embedding.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. encoder</span></span><br><span class="line">encoder_class=Encoder(self.d_model,self.d_k,self.d_v,self.sequence_length,self.h,self.batch_size,self.num_layer,input_x_embeded,input_x_embeded,dropout_keep_prob=self.dropout_keep_prob,use_residual_conn=self.use_residual_conn)</span><br><span class="line">Q_encoded,K_encoded = encoder_class.encoder_fn() <span class="comment">#K_v_encoder</span></span><br><span class="line"></span><br><span class="line">Q_encoded=tf.reshape(Q_encoded,shape=(self.batch_size,<span class="number">-1</span>)) <span class="comment">#[batch_size,sequence_length*d_model]</span></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"output"</span>):</span><br><span class="line">    logits = tf.matmul(Q_encoded, self.W_projection) + self.b_projection <span class="comment">#logits shape:[batch_size*decoder_sent_length,self.num_classes]</span></span><br><span class="line">print(<span class="string">"logits:"</span>,logits)</span><br><span class="line"><span class="keyword">return</span> logits</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encoder_single_layer</span><span class="params">(self,Q,K_s,layer_index)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    singel layer for encoder.each layers has two sub-layers:</span></span><br><span class="line"><span class="string">    the first is multi-head self-attention mechanism; the second is position-wise fully connected feed-forward network.</span></span><br><span class="line"><span class="string">    for each sublayer. use LayerNorm(x+Sublayer(x)). input and output of last dimension: d_model</span></span><br><span class="line"><span class="string">    :param Q: shape should be:       [batch_size*sequence_length,d_model]</span></span><br><span class="line"><span class="string">    :param K_s: shape should be:     [batch_size*sequence_length,d_model]</span></span><br><span class="line"><span class="string">    :return:output: shape should be:[batch_size*sequence_length,d_model]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="comment">#1.1 the first is multi-head self-attention mechanism</span></span><br><span class="line">    multi_head_attention_output=self.sub_layer_multi_head_attention(layer_index,Q,K_s,self.type,mask=self.mask,dropout_keep_prob=self.dropout_keep_prob) <span class="comment">#[batch_size,sequence_length,d_model]</span></span><br><span class="line">    <span class="comment">#1.2 use LayerNorm(x+Sublayer(x)). all dimension=512.</span></span><br><span class="line">    multi_head_attention_output=self.sub_layer_layer_norm_residual_connection(K_s ,multi_head_attention_output,layer_index,<span class="string">'encoder_multi_head_attention'</span>,dropout_keep_prob=self.dropout_keep_prob,use_residual_conn=self.use_residual_conn)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#2.1 the second is position-wise fully connected feed-forward network.</span></span><br><span class="line">    postion_wise_feed_forward_output=self.sub_layer_postion_wise_feed_forward(multi_head_attention_output,layer_index,self.type)</span><br><span class="line">    <span class="comment">#2.2 use LayerNorm(x+Sublayer(x)). all dimension=512.</span></span><br><span class="line">    postion_wise_feed_forward_output= self.sub_layer_layer_norm_residual_connection(multi_head_attention_output,postion_wise_feed_forward_output,layer_index,<span class="string">'encoder_postion_wise_ff'</span>,dropout_keep_prob=self.dropout_keep_prob)</span><br><span class="line">    <span class="keyword">return</span>  postion_wise_feed_forward_output,postion_wise_feed_forward_output</span><br></pre></td></tr></table></figure></p>
+<p><strong>3.6.5模型的分析</strong></p>
+<blockquote>
+<p><strong>1.</strong> 论文《Attention is all you need》中的Transformer指的是完整的Encoder-Decoder框架，而对于此项文本分类来说，Transformer是其中对应的Encoder，而一个Encoder模块(Block)包含着多个子模块(包括Multi-head self attention，Skip connection，LayerNorm，Feed Forward)，如下：<img src="https://blog-1252061914.cos.ap-guangzhou.myqcloud.com/%E6%96%87%E6%9C%AC%E5%88%86%E7%B1%BB/6.jpg" width="100%" height="35%" align="center" alt="transformer"><strong>2.</strong> 对于Transformer来说，需要明确加入位置编码学习position Embedding.因为对于self Attention来说，它让当前输入单词和句子中任意单词进行相似计算，然后归一化计算出句子中各个单词对应的权重，再利用权重与各个单词对应的变换后V值相乘累加，得出集中后的embedding向量，此间是损失掉了位置信息的。因此，为了引入位置信息编码，Transformer对每个单词一个Position embedding，将单词embedding和单词对应的position embedding加起来形成单词的输入embedding。<br><strong>3.</strong>Transformer中的self Attention对文本的长距离依赖特征的提取有很强的能力，因为它让当前输入单词和句子中任意单词进行相似计算，它是直接进行的长距离依赖特征的获取的，不像RNN需要通过隐层节点序列往后传，也不像CNN需要通过增加网络深度来捕获远距离特征。此外，对应模型训练时的并行计算能力，Transformer也有先天的优势，它不像RNN需要依赖前一刻的特征量。<br><strong>4.</strong> 张俊林大佬在【6】中提到过，在Transformer中的Block中不仅仅multi-head attention在发生作用，而是几乎所有构件都在共同发挥作用，是一个小小的系统工程。例如Skip connection，LayerNorm等也是发挥了作用的。对于Transformer来说，Multi-head attention的head数量严重影响NLP任务中Long-range特征捕获能力：结论是head越多越有利于捕获long-range特征。</p>
+</blockquote>
+<h4 id="4总结"><a href="#4总结" class="headerlink" title="4总结"></a>4总结</h4><blockquote>
+<p><strong>1.</strong>对于一个人工智能领域的问题的解决，不管是使用深度学习的神经网络还是使用机器学习的人工特征提取，效果的好坏主要是和特征器的提取能力挂钩的。机器学习使用人工来做特征提取器，对于问题的解决原因，可解释性强。而深度学习的数据网络结构使用线性的和非线性的神经元节点相结合比较抽象的作为一个特征提取器。<br>在文本处理上，特征抽取能力主要包括有有句法特征提取能力；语义特征提取能力；长距离特征捕获能力；任务综合特征抽取能力。上面四个角度是从NLP的特征抽取器能力强弱角度来评判的，另外再加入并行计算能力及运行效率，这是从是否方便大规模实用化的角度来看的。<br>而对于各个领域的的问题的解决，新浪微博AI Lab资深算法专家张俊林博士大佬说过一句话：一个特征抽取器是否适配问题领域的特点，有时候决定了它的成败，而很多模型改进的方向，其实就是改造得使得它更匹配领域问题的特性。<br><strong>2.</strong>对于输出空间巨大的大规模文本分类问题。事实上，对于文本的生成问题(对于其中一个单词的生成)，可以看做是输出空间巨大的大规模文本的文本分类问题。在Word2vec中，解决的方法是使用层次softmax的方法，首先对分类的标签进行哈夫曼树的构建，每个分类标签对应着一个哈夫曼码，位于哈夫曼树的叶子结点，其中每个分支表示通往每个路径的概率。此外，word2vec中也提出negative sampling的方式，因此可以考虑使用 negative sampling的方式来解决此类问题，对标签的样本重新进行构建二分类，首先(x,y)表示正确的样本为正样本，然后根据分类标签的概率分布进行采样德奥(x,y‘)作为负样本，重构成二分类问题。常在Seq2Seq的生成中，采用【8】<a href="http://www.aclweb.org/anthology/P15-1001" target="_blank" rel="noopener">Sampled Softmax</a>、<a href="https://arxiv.org/abs/1609.04309" target="_blank" rel="noopener">Adaptive softmax</a>等方式来缓解输出空间巨大的大规模文本分类。<br><strong>3.</strong>对于标签存在一定关联的情况下的文本分类。我们常常做的文本分类是使用一对一或者一对多方法的方法进行分类器的训练，例如SVM或者NB等。如果标签也存在一点的联系，如标签类目树，或者单个标签与单个标签存在相关性等。对于单个标签与单个标签存在相关性，目前有人将此类多标签问题当做序列生成问题来解决，效果性能得到了很大的改进,对应的论文有<a href="https://arxiv.org/abs/1806.04822" target="_blank" rel="noopener">SGM: Sequence Generation Model for Multi-Label Classification</a>.还有对标签层次化问题进行了研究的相关论文<a href="https://nlp.stanford.edu/courses/cs224n/2013/reports/nayak.pdf" target="_blank" rel="noopener">A Study of multilabel text classification and the effect of label hierarchy</a><br><strong>4.</strong>基于深度学习技术的文本分类技术比起传统的文本分类模型(LR，SVM 等)的优势。首先，免去了人工的提取文本特征，它可以自动的获取基础特征并组合为高级的特征，训练模型获得文本特征与目标分类之间的关系，省去了使用TF-IDF等提取句子的关键词构建特征工程的过程，实现端到端。其次，相比传统的N-gram模型而言，深度学习中可以更好的利用词序的特征，CNN的文本分类模型中的filter的size的大小可以当做是一种类似于N-gram的方式，而RNN（LSTM）则可以利用更长的词序，配合Attention机制则可以通过加权矩阵体现句子中的核心词汇部位。最后，随着样本的增加和网络深度的增加，深度学习的分类精度会更高。</p>
+</blockquote>
+<h4 id="5参考链接"><a href="#5参考链接" class="headerlink" title="5参考链接"></a>5参考链接</h4><p>【1】<a href="https://github.com/brightmart" target="_blank" rel="noopener">brightmart/text_classification</a><br>【2】<a href="http://nlp.seas.harvard.edu/2018/04/03/attention.html" target="_blank" rel="noopener">The Annotated Transformer</a><br>【3】<a href="https://mp.weixin.qq.com/s/_xILvfEMx3URcB-5C8vfTw" target="_blank" rel="noopener">fastText、TextCNN、TextRNN…这套NLP文本分类深度学习方法库供你选择</a><br>【4】<a href="https://blog.csdn.net/sun_brother/article/details/80327070" target="_blank" rel="noopener">word2vec、glove和 fasttext 的比较</a><br>【5】<a href="https://mp.weixin.qq.com/s/t0GN4ClY-6ZxSS0daN43Vg" target="_blank" rel="noopener">从Word Embedding到Bert模型——自然语言处理预训练技术发展史</a><br>【6】<a href="https://zhuanlan.zhihu.com/p/54743941" target="_blank" rel="noopener">放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN/RNN/TF）比较</a><br>【7】<a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">《BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding》</a><br>【8】<a href="https://blog.csdn.net/MebiuW/article/details/68952814" target="_blank" rel="noopener">Sampled Softmax 论文笔记：On Using Very Large Target Vocabulary for Neural Machine Translation</a></p>
+
+      
+    </div>
+    
+    
+    
+    <div>
+    
+    <div>
+
+<div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+    
+    </div>
+    <div>
+    
+    
+<div class="my_post_copyright">
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<!-- JS库 sweetalert 可修改路径 -->
+<script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<p><span>本文标题:</span><a href="/2019/01/12/NLP系列之文本分类/">NLP系列之文本分类</a></p>
+<p><span>文章作者:</span><a href="/" title="访问 ComeOnJian 的个人博客">ComeOnJian</a></p>
+<p><span>发布时间:</span>2019年01月12日 - 15:01</p>
+<p><span>最后更新:</span>2019年01月18日 - 19:01</p>
+<p><span>原始链接:</span><a href="/2019/01/12/NLP系列之文本分类/" title="NLP系列之文本分类">https://jianwenjun.xyz/2019/01/12/NLP系列之文本分类/</a>
+<span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://jianwenjun.xyz/2019/01/12/NLP系列之文本分类/"  aria-label="复制成功！"></i></span>
+</p>
+<p><span>许可协议:</span><i class="fa fa-creative-commons"></i>  转载请保留原文链接及作者。</p>
+</div>
+<script>
+var clipboard = new Clipboard('.fa-clipboard');
+$(".fa-clipboard").click(function(){
+clipboard.on('success', function(){
+swal({
+title: "",
+text: '复制成功',
+icon: "success",
+showConfirmButton: true
+});
+});
+});
+</script>
+
+
+    
+</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/28/机器学习中你需要了解的各种熵/" rel="next" title="机器学习中你需要了解的各种熵">
+                <i class="fa fa-chevron-left"></i> 机器学习中你需要了解的各种熵
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
+        <div id="gitment-container" style="display:none"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/me.png"
+                alt="ComeOnJian" />
+            
+              <p class="site-author-name" itemprop="name">ComeOnJian</p>
+              <p class="site-description motion-element" itemprop="description">生活不能等待别人来安排，要自己去争取与奋斗！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/JianWenJun" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/u014732537" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-cubes"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://atcumt.com" title="翔工作室" target="_blank">翔工作室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://pages.coding.me" title="Hosted by Coding Pages" target="_blank">Hosted by Coding Pages</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://mail.qq.com" title="联系我 1343483119@qq.com" target="_blank">联系我 1343483119@qq.com</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1前言"><span class="nav-number">1.</span> <span class="nav-text">1前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2文本分类任务"><span class="nav-number">2.</span> <span class="nav-text">2文本分类任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3基础文本分类模型的介绍及分析"><span class="nav-number">3.</span> <span class="nav-text">3基础文本分类模型的介绍及分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1FastText"><span class="nav-number">3.1.</span> <span class="nav-text">3.1FastText</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2TextCNN"><span class="nav-number">3.2.</span> <span class="nav-text">3.2TextCNN</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3TextRNN-LSTM"><span class="nav-number">3.3.</span> <span class="nav-text">3.3TextRNN/LSTM</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4RCNN"><span class="nav-number">3.4.</span> <span class="nav-text">3.4RCNN</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-5Hierarchical-Attention-Network"><span class="nav-number">3.5.</span> <span class="nav-text">3.5Hierarchical Attention Network</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-6Transformer"><span class="nav-number">3.6.</span> <span class="nav-text">3.6Transformer</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4总结"><span class="nav-number">4.</span> <span class="nav-text">4总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5参考链接"><span class="nav-number">5.</span> <span class="nav-text">5参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ComeOnJian</span>
+
+  
+</div>
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i>
+<span id="busuanzi_container_site_uv">
+网站访问量<span id="busuanzi_value_site_uv"></span>次
+</span>
+<i class="fa fa-user-md"></i>
+<span class="post-count">博客全站共90.9k字</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: '<%= page.date %>',
+            owner: 'JianWenJunApp',
+            repo: 'Gitment_comment',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'e7f5a169051646d211557a945522bf51db657645',
+            
+                client_id: '2a89b587467365df58a4'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      function showGitment(){
+        document.getElementById("gitment-display-button").style.display = "none";
+        document.getElementById("gitment-container").style.display = "block";
+        renderGitment();
+      }
+      
+      </script>
+    
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("WIITaDESnTaa1UC8NEvBduE4-gzGzoHsz", "R8PMsrxslizJOJuVkFpUnArz");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+
