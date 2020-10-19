@@ -627,7 +627,7 @@ install_select(){
 install_prepare_password(){
     echo "Please enter password for ${software[${selected}-1]}"
     # read -p '(Default password: teddysun.com):' shadowsockspwd
-    shadowsockspwd="abcde12345678.."
+    shadowsockspwd="12345678"
     [ -z "${shadowsockspwd}" ] && shadowsockspwd='teddysun.com'
     echo
     echo "password = ${shadowsockspwd}"
@@ -640,7 +640,7 @@ install_prepare_port() {
     dport=$(shuf -i 9000-19999 -n 1)
     echo -e "Please enter a port for ${software[${selected}-1]} [1-65535]"
     # read -p "(Default port: ${dport}):" shadowsocksport
-    shadowsocksport=445
+    shadowsocksport=444
     [ -z "${shadowsocksport}" ] && shadowsocksport=${dport}
     expr "${shadowsocksport}" + 1 &>/dev/null
     if [ $? -eq 0 ]; then
