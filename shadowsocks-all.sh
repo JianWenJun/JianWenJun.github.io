@@ -607,7 +607,7 @@ install_select(){
         hint="${software[$i-1]}"
         echo -e "${green}${i}${plain}) ${hint}"
     done
-    # read -p "Please enter a number (Default ${software[0]}):" selected
+    # read -p "Please enter a number (Default ${software[0]}):" 
     selected=2
     [ -z "${selected}" ] && selected='1'
     case "${selected}" in
@@ -627,7 +627,7 @@ install_select(){
 install_prepare_password(){
     echo "Please enter password for ${software[${selected}-1]}"
     # read -p '(Default password: teddysun.com):' shadowsockspwd
-    shadowsockspwd="12345678"
+    shadowsockspwd="A123..678b"
     [ -z "${shadowsockspwd}" ] && shadowsockspwd='teddysun.com'
     echo
     echo "password = ${shadowsockspwd}"
@@ -640,7 +640,7 @@ install_prepare_port() {
     dport=$(shuf -i 9000-19999 -n 1)
     echo -e "Please enter a port for ${software[${selected}-1]} [1-65535]"
     # read -p "(Default port: ${dport}):" shadowsocksport
-    shadowsocksport=444
+    shadowsocksport=4477
     [ -z "${shadowsocksport}" ] && shadowsocksport=${dport}
     expr "${shadowsocksport}" + 1 &>/dev/null
     if [ $? -eq 0 ]; then
@@ -723,7 +723,7 @@ install_prepare_cipher(){
 install_prepare_protocol(){
     while true
     do
-    echo -e "Please select protocol for ${software[${selected}-1]}:"
+    # echo -e "Please select protocol for ${software[${selected}-1]}:"
     # for ((i=1;i<=${#protocols[@]};i++ )); do
     #     hint="${protocols[$i-1]}"
     #     echo -e "${green}${i}${plain}) ${hint}"
@@ -740,7 +740,7 @@ install_prepare_protocol(){
     #     continue
     # fi
     # shadowsockprotocol=${protocols[$protocol-1]}
-    shadowsockprotocol='origin'
+    shadowsockprotocol="plain"
     echo
     echo "protocol = ${shadowsockprotocol}"
     echo
@@ -751,7 +751,7 @@ install_prepare_protocol(){
 install_prepare_obfs(){
     while true
     do
-    echo -e "Please select obfs for ${software[${selected}-1]}:"
+    # echo -e "Please select obfs for ${software[${selected}-1]}:"
     # for ((i=1;i<=${#obfs[@]};i++ )); do
     #     hint="${obfs[$i-1]}"
     #     echo -e "${green}${i}${plain}) ${hint}"
@@ -768,7 +768,7 @@ install_prepare_obfs(){
     #     continue
     # fi
     # shadowsockobfs=${obfs[$r_obfs-1]}
-    shadowsockobfs='plain'
+    shadowsockobfs="plain"
     echo
     echo "obfs = ${shadowsockobfs}"
     echo
@@ -847,7 +847,6 @@ install_prepare(){
     echo
     echo 'Press any key to start...or Press Ctrl+C to cancel'
     # char=$(get_char)
-    # char = "1"
 
 }
 
